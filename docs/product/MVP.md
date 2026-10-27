@@ -106,7 +106,7 @@ Before the milestone may be marked complete:
 - anonymous taste state survives Google/Apple conversion without duplicate identity/Profile creation,
 - a personal invite can convert the receiver into an accepted Friend of the inviter,
 - accepting a Friend invite does **not** automatically create a SharedProfile,
-- Friends can explicitly create a SharedProfile through a short consent-based flow,
+- Friends can explicitly start a temporary SharedSession with the selected people, using an internal authorized SharedProfile without naming/selecting permanent groups,
 - the full link → Taste → auth → Friend → Shared loop is measurable, privacy-safe and abuse-resistant,
 - core PersonalProfile/SharedProfile/Lists/search flows work end-to-end,
 - a controlled external beta validates the complete intended acquisition path,
@@ -143,9 +143,9 @@ Commercial monetization, public stranger discovery, dating, extra production dom
 
 - [x] `MVP-NAV-001` Persistent Kajo mark returns to the currently active Profile Room.
 - [x] `MVP-NAV-002` Persistent bottom dock exposes menu + Inbox without conventional multi-tab navigation.
-- [x] `MVP-NAV-003` Drawer owns Profile switching plus Profile/Lists/Groups destinations without duplicate/dead entries.
-- [x] `MVP-NAV-004` Bottom-center Profile identity returns to the active Room from other routes and opens the accepted lightweight Profile quick switcher when already home.
-- [ ] `MVP-NAV-005` Canonical Groups/Profile surface filters only already-authorized Profile names; unrelated/private Profiles are never exposed.
+- [x] `MVP-NAV-003` Delivered legacy shell: drawer owns Profile switching plus Profile/Lists/Groups destinations without duplicate/dead entries. The October 27 session successor below replaces required permanent-group navigation without erasing that delivery record.
+- [x] `MVP-NAV-004` Delivered legacy shell: bottom-center Profile identity returns to the active Room and opens its lightweight Profile quick switcher at home. The target instead shows Personal or the accepted active session and safe resume/leave behavior.
+- [ ] `MVP-NAV-005` Friends and active-session navigation replace required permanent-group creation/selection. Only authorized Friends, participants and retained history appear; pending/expired sessions grant no access. Home/resume/leave, empty/blocked states and legacy-data access pass representative device/accessibility tests.
 
 ## Discovery
 
@@ -215,19 +215,23 @@ release; a group invitation or decision session does not replace these gates.
 - [ ] `MVP-FRIEND-006` Remove/block/reinvite behavior is explicit; blocked/removed states cannot be bypassed with old tokens.
 - [ ] `MVP-FRIEND-007` Invite creation/open/accept and nickname/search surfaces use enumeration/spam/rate-limit controls suitable for public release.
 
-## Shared Kajo creation from Friends
+## Temporary Shared sessions from Friends
 
-Existing SharedProfile learning semantics remain canonical.
+The [October 27 direction](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+keeps SharedProfile as the internal joint learning target and makes the visible
+collaboration temporary. The checked Profile entries record existing legacy
+capabilities, not delivery of this new session lifecycle or navigation.
 
 - [x] `MVP-PROFILE-001` Every permanent User has a PersonalProfile.
 - [x] `MVP-PROFILE-002` 2-N Users can belong to persistent SharedProfile through accepted membership.
 - [x] `MVP-PROFILE-003` Events store `actorUserId` separately from `profileId`.
 - [x] `MVP-PROFILE-004` SharedProfile name length is 2–32 characters.
 - [x] `MVP-PROFILE-005` Member can leave SharedProfile safely with confirmation and correct fallback/access loss.
-- [ ] `MVP-GROUP-001` Two Friends can explicitly create a new SharedProfile through one short consent-based flow; accepting a Friend invite never creates it automatically.
-- [ ] `MVP-GROUP-002` The planned compact 3–5-person creation flow can select authorized accepted Friends but still requires canonical membership acceptance; Friendship and Shared membership lifecycles remain independent. Existing generic 2-N membership support remains intact.
-- [ ] `MVP-GROUP-003` Newly created SharedProfile immediately uses the existing canonical joint/common-fit prediction boundary; no pair-specific duplicate recommender is introduced.
-- [ ] `MVP-GROUP-004` Planned Phase 16.2 creation uses 2–5 total person slots, including the creator in one slot. Each `+` selects an authorized accepted Friend or creates an opaque expiring/revocable invitation with show/copy/OS-share actions (including WhatsApp where available). The receiver continues through the same app/Taste/link flow and explicitly accepts the correct Friend/group permissions; sending/opening a link creates no membership/Friendship or private history access. Pending and accepted slots remain distinct; Friend safety gates precede this UX.
+- [ ] `MVP-GROUP-001` Two Friends can invite/accept and begin temporary joint browsing without creating/naming/selecting a permanent group. Friend acceptance alone never starts a SharedSession or grants session access.
+- [ ] `MVP-GROUP-002` The compact flow supports 2–5 total people including the initiator, with explicit acceptance of the declared roster. Pending/declined/expired invitees supply no membership, features or votes. A–B–C and A–B–Z use isolated joint contexts; a roster change requires a newly accepted session.
+- [ ] `MVP-GROUP-003` An active session uses the canonical joint/common-fit boundary through an authorized internal SharedProfile. The same exact accepted set may reuse eligible joint memory; a fresh session resets only session-scoped working context. No participant/host average or private Friend-history bypass replaces the existing model.
+- [ ] `MVP-GROUP-004` Each `+` selects an authorized accepted Friend and uses a separate opaque SharedSessionInvite with show/copy/OS-share actions where supported. New Friends complete distinct Friend consent before session acceptance. Expiry/revocation/receiver/roster scope, replay, partial acceptance, all-pair block checks and app/Taste/auth continuation pass; links grant no access merely by opening.
+- [ ] `MVP-GROUP-005` End/expiry/leave, restart, stale cards, concurrent starts and participant replacement preserve exact session/actor/Profile/roster origins and prevent new choices in an inactive context. Preserve authorized legacy profiles, Lists/messages, frozen forecasts and delayed individual round responses through an explicit migration. Same-set reuse never restores revoked access or erased evidence; session end is neither deletion nor a joint outcome. Two-person/N-member server and device tests pass.
 
 ## Existing Shared discovery
 
@@ -246,7 +250,7 @@ Existing SharedProfile learning semantics remain canonical.
 These October 9 product requirements are queued under ROADMAP 16.4 after 16.3;
 they do not describe delivered Shared discovery or SharedRatingRound behavior.
 
-- [ ] `MVP-SOCIAL-010` SharedProfile offers an optional “watch/read today” session with at most five current canonical BOOK/MOVIE suggestions, ranked by the same predictor using the inherited DiscoveryMode/risk policy. Optional Tinder-like cards have accessible non-gesture alternatives and exact displayed origins; other “do today” domains remain future scope.
+- [ ] `MVP-SOCIAL-010` An active SharedSession offers an optional “watch/read today” mode with at most five current canonical BOOK/MOVIE suggestions, ranked by the same predictor using the inherited DiscoveryMode/risk policy. It reuses the accepted session/context rather than requiring another permanent group. Optional Tinder-like cards have accessible alternatives and exact displayed origins; other “do today” domains remain future scope.
 - [ ] `MVP-SOCIAL-011` Session-level rejection can replace/veto the current suggestion, with a proposed any-participant veto rule to confirm when implemented; “already seen/read” replaces the option within this session. Refill is bounded and reports genuine eligibility exhaustion or expiry. These actions do not silently submit ordinary durable not-interest, erase history, permanently prohibit rewatch, complete a SharedRatingRound or create group reward.
 - [ ] `MVP-SOCIAL-012` Joint decision sessions retain a bounded frozen accepted roster and actor/Profile/session/version provenance, with explicit membership-change/expiry/cancel/exact-retry/concurrency behavior, authorized minimal telemetry and lifecycle/deletion rules. Two-person and N-member server/device/accessibility cases pass; choosing alone is not confirmed joint consumption or satisfaction.
 
@@ -372,10 +376,10 @@ D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/re
 
 ## Growth/funnel measurement — release blockers
 
-- [ ] `MVP-GROWTH-001` Funnel telemetry can reconstruct public link/open → Taste start/response/completion → challenge → preview → auth conversion → Friend invite/open/accept → Friendship → SharedProfile creation.
+- [ ] `MVP-GROWTH-001` Funnel telemetry can reconstruct public link/open → Taste start/response/completion → challenge → preview → auth conversion → Friend invite/open/accept → Friendship → SharedSession invitation/acceptance/activation/end. Internal Profile allocation is distinct from successful joint session activation.
 - [ ] `MVP-GROWTH-002` Funnel events are semantically separate from Item preference/consumption evidence; growth clicks cannot become recommender reward by default.
 - [ ] `MVP-GROWTH-003` Taste policy, model/policy versions, campaign/referral source and relevant experiment assignment are traceable for evaluation.
-- [ ] `MVP-GROWTH-004` Release metrics include Taste completion, recognition, holdout error/hit rate, account conversion, D1/D7, invites/activated User, invite→Friend conversion, Friends→Shared creation and successful discoveries; installs/time-spent alone are not success.
+- [ ] `MVP-GROWTH-004` Release metrics include Taste completion, recognition, holdout error/hit rate, account conversion, D1/D7, invites/activated User, invite→Friend conversion, Friends→accepted joint session and successful discoveries; installs/time-spent/session counts alone are not success.
 
 ## UX and accessibility
 
@@ -415,15 +419,15 @@ Retained v1/challenge protocols and first measured answers stay preserved.
 ## Production services and data lifecycle
 
 - [ ] `MVP-OPS-001` Every production service has owner/environment/region/access/recovery/cost/deployment record; staging and production data/secrets are isolated.
-- [ ] `MVP-OPS-002` Versioned retention/deletion/export covers Auth, anonymous identities/Taste sessions, attribution/invites/Friendship, Personal/Shared evidence, imports, Lists/messages, traces, derived state, device data, logs and backups.
+- [ ] `MVP-OPS-002` Versioned retention/deletion/export covers Auth, anonymous identities/Taste sessions, attribution/invites/Friendship, SharedSessions and their participation receipts, Personal/Shared evidence, imports, Lists/messages, traces, derived state, device data, logs and backups. Session end and source erasure are separate lifecycle actions.
 - [ ] `MVP-OPS-003` Backup and isolated restore drills meet recorded objectives for database/objects/config/signing recovery.
 - [ ] `MVP-OPS-004` Alerts/runbooks cover API/auth/Taste/link/import/worker failures, crash rate, queue age, Prediction quality/latency, database/storage growth and spend. `MVP-UX-008` supplies correlated stage timings, representative baselines and calibrated latency budgets; diagnostic sampling, overhead, access and retention remain bounded, and operational timings do not become preference evidence.
 - [-] `MVP-OPS-005` Dependency/secret/license checks, protected release workflow, migration/config parity and proven-unused artifact cleanup are complete; production builds fail closed on missing production config/mock discovery. #295 accepts production configuration/input guards and #296 resolves the recorded dependency advisories; hosted/security/lifecycle/release verification remains open.
-- [ ] `MVP-OPS-006` Anonymous Taste and Friend-invite creation/open/accept have abuse/rate limits, anti-enumeration, revoke/expiry, block handling and redacted diagnostics suitable for public links.
+- [ ] `MVP-OPS-006` Anonymous Taste, Friend invites and SharedSession invites/activation have abuse/rate limits, anti-enumeration, revoke/expiry, receiver/roster binding, block handling and redacted diagnostics suitable for public links.
 
 ## External beta readiness
 
-- [ ] `MVP-BETA-001` A clean external visitor can use the **actual intended flow** without developer setup: link → Taste → challenge → preview → Google/Apple → Kajo → invite Friend → accepted Friendship → explicit SharedProfile → joint recommendation.
+- [ ] `MVP-BETA-001` A clean external visitor can use the **actual intended flow** without developer setup: link → Taste → challenge → preview → Google/Apple → Kajo → invite Friend → accepted Friendship → explicit temporary SharedSession → joint recommendation. Repeat with a changed participant set and verify isolated history without a permanent-group picker.
 - [ ] `MVP-BETA-002` Failures are diagnosable and beta outcomes drive bounded fixes/calibration rather than silent architecture changes; small beta percentages are not treated as proof of small statistical lifts.
 - [ ] `MVP-BETA-003` Owner accepts the complete link-to-app flow on representative Android/iOS devices before the Share Link Gate.
 

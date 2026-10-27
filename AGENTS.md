@@ -128,6 +128,14 @@ Do not claim broad public-link readiness before `MVP-REL-004` / the ROADMAP **Sh
 
 ## 4. Canonical domain rules
 
+**Owner refinement — 2026-10-27:** joint browsing starts from the Friend network
+through temporary accepted `SharedSession`s, without creating/naming/selecting
+permanent groups in the normal flow. `SharedProfile` remains the internal learned
+joint target. Different accepted participant sets use isolated contexts; ending
+a session does not erase history. [ADR-0013](docs/architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+owns the design and legacy-preservation boundary. This is planned product behavior,
+not a delivered session backend, and does not change engine-first execution order.
+
 Core abstractions include:
 
 - `User`
@@ -138,6 +146,8 @@ Core abstractions include:
 - `SharedProfile`
 - `FriendInvite`
 - `Friendship`
+- `SharedSession` (planned)
+- `SharedSessionInvite` (planned)
 - `TasteSession`
 - `Item`
 - `Event`
@@ -153,6 +163,8 @@ Rules:
 - Personal and Shared Profiles are distinct learned contexts.
 - SharedProfile is not a simple average of members.
 - Friendship is not SharedProfile membership and grants no private PersonalProfile access.
+- Session participation is explicit; neither Friendship nor an old SharedProfile
+  membership alone authorizes a new session. Never mix A–B–C history into A–B–Z.
 - Personal Friend invite does not automatically create SharedProfile.
 - Anonymous Taste conversion must preserve the same logical PersonalProfile/taste state rather than duplicating it.
 - `Item` is domain-agnostic; do not create BookProfile/MovieProfile/BookPrediction/etc.

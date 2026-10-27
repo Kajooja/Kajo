@@ -17,6 +17,22 @@ Eight bounded source packets are accepted and all five SQL forwards are installe
 The owned V4 receipt installation and source/native receipts are below. Do not
 repeat any installed forward or the completed Personal receipt source packet.
 
+**Owner refinement — 2026-10-27:** joint browsing starts from a persistent Friend
+network with temporary accepted sessions, without required permanent-group
+creation/selection. [ADR-0013](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+retains SharedProfile as the internal learned context. Same-set authorized history
+reuse is the working assumption; A–B–C and A–B–Z are isolated contexts. Session
+end is not history deletion, and legacy named groups are not merged/reset.
+Canonical product/domain/architecture requirements now carry this target; the
+session lifecycle/navigation is planned Phase 16 work under engine-first order.
+
+The implementation audit found that `sharedProfileOperations.ts` and
+`SharedProfilesScreen.tsx` still use named Profile/member RPCs. The #232F producer
+freezes the full current actor/enrollment set and selected immutable captures,
+but has no SharedSession identity and no actual ranking consumer. Its existing
+`INPUT_CAPTURE_ONLY` / `NOT_RECORDED` statuses remain correct. No mobile, SQL,
+deployment or device result is claimed for this documentation refinement.
+
 The one next source packet is the genuine consumer of the accepted #232F
 `shared-round-prediction-input-v1` boundary. Start from fresh main and audit the
 existing producer, immutable evidence captures, Shared scoring feature owners,
@@ -26,6 +42,15 @@ consumption path: calculate its versioned forecast from that exact prepared
 input and atomically retain the input identity with the resulting PredictionRun.
 Registration beside an unchanged scorer is insufficient; do not add a parallel
 whole scorer or silently claim the old input-capture-only artifacts were consumed.
+
+Apply the new direction without fabricating a session backend: the first native
+consumer uses the existing truthful full-Profile enrollment basis. Add explicit
+overlapping-set isolation (A–B–C cannot feed A–B–Z), current enrollment-generation
+checks and revoked/erased-source rejection to its fixtures. Repeated use of an
+authorized same-set context may retain eligible prior evidence without changing
+the target experience's zero-response boundary. Future real session inputs need
+a versioned producer/adapter with actual lifecycle/roster receipts; a synthetic
+session ID or a hidden permanent-group picker does not meet that later gate.
 
 Preserve current membership and actor/enrollment scope, the never-answered target
 experience and its complete zero-response prefix, selected receipt and immutable

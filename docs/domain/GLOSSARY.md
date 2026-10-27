@@ -11,10 +11,12 @@ This file is authoritative for domain terminology. Code must use these names unl
 | Nickname / nimimerkki | `nickname` | Unique user-visible User identity; display casing preserved, uniqueness/sign-in/search case-insensitive; MVP length 2–24. |
 | Profile | `Profile` | Prediction, memory, Lists and messaging context; Personal or Shared. Maps to engine Subject, not acting User. |
 | Personal profile / oma Kajo | `PersonalProfile` | One person's Kajo context; anonymous Taste state upgrades into the same logical context rather than a duplicate profile. |
-| Shared profile / yhteinen Kajo | `SharedProfile` | Persistent 2-N accepted-member Profile with its own learned joint state/history/theme/Lists/chat; name length 2–32; created explicitly, not through Friendship alone. |
+| Shared profile / yhteinen Kajo | `SharedProfile` | Durable joint Prediction/memory/history/Lists context. The October 27 target keeps it internal to temporary accepted sessions with isolated participant sets; no named-group selection is required. Existing named 2-N member Profiles and their 2–32-character names retain legacy compatibility. |
 | Profile member | `ProfileMember` | Accepted User/Profile membership. Pending invitation is not membership. |
 | Friend invite | `FriendInvite` | Opaque server-owned expiring/revocable invitation; may start Taste and create Friendship after consent/identity conversion; not Shared membership. |
 | Friendship | `Friendship` | Reciprocal active social relationship between permanent Users; no private Personal evidence access or automatic SharedProfile. |
+| Joint browsing session / yhteinen selailu | `SharedSession` | Planned temporary joint browsing scope, initially 2–5 accepted people, with its own identity/lifecycle and an authorized SharedProfile target. Not a new Profile, a generic Event session or a completed SharedRatingRound. |
+| Joint browsing invite | `SharedSessionInvite` | Planned expiring/revocable invitation to a particular session and proposed roster. Opening/accepting a Friend invite is not session consent; legacy Profile invitations keep their original purpose. |
 | Taste session | `TasteSession` | Versioned real-Item cold-start/acquisition sequence with safety budgets and pause/resume. Sequential target uses committed-prefix adaptation and provisional per-domain readiness; fixed counts do not certify reliability. Existing v1 sessions remain preserved. |
 | Taste response | `TasteResponse` | Versioned answer/command evidence. The current feed exposes List saving, numeric rating and combined Ohita; En tunne is removed. Retained UNKNOWN/NOT_INTERESTED responses keep their original meanings. An ambiguous skip does not reveal which old reason applies; projection retains source provenance. |
 | Taste challenge | `TasteChallenge` | Prospective held-out-answer evaluation with prediction/state/model/prefix committed first, first-answer measurement immutable and future projection afterward. Delayed pairs use the unchanged earlier panel. Sequential target evaluates per question; existing v1 frozen batch remains evaluation-only. |
@@ -118,13 +120,21 @@ The following terms are proposed contract names, **not a claim that matching cod
 ```text
 AnonymousIdentity ──upgrade/link──> User ──owns──> PersonalProfile
 User A + User B ──Friendship──> lightweight social graph
-Friendship ──explicit consent flow──> SharedProfile membership
+Friendship ──explicit session consent──> SharedSession ──authorized target──> SharedProfile
 Kajo Profile ──DomainAdapter──> engine Subject
 Kajo acting User != engine prediction Subject
 external research subject != Kajo User/Profile
 ```
 
-FriendInvite is not Friendship; Friendship is not SharedProfile or ProfileMember; membership does not grant raw private Personal evidence access. TasteSession is not another media-specific Profile. AcquisitionAttribution is not taste evidence. ExternalTastePrior, native PopulationMemory and SyntheticScenarioMemory are not interchangeable.
+FriendInvite is not Friendship; Friendship is not SharedSession participation or
+SharedProfile membership. A SharedSession ends independently of retained joint
+memory; a different accepted roster uses a different context. Current Profile
+membership alone is not consent to a new session. Membership never grants raw
+private Personal evidence access. [ADR-0013](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+is the planned successor; current named-group APIs remain legacy implementation.
+TasteSession is not another media-specific Profile. AcquisitionAttribution is
+not taste evidence. ExternalTastePrior, native PopulationMemory and
+SyntheticScenarioMemory are not interchangeable.
 
 [Sequential Taste](PREDICTION_MODEL.md#sequential-adaptive-taste) readiness is
 provisional rather than statistical reliability or model admission. Ordinal

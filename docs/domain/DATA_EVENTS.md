@@ -710,6 +710,30 @@ Repeated link opens must not create multiple Friendships. `FRIEND_RELATIONSHIP_C
 
 Remove/block actions are social lifecycle facts, not taste evidence.
 
+### Temporary Shared session provenance — October 27 target
+
+`SharedSessionInvite` and `SharedSession` lifecycle telemetry are distinct from
+Friendship, legacy Profile invitations and generic Event-session identifiers.
+Record actual accepted participant/enrollment scope, session/lifecycle revision
+and actor with join/start/leave/end facts; opening an invite supplies no taste
+evidence. Session duration is not automatically Item attention, an experienced
+Item, a rating or joint reward. Planned names in LAUNCH_LOOP are not a claim
+that matching Events/RPCs are deployed.
+
+New session-backed delivery, action and round origins must bind the real session,
+SharedProfile and frozen accepted roster alongside existing prediction/receipt
+identities. Reconnect/retry cannot redirect an old choice to today's different
+session; participant replacement cannot change a frozen round's denominator.
+Ending/expiring browsing admits no new choices and never completes missing
+ratings. Separately authorized delayed responses keep the original round scope.
+
+Retained joint Lists/history/messages stay in their original context. Do not
+copy A–B–C evidence into A–B–Z or rewrite legacy profile/actor origins during
+migration. Explicit source erasure still removes copied inputs and dependent
+forecasts; ending a session alone is not source erasure. DOMAIN_MODEL and
+[ADR-0013](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+own the planned authorization and lifetime boundaries.
+
 ## 8. Prediction traceability
 
 When Kajo chooses an Item through Prediction, subsequent relevant Events should preserve:
@@ -920,6 +944,13 @@ the capture reference it actually used; a separately declared joint target and
 exposed-outcome metric are still required before learning admission.
 
 ### Prepared pre-first-response inputs — #232F, source only
+
+This v1 producer records current complete Profile enrollment, not a
+SharedSession. Its immutable artifacts remain truthful under ADR-0013. The
+bounded actual consumer can use this existing basis; future session-backed
+inputs need a versioned producer with a real accepted session/roster receipt.
+Do not synthesize a session from member IDs or retroactively add session consent
+to old inputs. Consumed-run lineage remains the next implementation gate.
 
 `private.capture_shared_round_prediction_input_v1(capture_id, profile_id,
 round_id, expected_revision, source_capture_ids)` is an internal owner-invoker

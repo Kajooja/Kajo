@@ -12,6 +12,16 @@ Taste and Discovery consume one versioned prediction input and one eligible
 candidate/scoring service, with a frozen, measurable decision-to-outcome chain.
 Finish and connect the accepted foundations; do not create another scorer.
 
+The October 27 [session direction](../../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+makes joint browsing temporary and Friend-based while keeping an internal
+SharedProfile memory context. The genuine #232F consumer remains this sprint's
+next bounded source packet on the existing full-Profile enrollment basis.
+Require exact-set isolation (including overlapping A–B–C/A–B–Z), real enrollment
+generations and source withdrawal. Same-set reuse cannot restore revoked or
+erased lineage. Do not invent a session ID or claim existing fixtures prove the
+future lifecycle; actual session/roster receipt binding and replacement social
+navigation are versioned Phase 16 successors. Engine-first order is unchanged.
+
 ## Scope and deliverables
 
 1. Reconcile the active #357–#360 source/CI/deployment receipts, preserving accepted

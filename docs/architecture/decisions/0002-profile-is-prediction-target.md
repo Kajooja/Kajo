@@ -3,6 +3,11 @@
 Status: Accepted
 Date: 2026-08-25
 
+Refined on 2026-10-27 by [ADR-0013](0013-friend-network-and-temporary-shared-sessions.md):
+temporary Friend-based sessions replace required named-group navigation; the
+durable internal SharedProfile prediction target remains. The text below records
+the original decision, not a requirement to retain fixed groups in the new UX.
+
 ## Context
 
 Kajo must support both one-person discovery and persistent 2-N person shared Kajos that learn their own joint preferences.

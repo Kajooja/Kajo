@@ -5,6 +5,12 @@ Date: **2026-09-07**
 Decision owner: Product / architecture  
 Tracking: #215
 
+Refined on 2026-10-27 by [ADR-0013](0013-friend-network-and-temporary-shared-sessions.md):
+explicit temporary session participation replaces required named-group creation
+in the new product flow. Friend, session and legacy membership invitations stay
+distinct; internal SharedProfile learning and Personal privacy remain. The
+original rationale below is retained as history.
+
 ## Context
 
 Kajo's first public release must acquire users through a low-friction Taste Test that can begin before registration, preserve cold-start learning through account conversion, support personal invite links and then make shared use easy.

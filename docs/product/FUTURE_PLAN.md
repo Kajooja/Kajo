@@ -61,7 +61,8 @@ The following are **no longer future-only ideas**:
 - personal Friend invite,
 - reciprocal lightweight Friendship,
 - Friends surface and basic remove/block/abuse lifecycle,
-- explicit Friends → SharedProfile creation,
+- explicit Friends → temporary SharedSession, with an internal authorized
+  SharedProfile memory context and no required permanent-group picker (ADR-0013),
 - complete acquisition/funnel telemetry,
 - one-million-user-compatible identity/taste/social contracts,
 - practical Engine V1 across Sprints 015–021, retaining the independent contracts and reproducible E1 → D1 → D2 external-data foundation,

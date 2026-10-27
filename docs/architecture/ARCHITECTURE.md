@@ -176,9 +176,13 @@ Keep separate server semantics for:
 
 1. public/reusable Taste/campaign link,
 2. personal Friend invite,
-3. SharedProfile membership invite.
+3. legacy SharedProfile membership invite,
+4. planned SharedSession invite for one receiver and declared session/roster.
 
-A public Taste link carries no Friend/Shared authorization. A Friend invite may resolve the inviter after authorization but grants no Friendship until explicit acceptance. A SharedProfile invite remains membership-specific.
+A public Taste link carries no Friend/Shared authorization. A Friend invite may
+resolve the inviter after authorization but grants no Friendship until explicit
+acceptance. Legacy Profile invites remain membership-specific; a session invite
+is separate and grants participation only after explicit current authorization.
 
 Tokens are opaque, expiring/revocable where appropriate, rate-limited and replay-safe.
 
@@ -191,7 +195,7 @@ Tokens are opaque, expiring/revocable where appropriate, rate-limited and replay
 It provides:
 
 - canonical Friends listing,
-- a convenient source for SharedProfile creation/invitation,
+- a convenient source for temporary SharedSession invitations,
 - later optional social discovery features.
 
 It does **not** provide:
@@ -204,17 +208,32 @@ It does **not** provide:
 
 SharedProfile remains the learned joint recommendation target. Existing `ProfileMember`, Endorsement, Lists, Shared Saved consensus and Profile messaging rules remain canonical.
 
-Canonical path:
+The [October 27 target](decisions/0013-friend-network-and-temporary-shared-sessions.md)
+uses Friends → accepted temporary SharedSession → authorized internal SharedProfile
+→ joint Prediction/Memory. No permanent group name/picker is required. A session
+is the coordination/lifecycle boundary; its exact accepted participant set resolves
+the learned context without replacing the Profile prediction target.
 
-```text
-Friendship
-→ explicit create yhteinen Kajo
-→ SharedProfile
-→ accepted ProfileMember lifecycle
-→ joint Prediction/Memory
-```
+Same-set authorized context reuse retains durable memory across sessions, with
+fresh session WorkingState. Different sets use isolated contexts. Legacy named
+profiles/Lists/messages/forecasts are preserved, not automatically merged by
+membership equality. Friend removal, session end and evidence deletion remain
+distinct operations with explicit current authorization.
 
-Friend removal and Shared membership are independent lifecycle operations.
+### SharedSession — planned lifecycle boundary
+
+The server must serialize invite acceptance/roster changes/activation, bind exact
+session and enrollment revisions to predictions/actions, and reject expired or
+changed-session writes including stale queued commands. Current context access
+plus active session participation are required; UI-only hiding of a group picker
+is insufficient. Concurrent identical starts need declared idempotency and
+context resolution, not duplicate or accidentally mixed learned histories.
+
+The existing #232F producer has no session lifecycle: it captures current full
+Profile enrollment and a pre-first-response round. Its actual consumer can be
+completed on that native boundary now. A real session-backed version follows the
+new lifecycle and source/forecast erasure contracts before public UI activation.
+No new service, graph database, table or RPC is introduced by this design receipt.
 
 ## 7. Canonical data/backend
 

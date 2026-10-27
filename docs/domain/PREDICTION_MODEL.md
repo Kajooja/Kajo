@@ -1542,6 +1542,30 @@ selection/preservation behavior only.
 
 A SharedProfile remains one Prediction target. Kajo must not rank separately for each member and merely interleave lists.
 
+### Temporary session and joint memory — October 27 target
+
+[ADR-0013](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+removes required permanent-group navigation, not the joint prediction subject.
+An accepted SharedSession resolves an authorized internal SharedProfile for its
+exact participant set. A new session has fresh WorkingState; eligible durable
+joint history for the same set may remain usable. A–B–C and A–B–Z are separate
+contexts. An invite, same host or overlapping Friends is not a source-admission
+rule and supplies no raw Personal or other-group evidence.
+
+Future session inputs must bind the actual session/lifecycle revision, complete
+accepted actors/enrollment and receipt before scoring; recheck authority at use.
+Roster changes invalidate future work on the old session without rewriting its
+forecasts/first answers. Personal fit remains an authorized aggregate contribution
+with sparse fallback, not copied Personal history or an average of all Friends.
+Session end is not forgetting, a completed outcome or learning admission.
+
+The current #232F v1 input has only its truthful full-Profile enrollment basis.
+Continue the genuine consumer on that existing authorized native boundary and
+preserve its exact actor/source/cutoff controls; do not invent a SharedSession
+or treat a capture as a consumed forecast. The later session producer/adapter
+requires a versioned compatibility boundary and fresh authorization/race/erasure
+tests. Neither this design nor legacy Profile fixtures prove the new session UI.
+
 ### MVP common-fit — `shared-common-fit-v1.1`
 
 The hosted MVP composition is:
@@ -1819,6 +1843,12 @@ rules before quality comparison or any promotion/rollback admission. The current
 SQL scorer, root numeric engine and #232E ordinal diagnostics remain unchanged.
 DATA_EVENTS owns producer locks, replay, bounds and whole-artifact erasure;
 STATUS owns exact source/CI/native acceptance.
+
+The October 27 session direction adds an exact-set isolation control to this
+packet: an overlapping A–B–Z enrollment must never consume A–B–C input/sources.
+Input identity includes actual enrollment generations, not just a sorted list
+of user IDs. Reusing an eligible same-set context cannot revive erased/revoked
+source lineage. Dynamic Friend/session UI remains Phase 16 product work.
 
 ## 11. Cold start and external history
 

@@ -80,6 +80,11 @@ For Taste-first acquisition, an anonymous visitor may begin building the same lo
 
 Represents 2-N accepted Users together. It has its own learned state and may develop preferences that do not equal a simple average of members.
 
+Under the [October 27 session design](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md),
+this durable context is internal to temporary Friend-based joint browsing. Its
+memory lifetime is distinct from the visible session. Existing named Profiles
+retain their records and authorization until an explicit compatible migration.
+
 Invariants:
 
 - an Event in Shared context retains actual `actorUserId`,
@@ -324,28 +329,63 @@ FriendInvite accepted
 → Friendship ACTIVE
 ```
 
-## SharedProfile creation from Friends
+## Shared sessions from Friends
 
-Friendship is a convenient source of candidate members, not group membership itself.
+The October 27 target replaces required permanent-group creation/selection with
+temporary `SharedSession`s. Friendship supplies candidates; all actual people
+explicitly accept the declared roster. The planned compact bound is 2–5 total
+people, including the initiator. A may invite B and C without creating B–C
+Friendship. A blocked pair cannot be admitted through another person's invitation.
+LAUNCH_LOOP owns the invite/user flow and ADR-0013 the architectural decision.
 
-Two-person path:
+`SharedSession` is a coordination/authorization scope, not another prediction
+subject. Its server identity binds the SharedProfile, complete accepted actor/
+enrollment set, roster/lifecycle revision, expiry and command receipts. Proposed,
+pending, active and ended/expired participation remain distinguishable; exact
+storage/API names are selected in implementation. It is separate from a generic
+Event session and from each Item's `SharedRatingRound`.
 
-```text
-Friend A + Friend B
-→ explicit "create yhteinen Kajo"
-→ SharedProfile
-→ membership acceptance/creation under canonical Shared rules
-```
+Resolve a session-backed SharedProfile only for an actually accepted exact
+participant set. The same authorized set may reuse its retained joint context
+regardless of invitation order/initiator; a roster key is not authorization and
+cannot restore a revoked membership or erased source. Do not materialize every
+possible Friend combination or merge existing named Profiles with equal members.
 
-For 3+ users, selected Friends still pass through explicit Shared membership acceptance.
+Start fresh session WorkingState while retaining eligible durable joint memory.
+A–B–C today and A–B–Z tomorrow use separate contexts. Adding/removing someone
+stops new decisions for the old roster and requires a newly accepted session;
+it never rewrites old membership snapshots, forecasts, answers or List ownership.
+During invitation, a changed roster must be shown and accepted before activation.
+Pending slots contribute neither features nor votes/consensus membership.
 
-The planned compact creation UX uses 2–5 total people including the creator,
-without replacing generic 2-N SharedProfile membership. Opaque link delivery
-and Friend selection remain distinct from accepted Friendship/ProfileMember;
-opening a link cannot create either relationship or grant private history access.
-LAUNCH_LOOP/UX_PRINCIPLES own the planned slot/share presentation under ROADMAP 16.2.
+Disconnect/reconnect alone does not alter the accepted roster. Explicitly leaving
+joint browsing ends new choices for that session; the remaining people may start
+a newly accepted session for their changed set. Leaving/ending browsing is not
+the legacy leave-Profile operation or an evidence-deletion request. Permanent
+context access withdrawal has its own explicit lifecycle and privacy controls.
 
-Friend removal does not silently remove or rewrite existing SharedProfile history/membership. Any desired membership change uses SharedProfile lifecycle rules.
+New-session ranking/commands require current context authorization and the exact
+active session/accepted roster. Session expiry/end blocks new browsing choices;
+an old Profile membership, URL, pending invitation or cached card cannot bypass
+that check. Reconnect retries the exact live session or falls back safely to
+Personal. Block/revocation is checked before new access/decisions; historical
+evidence remains governed by its own retention/deletion rules.
+
+Closing a session does not delete shared Lists/history/messages or imply a joint
+outcome. Access to retained content still requires its original context rights;
+Z cannot see A–B–C history through A–B–Z. Delayed round responses need their own
+current authorized actor and frozen participant set, even after browsing ends.
+An incomplete round remains incomplete. Source withdrawal/deletion propagates
+through copied inputs, forecasts, caches and learned influence under existing gates.
+
+`SharedSessionInvite` has its own purpose, target/roster revision, intended
+receiver, bounded expiry/use and revocation. It is not a FriendInvite or a legacy
+Profile invitation. Link delivery/opening grants nothing; replay is idempotent
+and cannot admit an expired/changed roster. Friendship remains independent of
+historical Profile membership and never exposes private Personal evidence.
+
+These are target contracts. Existing named-group APIs remain in use until the
+versioned server lifecycle, permission/migration tests and replacement UX pass.
 
 ## Item
 

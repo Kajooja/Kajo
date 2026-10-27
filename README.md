@@ -39,7 +39,12 @@ Current project state: [`docs/project/STATUS.md`](docs/project/STATUS.md)
 
 Current MVP scope: [`docs/product/MVP.md`](docs/product/MVP.md)
 
-The first public release includes the Taste-first link → anonymous learning → account conversion → Friend → explicit SharedProfile loop. Its runtime and release acceptance remain open; see [`STATUS.md`](docs/project/STATUS.md).
+The first public release includes Taste-first link → anonymous learning → account
+conversion → Friend → accepted temporary SharedSession. The
+[October 27 direction](docs/architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+removes required permanent-group creation/selection while retaining an authorized
+internal SharedProfile for joint memory. Session implementation and runtime/release
+acceptance remain open; see [`STATUS.md`](docs/project/STATUS.md).
 
 ## Development quick start
 

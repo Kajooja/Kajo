@@ -20,6 +20,13 @@ rating. Old UNKNOWN/NOT_INTERESTED records retain their original meanings.
 
 ## Core feeling
 
+**October 27 Shared successor:** Friends and temporary accepted sessions replace
+required permanent-group creation/selection in the target UX. The numbered
+principles below incorporate that direction; the currently implemented named
+groups/quick switcher remain until the server lifecycle and replacement UI are
+accepted. [ADR-0013](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+preserves internal SharedProfile memory and legacy data.
+
 Kajo should feel calm, personal, atmospheric and intelligent. It should not feel like a dashboard, analytics tool, casino UI, futuristic control panel, 3D game or registration funnel disguised as a product.
 
 The first-time experience has one additional rule:
@@ -39,7 +46,7 @@ A person opening a Kajo link should be able to begin using Kajo immediately, bui
 7. **Preview before CTA.** After the challenge, show a small unseen recommendation preview before the primary Apple/Google continuation action.
 8. **Personal invites feel personal but remain consent-based.** An invite may identify the inviter in restrained copy after server authorization. Receiver explicitly accepts Friendship; opening a link never silently creates a social relationship.
 9. **Friendship is lightweight.** Accepted Friends appear on a simple Friends surface. Friendship does not create a joint Room/Profile automatically and does not expose private taste history.
-10. **Shared Kajo is intentional.** From Friends, creating `yhteinen Kajo` should be one short explicit flow. SharedProfile is a learned place/context, not a hidden side effect of a referral.
+10. **Joint browsing is intentional and temporary.** From Friends, choose people and invite them to “Selaa yhdessä”. Show the proposed roster and each person's acceptance. No group name or permanent group creation is required; internal joint memory is not a side effect of a Friend invite.
 
 The owner's October 9 clarification reaffirms the initial adaptive Taste as a
 pre-release requirement. Group invitation shortcuts preserve accepted Personal
@@ -47,9 +54,9 @@ setup and never replace the planned Taste, frozen challenge or usefulness gates.
 
 ## Authenticated Kajo principles
 
-11. **Navigation stays compact.** Domain discovery begins from Room objects. Account/Profile/Lists/Friends/Groups management belongs in restrained persistent navigation rather than Room clutter.
-12. **Minimal persistent shell.** Top: Kajo Home mark + global DiscoveryMode curtain. Bottom: menu + active Profile identity/SharedProfile quick switcher + Inbox. Do not add a conventional multi-tab bar without explicit product decision.
-13. **Profile switching starts at home.** Top Kajo mark returns to the active Profile Room. Bottom-center identity also returns home from other routes; when already home, it opens the lightweight Profile quick switcher. Full management remains on canonical Groups surfaces; the planned Friends surface follows the launch contract.
+11. **Navigation stays compact.** Domain discovery begins from Room objects. Account, Lists, Friends and authorized history belong in restrained navigation. A permanent Groups destination is not required by the new session flow.
+12. **Minimal persistent shell.** Top: Kajo Home mark + global DiscoveryMode curtain. Bottom: menu + active Personal/session identity + Inbox. An active joint session shows its people and an accessible leave/end action. Keep the shell compact without a conventional multi-tab bar.
+13. **Context changes are explicit.** Home controls return to the current Personal/session Room. Friends starts joint browsing; an actually active accepted session can be resumed directly. The target replaces the permanent-group quick picker, and safely falls back to Personal when the session ends/expires. Preserve old data access during migration.
 14. **Sign out is secondary account navigation.** `Kirjaudu ulos` belongs in account/drawer navigation, not the Room.
 15. **Illustrated 2D first.** The Room may use restrained 2.5D depth through overlap/light/blur/shadow but remains a fixed illustrated mobile surface. No free camera, virtual walking or game-like 3D world.
 16. **Content is more important than chrome.** Posters/covers and atmosphere carry visual interest.
@@ -66,14 +73,23 @@ setup and never replace the planned Taste, frozen challenge or usefulness gates.
 
 ## Shared Kajo principles
 
-27. **Shared Kajo feels like a place.** Switching to SharedProfile changes Profile context, theme and joint recommendation behavior, not merely a filter.
+27. **Together means this accepted set of people.** Entering a SharedSession changes the authorized prediction context, participants and joint behavior. A–B–C and A–B–Z remain distinct; the same people's eligible joint history can persist across sessions without group setup.
 28. **Shared recommendations are already shared.** Do not create a parallel `Ehdota yhteiseen` recommender surface.
 29. **Shared positive action is collaborative.** Choosing a custom List in Shared discovery creates actor-specific Endorsement/pending proposal, not immediate membership or Saved state.
 30. **Pending and consensus are visually distinct.** Pending proposer/List provenance and explicit approval remain readable without relying on color alone. Only unanimity produces durable consensus and Shared Saved/list commit.
 31. **Lists and discovery are different surfaces.** Consumed/saved/List history persists even when ordinary discovery suppresses an Item. Collections reuse Discovery covers, show given ratings, and offer list/poster-grid browsing while keeping their own collection context. The planned view controls below extend the existing partial List/grid support to consumed history.
 32. **Shared provenance is truthful.** List membership retains original proposer/added time where defined; UI does not invent actor provenance.
 33. **List choice stays lightweight.** Personal users check all destinations and press Lisää valituille listoille once; all acknowledged additions advance to the next card without a separate Valmis action. Show save progress, retain confirmed additions and unresolved choices on partial failure. Recent choices stay bounded with expansion/new-list creation on demand. Shared members approve the same explicit destination set before unanimous commit.
-34. **Messaging stays Profile-scoped and quiet.** Inbox combines relevant invitation/message activity. Message failure must not roll back successful List action.
+34. **Messaging stays context-scoped and quiet.** Inbox distinguishes Friend, session and legacy Profile invitations. Retained joint messages/Lists keep their actual authorized Profile; changing sessions never exposes another set's content. Message failure must not roll back successful List action.
+
+The session invitation surface distinguishes accepted/pending/declined/expired
+people. A changed roster needs explicit acceptance; late acceptance cannot alter
+an active session silently. Returning to Personal or closing joint browsing does
+not reset taste, clear Lists or complete a SharedRatingRound. Reconnect resumes
+only the exact still-authorized live session. Accessible controls, large text,
+partial acceptance, block/remove, expiry and old-card retries require device
+acceptance. Ordinary joint discovery remains the shared feed; an optional bounded
+“today” decision uses this session rather than creating a second group surface.
 
 ## Motion and accessibility
 
@@ -113,7 +129,10 @@ DiscoveryMode atmosphere may alter the same scene:
 - Bookshelf: books.
 - TV/screen: movies.
 
-Friends, SharedProfiles, Inbox, Lists and account actions belong to persistent navigation rather than extra Room wall objects unless a later domain genuinely benefits from a new spatial metaphor.
+Friends, active-session access, Inbox, Lists and account actions belong to
+persistent navigation rather than extra Room wall objects unless a later domain
+genuinely benefits from a new spatial metaphor. Internal SharedProfiles do not
+require a permanent-group picker in the target session UX.
 
 ## Browse completion
 
@@ -203,7 +222,7 @@ open link
 → create/send Friend invite
 → receiver Taste/auth/accept
 → Friends surface
-→ explicit SharedProfile creation
+→ explicit temporary SharedSession acceptance
 → joint recommendation
 ```
 
@@ -303,20 +322,20 @@ A new joint viewing uses a new round and retains the earlier experience. Existin
 Personal setup/history survives. This is a release requirement, not functionality
 delivered by the multi-destination picker.
 
-## Planned compact group creation and joint decision — 2026-10-09
+## Planned compact Shared session and joint decision — refined 2026-10-27
 
-Deliver compact creation under ROADMAP 16.2 after Friend invite/safety lifecycle
-16.0–16.1. Show **2–5 total person slots including the creator**, already occupying
-one slot. A `+` selects an authorized accepted Friend or generates an opaque
-invitation that can be shown, copied or shared through the OS share sheet,
-including WhatsApp where available. Distinguish pending invitations from accepted
-members. Receiver continuation uses the same app/Taste/link route and explicit
-Friend/group consent; sending or opening a link creates no relationship or
-private Personal history access. This UI does not impose a new bound on existing
-generic 2-N SharedProfile storage.
+Deliver the October 27 session flow under ROADMAP 16.2 after Friend invite/safety
+lifecycle 16.0–16.1. Keep the October 9 compact **2–5 total person slots including
+the initiator**. A `+` selects a Friend and sends a correctly scoped session
+invitation with show/copy/OS-share where supported. New Friends first accept
+the distinct Friend relationship; that consent does not join the session.
+Show the declared roster and accepted/pending/declined/expired states, then
+activate only after explicit acceptance. No group name/setup/picker is required.
+App/Taste/auth continuation, roster changes and legacy 2-N history/access stay
+within the authorization/lifecycle contracts in LAUNCH_LOOP and DOMAIN_MODEL.
 
 After 16.3's rating evidence/controlled rewatch, planned 16.4 offers an optional
-“what should we watch/read today?” Shared session with at most five current
+“what should we watch/read today?” mode within the active SharedSession with at most five current
 canonical BOOK/MOVIE suggestions. Reuse the same predictor and inherited
 DiscoveryMode/risk; optional Tinder-like cards retain accessible buttons and do
 not replace ordinary grid discovery or duplicate the global curtain control.
@@ -330,7 +349,7 @@ erases history, permanently forbids rewatch, completes a SharedRatingRound or
 creates group reward. Freeze the accepted session roster with explicit expiry,
 membership-change, concurrency, lifecycle and minimal telemetry rules; choice
 alone is not confirmed consumption. The separate optional List-only FUT-UX-003
-is not promoted by this plan. MVP-GROUP-004 and MVP-SOCIAL-010..012 remain open;
+is not promoted by this plan. MVP-GROUP-001..005 and MVP-SOCIAL-010..012 remain open;
 no current UI changes merely by recording these ideas.
 
 ## Required pre-MVP card controls — #239 / MVP-UX-006
