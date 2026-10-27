@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — nine source packets accepted; five SQL forwards installed; remaining acceptance open**
+Status: **IN PROGRESS — nine source packets accepted; six SQL forwards installed; remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -15,7 +15,8 @@ Finish and connect the accepted foundations; do not create another scorer.
 The October 27 [session direction](../../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
 makes joint browsing temporary and Friend-based while keeping an internal
 SharedProfile memory context. The bounded #232F consumer is accepted source
-on the existing full-Profile enrollment basis; its guarded hosted rollout is next.
+on the existing full-Profile enrollment basis; its exact hosted forward is installed
+and preservation-verified. Prospective outcome reconciliation is the next packet.
 Require exact-set isolation (including overlapping A–B–C/A–B–Z), real enrollment
 generations and source withdrawal. Same-set reuse cannot restore revoked or
 erased lineage. Do not invent a session ID or claim existing fixtures prove the
@@ -84,8 +85,11 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The active bounded packet is the guarded #232F Shared consumption rollout;
-[STATUS](../STATUS.md) owns its exact source/CI and separate hosted handoff.
+The active bounded packet is prospective Shared forecast-to-outcome reconciliation
+through the existing #232C/#232E/#232F owners. Predeclare eligibility, selection,
+maturity and cohort boundaries; preserve frozen first-answer lineage and distinguish
+evaluation from real exposure. [STATUS](../STATUS.md) owns its exact handoff and
+the completed source/CI/hosted receipts.
 
 ## Evidence and completion rules
 
@@ -119,11 +123,23 @@ does not become an invented pass.
   evidence. Populated rows/defaults, 269 function identities/metadata
   and 2493 old native schema objects are preserved; five allowed
   bodies and seven private helpers are verified. The exact hosted format variant
-  is rehearsed and semantic drift rejected. All five [CI #785](https://github.com/Kajooja/Kajo/actions/runs/40486671110)
-  implementation gates pass on `9b9b9e0adc2e772e9fa043c32ef7a6cd05139714`; final receipt docs retain the same
-  five-gate requirement before merge. STATUS owns exact report/source evidence
-  and the next single-file hosted approval/preservation receipt. No production
-  installation, quality, Session lifecycle or public-delivery claim follows.
+  is rehearsed and semantic drift rejected. All five final-source
+  [CI #786](https://github.com/Kajooja/Kajo/actions/runs/40490626249) gates pass on
+  `1e5a6963418fd31e8ab6971a1923679dd55be7da`; accepted merge
+  `0ec9bd1085f522e686533120f56b1545d65ad1e4` has the exact tested tree.
+  [STATUS](../STATUS.md) owns the final report/source and separate hosted receipts.
+- Hosted ninth-packet forward: explicitly approved and installed once on October 27
+  as provider version `20261027114910`, name `shared_prepared_input_consumption`.
+  Stored bytes match the accepted migration. All 6465 old rows across 67 tables,
+  1994 old schema objects, 270 function identities/metadata, 265 unrelated bodies,
+  24 default-privilege records and 93 prior migration records are unchanged.
+  Five expected bodies, seven closed private helpers and one empty owner-only
+  RLS table match source. Missing/unbound markers are rejected; all 49 historical
+  unmarked runs retain their prior validation behavior. The only advisor delta
+  is the expected RLS-without-policy INFO for the closed new table. No fresh hosted
+  consumption, quality, Session lifecycle or public delivery was observed or claimed.
+  The next packet reconciles prospective outcomes through existing owners;
+  four-consumer, runtime/performance and predictive-quality gates remain open.
 - Eighth source packet: accepted through [PR #379](https://github.com/Kajooja/Kajo/pull/379),
   merge `d95429be91c232867f56765ef19b75d99e8b8038`. Actual owned V4 receipt
   scope/revision/transaction and before-lock visibility are consumed by the
