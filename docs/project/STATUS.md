@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-10-26**
+Last updated: **2026-10-27**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, eight bounded source packets accepted; four SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, eight bounded source packets accepted; five SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,69 +11,100 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — guarded owned V4 receipt-forward rollout / Sprint 015, #302, #336
+## Current handoff — genuine Shared prepared-input consumption / Sprint 015, #232F
 
-Eight bounded source packets are accepted. Four SQL forwards are installed; the
-new owned V4 receipt forward is **not installed**. The accepted source and exact
-CI receipt are below. The one next packet is its preservation-checked hosted
-rollout, **awaiting explicit owner approval for this exact production migration**.
-Repository publication/merge approval has been used. The previously recorded
-broad deployment authorization was insufficient for automatic approval review of
-this specific write; do not retry or bypass that rejection without explicit approval.
-Do not repeat any of the four installed forwards or implement this source again.
+Eight bounded source packets are accepted and all five SQL forwards are installed.
+The owned V4 receipt installation and source/native receipts are below. Do not
+repeat any installed forward or the completed Personal receipt source packet.
 
-After that approval, start from fresh accepted main. Install only
-`20261026201946_native_v4_receipt_forecast_binding.sql`, SHA-256
-`a4ec8f5cf5215d65c9b2f65eb64fb66a3621662b9d20516d221db41fdc4fd2e3`, after fresh
-READ ONLY preflight. Match its four predecessor function body/security/configuration
-guards and require both new helper names to be absent. Inventory all current
-public/private canonical rows, function identities/bodies/metadata, default
-privileges, table/access metadata and migration history before any write. Reuse
-the previous guarded rollout procedure; keep private row identities and snapshots
-outside Git. Stop on drift, unknown grants, preservation or admission mismatch.
+The one next source packet is the genuine consumer of the accepted #232F
+`shared-round-prediction-input-v1` boundary. Start from fresh main and audit the
+existing producer, immutable evidence captures, Shared scoring feature owners,
+native scope adapters and dependent-source erasure. Reuse the common candidate,
+request/identity and FINAL boundaries. Choose and document one bounded actual
+consumption path: calculate its versioned forecast from that exact prepared
+input and atomically retain the input identity with the resulting PredictionRun.
+Registration beside an unchanged scorer is insufficient; do not add a parallel
+whole scorer or silently claim the old input-capture-only artifacts were consumed.
 
-Apply the exact accepted SQL once through the supported migration transaction;
-record the provider-issued history version rather than inventing one. Postchecks
-must verify the four expected body changes and two private owner-only INVOKER
-helpers, unchanged existing function identities/metadata and unrelated bodies,
-closed API access, unchanged defaults, complete fixed-row preservation and prior
-history digests. Check retained historical replay and receipt admission using
-READ ONLY probes. Report any genuine concurrent/new rows separately; do not
-manufacture hosted answers, forecasts or observations to obtain a passing sample.
+Preserve current membership and actor/enrollment scope, the never-answered target
+experience and its complete zero-response prefix, selected receipt and immutable
+source capture identities/digests. An older participant set or reconfirmation
+cannot erase an earlier response. Declare supported features and insufficient-
+evidence fallback before implementation. Verify that changing supported prepared
+evidence affects the consumed forecast, and that identical declared inputs retain
+exact eligibility/identity plus a declared numeric tolerance. Cover independent
+native membership/answer races, correction/withdrawal, dependent-forecast erasure,
+retries and Personal/other-Shared isolation. Preserve existing records and grants.
 
-Record installation and any naturally observed fresh marked runs separately.
-No observed fresh run means no fresh-serving claim. The source proves visibility
-of one owned V4 receipt at command entry; it does not establish a global database
-prefix, historical reconstruction or cross-statement snapshot consistency.
-Retained forecasts, pools, panels, cached commands and selected policies stay
-preserved. Discovery's existing post-lock skip/reset gates remain intact.
+The producer's existing `INPUT_CAPTURE_ONLY` / `NOT_RECORDED` statuses remain
+truthful for unused artifacts. Genuine source consumption does not by itself
+admit joint learning, establish historical membership, select valid prospective
+outcome samples or prove usefulness. Require all five final-source gates before
+source acceptance and a separate preservation receipt for any new hosted forward.
+Existing repository publication/merge authorization remains applicable. The
+owner's October 27 hosted approval covers the exact V4 receipt migration below;
+it does not preapprove a different future hosted write.
 
-Sprint 015 stays open: real #232F Shared consumption, remaining four-consumer
-input parity, exposure/outcome reconciliation, native/hosted performance and
-predictive quality still require their own evidence. Unlike recognition and
-Discovery selection inputs remain non-comparable. Guided policy/readiness keeps
-its Sprint 019 dependencies; no source/installation result closes those gates.
+Sprint 015 remains open for remaining four-consumer parity, exposure/outcome
+reconciliation, native/hosted performance and predictive quality. Unlike retained
+recognition and Discovery selection policies remain non-comparable; guided
+policy/readiness keeps its Sprint 019 dependencies. Existing phone/runtime and
+release gates remain recorded without blocking this authorized source work.
 
-## Hosted receipt-forward attempt — blocked before execution, 2026-10-26
+## Hosted owned V4 receipt binding — 2026-10-27
 
-Automatic approval review rejected the supported `apply_migration` call for
-`native_v4_receipt_forecast_binding`. Its stated reason was that user-authored
-evidence clearly authorized repository publication/merge but did not clearly
-authorize this exact hosted production database write. No alternate execution
-path was attempted. The exact accepted file and SHA above are the approval scope.
+The owner explicitly approved this exact production migration on October 27 in
+response to the linked approval request. This resolves the October 26 automatic
+review rejection; no bypass or alternative write preceded that approval. Fresh
+preflight and verified installation followed the explicit approval.
 
-READ ONLY preflight had verified all 268 existing function identities/bodies/
-metadata, 24 default-privilege records, 67 tables/access definitions and 92 prior
-history records against the preceding hosted receipt. Both new helper names
-were absent and the migration's own four predecessor guards passed.
+The owner-authorized rollout installed only
+`20261026201946_native_v4_receipt_forecast_binding.sql`, accepted through
+[PR #379](https://github.com/Kajooja/Kajo/pull/379), source merge
+`d95429be91c232867f56765ef19b75d99e8b8038`. Provider history records it as
+`20261027063814_native_v4_receipt_forecast_binding`;
+retain that provider-issued timestamp. Its one stored statement is byte-identical
+to the accepted file: SHA-256
+`a4ec8f5cf5215d65c9b2f65eb64fb66a3621662b9d20516d221db41fdc4fd2e3`.
 
-Independent READ ONLY post-rejection checks at `2026-10-26T22:06:02Z` confirmed
-all **6465 fixed rows**, all 268 existing function identities/bodies/metadata,
-24 defaults and all 92 history records unchanged. Neither new helper exists,
-and there is no history row for the rejected migration. No new native receipt,
-clock/request or FINAL-marked run was observed. The forward is **not installed**;
-four earlier forwards remain installed. Private identities/snapshots stay outside
-Git. Refresh the preflight after approval; do not repeat accepted source work.
+Fresh READ ONLY preflight matched all 268 existing public/private
+function identities, bodies and metadata, 24 default-privilege records, all
+67 canonical tables and their primary keys/access metadata, and all
+92 prior migration-history records against the preceding verified receipt.
+The migration's four predecessor body/owner/security/configuration guards passed;
+both new helper names were absent before the exact accepted transaction applied.
+
+Postchecks verified the exact four patched bodies and new private owner-only
+INVOKER `capture_native_v4_receipt_v1(uuid,pg_snapshot)` and
+`validate_native_v4_receipt_v1(jsonb)`. All 268 existing identities/metadata,
+264 unrelated bodies, 24 default-privilege records and table/access metadata
+remained unchanged. Existing API access did not expand. All
+92 old migration rows retained their complete-row digests, with exactly one
+new migration and the expected new helper metadata/closed grants.
+
+All **6465 fixed existing rows** across the 67 tables retained their
+full-row digests and identities: zero missing/changed records and zero additional
+rows at the postcheck. This includes 49 PredictionRuns,
+2386 candidates, 47 V4 pools,
+47 panels and 73 sequential commands.
+Private identities, snapshots and environment details stay outside Git.
+
+A READ ONLY probe rejected both a missing marked receipt and an invalid marked
+receipt. All 49 historical unmarked sources retained their receipt/FINAL admission
+behavior. Security/performance findings were unchanged: the existing
+[leaked-password protection warning](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection),
+53 [RLS-without-policy INFO findings](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy),
+seven [unindexed-foreign-key INFO findings](https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys)
+and 58 [unused-index INFO findings](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index).
+The password finding keeps its existing #160/#184 disposition.
+
+No fresh `native-v4-receipt-v1`, native request/clock or FINAL-marked run was
+observed. No hosted answer, forecast, replay job or synthetic observation was
+created. This proves installation, closed access, read-only rejection and
+preservation; actual fresh serving, device adaptation, latency/usefulness and
+Sprint 015 acceptance stay open. CI #775 below supplies the isolated native
+concurrency/consumer proof. This acceptance receipt changes documentation only.
 
 ## Accepted owned V4 receipt-to-forecast binding — #379
 
@@ -139,7 +170,7 @@ separates full-input equality from receipt-aligned computation parity and never
 rebinds those witnesses. The complete V4 verifier runs in the early native phase.
 No production guard, database name, deadline or score tolerance was weakened.
 
-The source is accepted; its guarded hosted rollout awaits the approval above.
+The source is accepted and its guarded hosted forward is installed with the receipt above.
 Runtime usefulness, global commit visibility, historical reconstruction and
 Sprint 015 acceptance are not inferred from these source/native results.
 
