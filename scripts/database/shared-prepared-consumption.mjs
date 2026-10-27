@@ -157,6 +157,10 @@ export async function verifySharedPreparedConsumption(execSql) {
 
     const conformance = await verifyNativeSharedPreparedCases(execSql, Object.entries(forecasts).map(([name, id]) =>
       `select ${literal(name)} name,${literal(id)}::uuid prediction_id,null::jsonb evaluation_receipt`).join(' union all '));
+    const personalPrediction = randomUUID();
+    await exec(`begin;${auth(f.actor)}select private.capture_personal_evaluation_v1(${literal(personalPrediction)},
+      ${literal(f.personal)},array[${literal(f.movie)}]::uuid[],'2000-01-01','{}');commit;`, 'personal-isolation');
+    const personalBefore = await source(personalPrediction);
     const retained = await source(forecasts.consensus);
     const prepared = await one(`select result from private.shared_round_prediction_inputs where id=${literal(f.consensus)};`, 'frozen-input');
     const ordinal = [];
@@ -242,10 +246,16 @@ export async function verifySharedPreparedConsumption(execSql) {
         'unrelated',exists(select 1 from private.prediction_runs where id=${literal(forecasts.mixed)}));`, 'erasure-closure');
       assert.deepEqual(remaining, { run: false, binding: false, input: false, unrelated: true });
     }
+    assert.deepEqual(await source(personalPrediction), personalBefore);
+    await exec(`begin;select private.erase_prediction_sources_v1('ACTOR',${literal(f.partner)});commit;`, 'copied-actor-erasure');
+    assert.equal(await one(`select to_jsonb(count(*)) from private.prediction_runs where id in(
+      ${Object.values(forecasts).map(literal).join(',')});`, 'foreign-actor-forecasts'), 0);
+    assert.deepEqual(await source(personalPrediction), personalBefore, 'Copied Shared actor erasure changed an unrelated Personal forecast');
     return { status: 'PASS', genuineFeatureSensitivity: true, disagreement: true, constantAndEmptyFallback: true,
       exactRetry: true, corrections: 'FROZEN_OLD_NEW_STALE_REJECTED', scope: 'FULL_ENROLLMENT_PERSONAL_AND_OVERLAPPING_SET_ISOLATION',
       conformance, ordinalRatings: [0, 5, 10], responseScale: 'POSITIVE_AFFINE_INVARIANT',
       closedAccess: access, erasure: 'DEPENDENT_RUN_BINDING_INPUT_REMOVED_UNRELATED_PRESERVED',
+      copiedActorErasure: 'OTHER_ACTOR_FORECASTS_REMOVED_PERSONAL_PRESERVED',
       cleanup: 'CANONICAL_ROWS_RESTORED' };
   });
 }

@@ -107,7 +107,11 @@ begin
   if i.id is null or i.actor_user_id is distinct from actor or i.profile_id is distinct from target_profile
     or i.result#>'{target,round,participants}' is distinct from members then
     raise exception 'Shared consumption input access/enrollment denied' using errcode='42501';end if;
-  if i.result->>'inputDigest' is distinct from md5((i.result-'inputDigest')::text)
+  if i.result->>'contractVersion' is distinct from 'shared-round-prediction-input-v1'
+    or i.result->>'usage' is distinct from 'INPUT_CAPTURE_ONLY'
+    or i.result->>'predictorConsumption' is distinct from 'NOT_RECORDED'
+    or i.result->>'membershipValidity' is distinct from 'CURRENT_FULL_ENROLLMENT_AT_CAPTURE'
+    or i.result->>'inputDigest' is distinct from md5((i.result-'inputDigest')::text)
     or i.result->>'captureId' is distinct from i.id::text
     or i.result#>>'{target,round,roundId}' is distinct from i.round_id::text
     or i.result#>>'{target,sourceRevision}' is distinct from i.target_revision::text
@@ -132,7 +136,9 @@ begin
       <>jsonb_array_length(i.result->'sources') then
     raise exception 'Shared consumption source bindings incomplete' using errcode='55000';end if;
   for s in select value from jsonb_array_elements(i.result->'sources') loop
-    if not exists(select 1 from private.shared_round_outcome_captures c
+    if s.value->>'contractVersion' is distinct from 'shared-round-capture-v1'
+      or s.value#>>'{outcome,contractVersion}' is distinct from 'shared-round-outcome-v1'
+      or not exists(select 1 from private.shared_round_outcome_captures c
       join private.shared_round_prediction_input_sources e on e.source_capture_id=c.id and e.input_id=i.id
       join private.shared_rating_rounds r on r.id=c.round_id
       where c.id=(s.value->>'captureId')::uuid and c.result=s.value and c.profile_id=target_profile
