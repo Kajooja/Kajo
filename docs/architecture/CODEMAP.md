@@ -384,9 +384,8 @@ Do not hide those controls before a compatible lifecycle and authorized legacy
 history path exist.
 
 The prepared-input producer below freezes full current Profile enrollment and
-source captures. Its references are producer/getter/erasure code and verification
-fixtures; it still supplies no genuine ranking consumer or session authorization.
-Sprint 015 continues that consumer with exact participant/enrollment-set isolation.
+source captures. The bounded consumer below uses that existing basis with exact
+participant/enrollment-set isolation, without adding session authorization.
 The future session adapter must bind real lifecycle/roster receipts rather than
 infer them from Profile IDs. No planned session path is listed as delivered code.
 
@@ -401,8 +400,8 @@ full roster/prefix, prior-response refusal, exact retries, isolation/caps and
 source/actor erasure. The existing native CLI gate exercises actual independent
 response/capture and source-delete/capture lock orders; implementation of that
 probe is separate from a passing native run. No ranking or portable-engine
-consumer is introduced. DATA_EVENTS owns capture-only semantics and
-PREDICTION_MODEL owns the required genuine forecast-consumption lineage.
+consumer was introduced by that producer migration. DATA_EVENTS owns capture-only
+semantics and PREDICTION_MODEL owns forecast-consumption features/admission.
 
 The native helper retains a full initialized canonical snapshot for active
 fixture checks and the full original snapshot for after-cleanup restoration.
@@ -410,6 +409,27 @@ fixture checks and the full original snapshot for after-cleanup restoration.
 capture and cleanup SQL in a fresh full schema, proving the five automatic Saved
 Lists and detecting equal-count mutations to owned and unrelated Lists. No table
 or ownership exclusion relaxes the native race gate.
+
+### Genuine ordinal consumer and source withdrawal
+
+`20261027085219_shared_prepared_input_consumption.sql` adds the closed
+`consume_shared_round_prediction_input_v1` entry point, pure relative-tag feature
+preparation, current-input admission, immutable consumption bindings and their
+erasure boundary. Guarded changes reuse `rank_items_request_with_identity_v1`,
+the frozen FINAL run/validator and existing source eraser. The Shared common-fit
+and FINAL score formulas are unchanged. Normal delivery and Personal calls keep
+their existing paths. No new public RPC or SharedSession identity is introduced.
+
+`shared-prepared-consumption.{mjs,test.mjs}` and its SQL fixture exercise populated
+row/schema/grant preservation, real attributed outcome captures, numeric ordinal
+feature sensitivity, fallback, exact retry, corrections, overlapping-set/Personal
+isolation and dependent forecast erasure. `shared-prepared-consumption-concurrency.mjs`
+adds independent native response/source-correction/membership/retry/withdrawal
+orders to the CLI gate. `native-prediction-adapter.mjs` and
+`kajo-native-prediction.ts` validate the optional consumption/FINAL marker and
+compare actual SQL forecasts with the existing frozen replay at `1e-12` tolerance.
+These fixtures measure contract conformance, not prediction quality. STATUS owns
+the exact final-source/native and separate hosted acceptance receipts.
 
 ## Closed shadow-source erasure — #232D, active source only
 

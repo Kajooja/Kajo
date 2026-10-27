@@ -230,8 +230,8 @@ is insufficient. Concurrent identical starts need declared idempotency and
 context resolution, not duplicate or accidentally mixed learned histories.
 
 The existing #232F producer has no session lifecycle: it captures current full
-Profile enrollment and a pre-first-response round. Its actual consumer can be
-completed on that native boundary now. A real session-backed version follows the
+Profile enrollment and a pre-first-response round. Its bounded private ordinal
+consumer uses that native boundary. A real session-backed version follows the
 new lifecycle and source/forecast erasure contracts before public UI activation.
 No new service, graph database, table or RPC is introduced by this design receipt.
 
@@ -2032,8 +2032,8 @@ The October 9 dependency audit prioritizes the native memory/serving
 decay divergence before bounded ordered Personal session/state policy and adaptive
 Taste/frozen challenge. Preserve the current server boundary and version actual
 features/interpretation; normalized-feature activation must coordinate every
-consumer. Known Shared evidence defects remain mandatory, while its queued
-genuine prepared-input consumer and advanced models are not a blanket prerequisite
+consumer. Known Shared evidence defects remain mandatory, while remaining
+Shared consumer acceptance and advanced models are not a blanket prerequisite
 to Personal source work. ROADMAP owns order; STATUS owns exact acceptance.
 
 The complete source proposal is retained separately: transparent state/memory → latent representations → explicit outcome/next-state model → bounded multistep dreams → self-evolving geometry. Each generation needs its own suitable data and acceptance. Movie-only rating accuracy cannot close all of those gates.

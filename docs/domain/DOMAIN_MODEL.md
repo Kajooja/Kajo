@@ -603,7 +603,19 @@ time. The use is `INPUT_CAPTURE_ONLY`, with predictor consumption unrecorded;
 this creates no new PredictionRun, response, Event, reward or learned influence.
 Target receipt deletion and selected source-capture deletion invalidate the
 whole copied input artifact. DATA_EVENTS owns storage/replay/erasure and
-PREDICTION_MODEL owns the future actual-consumer and admission gates.
+PREDICTION_MODEL owns actual-consumer features and the remaining admission gates.
+
+`SharedRoundPredictionConsumption` binds one retained input to one newly computed
+PredictionRun. The private consumer requires the same current actor and complete
+enrollment, an unchanged never-answered target head and unchanged selected source
+heads. Its versioned ordinal features use the prepared response vectors through
+the existing common-fit/FINAL owners. The binding freezes source-feature inputs
+and digests atomically with the forecast; it never rewrites the input artifact.
+Exact retries replay the original forecast after current enrollment authorization.
+Corrections do not rewrite old predictions, but a new prediction cannot reuse a
+stale source head. Source withdrawal removes dependent forecasts before their
+input/binding. This source contract is owner-only evaluation, without delivery,
+SharedSession authorization, scalar joint reward or learning/promotion admission.
 
 ## Event
 

@@ -950,7 +950,8 @@ SharedSession. Its immutable artifacts remain truthful under ADR-0013. The
 bounded actual consumer can use this existing basis; future session-backed
 inputs need a versioned producer with a real accepted session/roster receipt.
 Do not synthesize a session from member IDs or retroactively add session consent
-to old inputs. Consumed-run lineage remains the next implementation gate.
+to old inputs. The bounded consumed-run lineage below uses only this existing
+full-Profile enrollment basis; STATUS separates source and hosted acceptance.
 
 `private.capture_shared_round_prediction_input_v1(capture_id, profile_id,
 round_id, expected_revision, source_capture_ids)` is an internal owner-invoker
@@ -1007,7 +1008,55 @@ deletion budget includes input parents and reverse-binding rows before mutation.
 Direct binding removal while a parent exists is denied; whole-parent cascades
 remain valid. Unresolved learned-policy influence
 still rejects the entire preparation before mutation. Automatic Auth/account
-erasure integration and genuine consumer-run lineage remain separate gates.
+erasure integration remains a separate gate.
+
+### Actual prepared-input consumption — #232F
+
+`private.consume_shared_round_prediction_input_v1(prediction_id, input_id)` is
+an owner-invoker evaluation entry point. It resolves the exact retained input,
+requests its one target Item through the existing explicit canonical candidate
+and identity owners, and uses `shared-prepared-ordinal-tags-v1` features through
+the existing Shared common-fit and FINAL scorers. PREDICTION_MODEL defines the
+feature support/fallback policy. A missing canonical candidate cannot leave a
+consumed forecast. The result is ordinal, not an expected 0–10 rating or delivery.
+
+The private RLS-enabled consumption table binds one input to one PredictionRun.
+Its immutable marker retains input ID/digest, target round/experience/Item,
+selected receipt/revision/prefix digest, actor/Profile, observation/consumption
+times and feature version/digest. Its separate private feature input freezes the
+current source Item tags and derived anonymous member tag states. Candidate
+explanations contain aggregate common fit and digests, never raw response vectors
+or per-member states. The marker is also included in the frozen FINAL run input;
+native SQL and portable admission validate that binding. Input markers remain
+`INPUT_CAPTURE_ONLY`/`NOT_RECORDED`: those immutable producer statements are not
+retroactively rewritten. Actual use is recorded by the separate consumption row.
+
+Consumption, including exact retry, requires READ COMMITTED. New allocation
+requires an input observed before the current
+transaction's arithmetic cutoff. This is no global commit-prefix certificate.
+The lifecycle lock is first, followed by current actor/full enrollment locks,
+input protection and deterministically ordered target/source round locks. The
+never-answered target's head and snapshot must still match; any response receipt
+in its entire history rejects new consumption. Selected captures must retain
+their exact bindings and current source heads. Corrections, clear, reconfirmation,
+leave/rejoin generations, withdrawn inputs and overlapping foreign Profile sets
+cannot silently change a prepared request. Source catalog tags are read at
+consumption under Item locks, not claimed as historical outcome-time metadata.
+The marker is bounded to 8 KiB and derived input to 256 KiB; existing input/source
+and frozen FINAL bounds also apply. One input cannot allocate multiple forecasts.
+
+An exact prediction/input retry reauthorizes current full enrollment and returns
+the immutable result even after subsequent answers or source corrections.
+Withdrawal has different semantics: the prediction-source eraser now includes
+consumers of copied origin IDs and inputs containing a deleted actor, regardless
+of which actor requested the forecast. All influence/lineage/resource guards run
+before writes. Dependent runs and binding rows are deleted before copied input
+parents; direct binding removal or input deletion with retained forecasts fails
+atomically. `private.erase_shared_prepared_evidence_v1('INPUT'|'OUTCOME_CAPTURE',
+id)` enters through the exclusive lifecycle gate and erases dependent runs before
+the selected evidence. Row triggers never acquire that gate late or recurse into
+source erasure. Whole-account automation, joint outcome-sample admission,
+predictive quality and real SharedSession consent remain separate gates.
 
 ### Closed prediction-source erasure preparation — #232D, source only
 

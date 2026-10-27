@@ -11,7 +11,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — genuine Shared prepared-input consumption / Sprint 015, #232F
+## Current handoff — Shared prepared-input source acceptance / Sprint 015, #232F
 
 Eight bounded source packets are accepted and all five SQL forwards are installed.
 The owned V4 receipt installation and source/native receipts are below. Do not
@@ -26,22 +26,20 @@ end is not history deletion, and legacy named groups are not merged/reset.
 Canonical product/domain/architecture requirements now carry this target; the
 session lifecycle/navigation is planned Phase 16 work under engine-first order.
 
-The implementation audit found that `sharedProfileOperations.ts` and
-`SharedProfilesScreen.tsx` still use named Profile/member RPCs. The #232F producer
-freezes the full current actor/enrollment set and selected immutable captures,
-but has no SharedSession identity and no actual ranking consumer. Its existing
-`INPUT_CAPTURE_ONLY` / `NOT_RECORDED` statuses remain correct. No mobile, SQL,
-deployment or device result is claimed for this documentation refinement.
+`sharedProfileOperations.ts` and `SharedProfilesScreen.tsx` still use named
+Profile/member RPCs. This packet implements an internal evaluation consumer,
+without a SharedSession backend or mobile navigation change. Existing input
+artifacts keep `INPUT_CAPTURE_ONLY` / `NOT_RECORDED`; a separate consumption
+binding records actual use without rewriting those producer statements.
 
-The one next source packet is the genuine consumer of the accepted #232F
-`shared-round-prediction-input-v1` boundary. Start from fresh main and audit the
-existing producer, immutable evidence captures, Shared scoring feature owners,
-native scope adapters and dependent-source erasure. Reuse the common candidate,
-request/identity and FINAL boundaries. Choose and document one bounded actual
-consumption path: calculate its versioned forecast from that exact prepared
-input and atomically retain the input identity with the resulting PredictionRun.
-Registration beside an unchanged scorer is insufficient; do not add a parallel
-whole scorer or silently claim the old input-capture-only artifacts were consumed.
+Active branch: `feat/232f-shared-input-consumer`. The CLI-generated forward is
+`20261027085219_shared_prepared_input_consumption.sql`. The private consumer
+calculates its one never-answered target forecast from supported prepared
+response vectors through the existing candidate/identity, Shared common-fit and
+frozen FINAL owners. It binds input, target receipt/prefix and feature identities
+atomically with the PredictionRun. No parallel whole scorer or public delivery
+entry point is added. PREDICTION_MODEL owns the declared ordinal tag policy and
+neutral fallback; this is not a calibrated expected-rating model.
 
 Apply the new direction without fabricating a session backend: the first native
 consumer uses the existing truthful full-Profile enrollment basis. Add explicit
@@ -52,15 +50,19 @@ the target experience's zero-response boundary. Future real session inputs need
 a versioned producer/adapter with actual lifecycle/roster receipts; a synthetic
 session ID or a hidden permanent-group picker does not meet that later gate.
 
-Preserve current membership and actor/enrollment scope, the never-answered target
-experience and its complete zero-response prefix, selected receipt and immutable
-source capture identities/digests. An older participant set or reconfirmation
-cannot erase an earlier response. Declare supported features and insufficient-
-evidence fallback before implementation. Verify that changing supported prepared
-evidence affects the consumed forecast, and that identical declared inputs retain
-exact eligibility/identity plus a declared numeric tolerance. Cover independent
-native membership/answer races, correction/withdrawal, dependent-forecast erasure,
-retries and Personal/other-Shared isolation. Preserve existing records and grants.
+Current local full-schema tests exercise genuine prepared-feature sensitivity,
+disagreement, empty/constant fallback, exact retries, stale source/target rejection,
+overlapping Profile/enrollment and Personal isolation, closed grants and dependent
+forecast erasure. Actual native SQL forecasts and frozen replay cross the portable
+adapter with exact identity/eligibility/ranks and `1e-12` score tolerance. The
+populated forward preserves existing rows, defaults, schema objects and unrelated
+function bodies. Independent native answer/membership/correction/withdrawal/retry
+probes are added to the CLI gate; their implementation is not a passing native run.
+
+Finish the final-source checks, inspect the native report against its exact source
+manifest, then merge the authorized source only after all five gates pass. Any
+new hosted rollout needs a concrete exact-file approval and fresh preservation
+preflight/receipt. Do not repeat the old producer or V4 receipt implementation.
 
 The producer's existing `INPUT_CAPTURE_ONLY` / `NOT_RECORDED` statuses remain
 truthful for unused artifacts. Genuine source consumption does not by itself
