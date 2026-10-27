@@ -535,7 +535,7 @@ adapter still excludes continuations. Old unmarked windows remain unmarked.
 These bindings assume trusted, authorized immutable source reads; they do not
 authenticate an arbitrary export or certify historical/committed-prefix
 availability. Full four-consumer same-pool parity, native/hosted performance,
-the real Shared prepared-input consumer and predictive quality remain open.
+remaining Shared prepared-input acceptance and predictive quality remain open.
 STATUS records source/CI and hosted-installation acceptance separately.
 
 This private scoring primitive is consumed by the
@@ -1560,8 +1560,8 @@ with sparse fallback, not copied Personal history or an average of all Friends.
 Session end is not forgetting, a completed outcome or learning admission.
 
 The current #232F v1 input has only its truthful full-Profile enrollment basis.
-Continue the genuine consumer on that existing authorized native boundary and
-preserve its exact actor/source/cutoff controls; do not invent a SharedSession
+The bounded consumer uses that authorized native boundary and preserves its
+exact actor/source/cutoff controls; do not invent a SharedSession
 or treat a capture as a consumed forecast. The later session producer/adapter
 requires a versioned compatibility boundary and fresh authorization/race/erasure
 tests. Neither this design nor legacy Profile fixtures prove the new session UI.
@@ -3158,8 +3158,8 @@ CODEMAP owns exact implementation paths and STATUS owns validation/activation.
 
 ROADMAP now advances bounded Personal state/session policy and adaptive Taste
 source work alongside independent Shared/native/device gates. Its genuine
-#232F consumer remains required for prospective Shared feature/learning
-admission; this Personal-first execution order does not relabel capture-only
+#232F consumer's hosted and feature/learning admission gates remain required;
+this Personal-first execution order does not relabel capture-only
 evidence as used by a forecast. Public anonymous Taste still requires stable
 server identity, retention/abuse and minimal measurement before acceptance.
 
@@ -3273,8 +3273,8 @@ or model admission. The frozen FINAL forward described above extends admission:
 marked fresh sources require the complete run/candidate input binding, while
 unmarked historical source support is preserved. The existing Personal temporal report/cohort v2 now consumes this
 adapter under the bounded admission contract above. Full four-consumer same-pool
-parity, committed-prefix reconstruction, remaining temporal acceptance and the
-real Shared prepared-input consumer remain separate Sprint 015 work.
+parity, committed-prefix reconstruction, remaining temporal acceptance and
+Shared prepared-input hosted/quality acceptance remain separate Sprint 015 work.
 
 ### External-data boundary
 

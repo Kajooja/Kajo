@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-27**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, eight bounded source packets accepted; five SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, nine bounded source packets accepted; five SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,11 +11,12 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — Shared prepared-input source acceptance / Sprint 015, #232F
+## Current handoff — guarded Shared prepared-input rollout / Sprint 015, #232F
 
-Eight bounded source packets are accepted and all five SQL forwards are installed.
-The owned V4 receipt installation and source/native receipts are below. Do not
-repeat any installed forward or the completed Personal receipt source packet.
+The ninth bounded source packet is accepted through
+[PR #383](https://github.com/Kajooja/Kajo/pull/383); the previous five SQL forwards
+are installed. The new Shared consumption forward below is **not installed**.
+Do not repeat the producer, V4 receipt binding or accepted consumer implementation.
 
 **Owner refinement — 2026-10-27:** joint browsing starts from a persistent Friend
 network with temporary accepted sessions, without required permanent-group
@@ -23,61 +24,99 @@ creation/selection. [ADR-0013](../architecture/decisions/0013-friend-network-and
 retains SharedProfile as the internal learned context. Same-set authorized history
 reuse is the working assumption; A–B–C and A–B–Z are isolated contexts. Session
 end is not history deletion, and legacy named groups are not merged/reset.
-Canonical product/domain/architecture requirements now carry this target; the
-session lifecycle/navigation is planned Phase 16 work under engine-first order.
+Session lifecycle/navigation remains planned Phase 16 work under engine-first order.
 
 `sharedProfileOperations.ts` and `SharedProfilesScreen.tsx` still use named
-Profile/member RPCs. This packet implements an internal evaluation consumer,
-without a SharedSession backend or mobile navigation change. Existing input
-artifacts keep `INPUT_CAPTURE_ONLY` / `NOT_RECORDED`; a separate consumption
-binding records actual use without rewriting those producer statements.
+Profile/member RPCs. The accepted private evaluation consumer uses the truthful
+full-Profile enrollment basis and supported prepared response vectors. It computes
+one never-answered target through the existing candidate/identity, common-fit and
+frozen FINAL owners. A separate immutable binding records actual input/feature
+use; producer artifacts keep `INPUT_CAPTURE_ONLY` / `NOT_RECORDED`.
+The ordinal baseline is not a calibrated expected-rating model or public delivery.
 
-Active branch: `feat/232f-shared-input-consumer`. The CLI-generated forward is
-`20261027085219_shared_prepared_input_consumption.sql`. The private consumer
-calculates its one never-answered target forecast from supported prepared
-response vectors through the existing candidate/identity, Shared common-fit and
-frozen FINAL owners. It binds input, target receipt/prefix and feature identities
-atomically with the PredictionRun. No parallel whole scorer or public delivery
-entry point is added. PREDICTION_MODEL owns the declared ordinal tag policy and
-neutral fallback; this is not a calibrated expected-rating model.
+**Next action:** obtain exact-file approval for the single new hosted forward
+[`20261027085219_shared_prepared_input_consumption.sql`](../../supabase/migrations/20261027085219_shared_prepared_input_consumption.sql),
+SHA-256 `fb6d278cf4462177958883610d3c6b68a1c21c6d769deba422b8612d745cd84f`. Repository publication/merge authorization
+remains applicable; the owner's earlier hosted approval covered only the exact
+V4 receipt migration recorded below, not this different write. A READ ONLY run
+of the new migration's exact predecessor/security preflight passed on October 27;
+no hosted mutation, synthetic forecast, account reset or model activation occurred.
 
-Apply the new direction without fabricating a session backend: the first native
-consumer uses the existing truthful full-Profile enrollment basis. Add explicit
-overlapping-set isolation (A–B–C cannot feed A–B–Z), current enrollment-generation
-checks and revoked/erased-source rejection to its fixtures. Repeated use of an
-authorized same-set context may retain eligible prior evidence without changing
-the target experience's zero-response boundary. Future real session inputs need
-a versioned producer/adapter with actual lifecycle/roster receipts; a synthetic
-session ID or a hidden permanent-group picker does not meet that later gate.
+After approval, refresh the accepted source and take a fresh bounded preservation
+snapshot of all existing rows, complete function identities/bodies/metadata,
+table/access/default metadata and migration history. Apply only the accepted file
+through the migration owner. Verify its stored bytes, the five permitted body
+changes, seven closed private helpers and one RLS/owner-only binding table; preserve
+all old rows and unrelated definitions. Record advisors and real observed runtime
+separately. Any predecessor drift or preservation failure stops the affected
+rollout; do not rewrite migration history or drop retained evidence as a rollback.
+The private consumer can remain unused while a corrective forward is reviewed.
 
-Current local full-schema tests exercise genuine prepared-feature sensitivity,
-disagreement, empty/constant fallback, exact retries, stale source/target rejection,
-overlapping Profile/enrollment and Personal isolation, closed grants and dependent
-forecast erasure. Actual native SQL forecasts and frozen replay cross the portable
-adapter with exact identity/eligibility/ranks and `1e-12` score tolerance. The
-populated forward preserves existing rows, defaults, schema objects and unrelated
-function bodies. Independent native answer/membership/correction/withdrawal/retry
-probes are added to the CLI gate; their implementation is not a passing native run.
-
-Finish the final-source checks, inspect the native report against its exact source
-manifest, then merge the authorized source only after all five gates pass. Any
-new hosted rollout needs a concrete exact-file approval and fresh preservation
-preflight/receipt. Do not repeat the old producer or V4 receipt implementation.
-
-The producer's existing `INPUT_CAPTURE_ONLY` / `NOT_RECORDED` statuses remain
-truthful for unused artifacts. Genuine source consumption does not by itself
-admit joint learning, establish historical membership, select valid prospective
-outcome samples or prove usefulness. Require all five final-source gates before
-source acceptance and a separate preservation receipt for any new hosted forward.
-Existing repository publication/merge authorization remains applicable. The
-owner's October 27 hosted approval covers the exact V4 receipt migration below;
-it does not preapprove a different future hosted write.
+Future actual session inputs require a versioned producer/adapter with real
+lifecycle/roster receipts. No synthetic session ID or hidden permanent-group
+picker satisfies that product gate. Source consumption does not itself admit
+joint learning, certify historical membership/commit visibility, select valid
+prospective outcome samples or prove usefulness.
 
 Sprint 015 remains open for remaining four-consumer parity, exposure/outcome
 reconciliation, native/hosted performance and predictive quality. Unlike retained
 recognition and Discovery selection policies remain non-comparable; guided
 policy/readiness keeps its Sprint 019 dependencies. Existing phone/runtime and
-release gates remain recorded without blocking this authorized source work.
+release gates remain recorded without blocking authorized independent source work.
+
+## Accepted Shared prepared-input consumption — #383
+
+The ninth bounded source packet supplies genuine prepared-feature use through
+the existing native scoring owners, strict source/target/enrollment admission,
+atomic input/feature bindings, portable frozen replay and dependent-source erasure.
+Complete attributed vectors contribute within-actor ordinal tag comparisons;
+empty, unsupported or constant evidence has neutral fallback. Existing common-fit
+shrinkage, consensus and disagreement arithmetic is reused. Prepared inputs use
+an explicit neutral prior; legacy callers retain their catalog prior.
+
+Four actual native forecasts cross the SQL/portable/frozen FINAL boundary with
+exact identity, eligibility, ranks and selection, **zero** maximum score difference
+at `1e-12`. The fixtures prove genuine feature sensitivity, disagreement,
+constant/empty fallback, exact retries, 0/5/10 ordinal sensitivity and positive
+affine response-scale invariance. Pure counterfactual copies are not native
+observations. Personal and overlapping A–B–C/A–B–Z inputs remain isolated.
+Corrections preserve existing forecasts and reject fresh use of a stale input;
+source withdrawal removes dependent runs/bindings/inputs. Erasing copied actor B
+also removes Shared forecasts requested by A while preserving A's separate
+Personal forecast. No measured quality claim follows.
+
+Independent native connections observe **seven** actual lock orders: consumer
+before/after target answer, source correction before consumer, source withdrawal
+before/after consumer, identical concurrent request and membership leave/rejoin
+before consumer. Rejected requests leave no forecast, retries return one exact
+result, and the complete concurrency fixture restores the full canonical row snapshot. Stack cleanup
+also passes; elapsed time alone is not accepted as concurrency evidence.
+
+The populated forward preserves all old rows/defaults, **2493**
+existing native schema objects and **269** existing function
+identities/metadata. Exactly five allowed bodies change and seven private INVOKER
+helpers are added. Closed grants, configuration/definer/collision/unknown-default
+rejection and unknown semantic-body rejection pass. The exact reviewed hosted
+common-fit comment/format variant is also rollback-rehearsed, preserving metadata;
+arbitrary normalization or unreviewed semantic variants are not admitted.
+
+**Implementation evidence:** all five required gates pass in
+[CI #785](https://github.com/Kajooja/Kajo/actions/runs/40486671110) on `9b9b9e0adc2e772e9fa043c32ef7a6cd05139714`. Its tested PR merge
+`1f8655c57a1449215eb141094b885d3d6243b4a4` and implementation source share tree
+`725b4d3519b2fde0956117cbf99b2a6efdb6a4fa`. The downloaded native report was independently checked
+against the entire source/migration manifest; SHA-256
+`07af3e6db786d17d1b57a3e143a7bd00e277c3feb8779afc4d85b2fca7eec943`. The final receipt-only documentation head must also pass
+the same five gates before #383 merges; the PR retains that final head/run/merge
+receipt. Later production installation requires the separate preservation receipt.
+
+**Validation:** 388 database, 332 engine, 904 mobile, 451 catalogue, 50 dependency,
+72 research, 11 acceptance and 32 Edge tests pass in CI, with lint/typecheck,
+ESM/import-graph checks and four configured exports. Local root check stopped at
+the Deno npm-registry connection refusal, and local configured smoke lacked the
+Supabase URL; neither is reported as a complete local pass. The seven focused
+current SQL tests pass locally. Initial CI #783/#784 stopped at a boolean psql
+acknowledgement format in the new test harness. The correction emits JSON and
+normalizes log-stage labels; no database guard, lock proof or tolerance was relaxed.
 
 ## Hosted owned V4 receipt binding — 2026-10-27
 

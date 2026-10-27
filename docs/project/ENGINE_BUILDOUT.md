@@ -325,6 +325,16 @@ performance or observed quality. Canonical contract details are in
 [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#frozen-final-scoring-input--sprint-015-source),
 and source/CI versus hosted acceptance remains in STATUS.
 
+The #232F prepared-input consumer now computes a prospective native Shared
+forecast from supported immutable response vectors through those existing
+identity/common-fit/FINAL owners. A separate consumption binding retains actual
+use while old input artifacts keep their capture-only statements. The declared
+within-actor ordinal baseline, exact enrollment/source isolation, frozen replay
+and dependent erasure advance EB-01/EB-03. They do not admit joint learning,
+prove a calibrated numeric rating or implement temporary Friend sessions.
+STATUS owns source/native acceptance and the separately authorized hosted gate;
+do not repeat the producer or build a parallel whole scorer.
+
 **Exit evidence:** the mapped cycle preserves Profile-as-Subject versus acting User, Personal/Shared scope, event occurrence/availability, candidate/slate order, frozen versions, late outcomes, idempotency and rollback. Extract one computation behind the current server boundary only after a same-input parity comparison; avoid a second drifting whole-scorer implementation. The eventual reusable integration must be exercised through the native boundary and another adapter, not merely imported into an unused package. Runtime acceptance and the E1 contract acceptance remain distinct.
 
 An optional externally trained prior is not a prerequisite for this core extraction. Conversely, rejecting that prior does not complete or cancel native-core integration. Full extraction is not silently added to MVP when existing requirements can be satisfied safely by the accepted SQL boundary.

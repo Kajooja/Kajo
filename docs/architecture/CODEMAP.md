@@ -419,6 +419,9 @@ erasure boundary. Guarded changes reuse `rank_items_request_with_identity_v1`,
 the frozen FINAL run/validator and existing source eraser. The Shared common-fit
 and FINAL score formulas are unchanged. Normal delivery and Personal calls keep
 their existing paths. No new public RPC or SharedSession identity is introduced.
+The prepared-only prior is explicitly neutral; legacy callers retain their
+catalog prior. The guarded forward accepts the exact reviewed hosted comment/
+format variant and canonical fresh body, while rejecting unknown semantic drift.
 
 `shared-prepared-consumption.{mjs,test.mjs}` and its SQL fixture exercise populated
 row/schema/grant preservation, real attributed outcome captures, numeric ordinal
