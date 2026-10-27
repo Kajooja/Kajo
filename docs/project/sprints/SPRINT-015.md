@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — eight source packets accepted; four SQL forwards installed; remaining acceptance open**
+Status: **IN PROGRESS — eight source packets accepted; five SQL forwards installed; remaining acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -74,7 +74,7 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The next bounded packet is the guarded hosted rollout of the accepted owned V4 receipt-to-forecast forward, awaiting explicit approval after automatic review rejected the exact production write; [STATUS](../STATUS.md) owns the source/CI receipt, rejection and preservation gates.
+The next bounded source packet is genuine #232F Shared prepared-input consumption; [STATUS](../STATUS.md) owns its exact scope and the completed owned V4 receipt-forward installation.
 
 ## Evidence and completion rules
 
@@ -115,18 +115,29 @@ does not become an invented pass.
   but exposed distinct global snapshot witnesses. Report v2 retains the full
   comparator result for each pair and reports receipt-aligned computation parity
   separately from full-input equality, with no snapshot rebinding. The final
-  source passes its declared gates. The new forward is **not hosted**. [STATUS](../STATUS.md)
-  owns the exact report receipt and one guarded rollout handoff. Global/history,
+  source passes its declared gates. The guarded forward is installed with the
+  receipt below. [STATUS](../STATUS.md) owns the exact source/native/hosted evidence
+  and one #232F consumer handoff. Global/history,
   four-consumer policy, runtime/performance and predictive-quality gates stay open.
 
-- Automatic approval review rejected this forward's hosted `apply_migration`
-  call because prior user-authored approval did not clearly cover this exact
-  production database write. No bypass was attempted. READ ONLY post-rejection
-  checks confirm 6465 fixed rows, 268 function identities/bodies/metadata,
-  24 default-privilege records and 92 history rows unchanged, with neither new
-  helper nor migration history entry present. The new forward remains uninstalled.
-  [STATUS](../STATUS.md) records the exact file/SHA and one approval-dependent
-  rollout handoff; the accepted source and CI do not need to be repeated.
+- On October 26 automatic approval review rejected this forward's hosted
+  `apply_migration` call because earlier approval did not clearly cover that
+  exact production write. READ ONLY checks confirmed no changes; no bypass was
+  attempted. On October 27 the owner explicitly approved the linked migration,
+  resolving that block. Fresh preflight preceded the verified installation below.
+
+- Owned V4 receipt forward is installed under the provider-issued history name
+  `20261027063814_native_v4_receipt_forecast_binding`;
+  its stored SQL exactly matches the accepted source SHA-256
+  `a4ec8f5cf5215d65c9b2f65eb64fb66a3621662b9d20516d221db41fdc4fd2e3`. Fresh pre/post checks
+  preserve 6465 fixed rows across 67 tables, all 268 existing function identities/
+  metadata, 264 unrelated bodies, 24 default-privilege records and all 92
+  previous history rows. Exactly four expected bodies change and two closed
+  private INVOKER helpers are added. Read-only missing/invalid receipt rejection,
+  49 legacy admission results and unchanged advisor findings are verified.
+  No fresh marked run or device observation was manufactured. [STATUS](../STATUS.md)
+  owns the exact hosted receipt and next genuine #232F source-consumption packet;
+  broader parity, runtime/performance, outcome and quality gates stay open.
 
 - Seventh source packet: accepted through [PR #376](https://github.com/Kajooja/Kajo/pull/376),
   merge `1c9ff2aa6f37325c8d7214fe9a1e692f048da647`. Actual V4 catalogue and request base scoring consume one
@@ -156,7 +167,7 @@ does not become an invented pass.
   their replay result. Security/performance findings are unchanged. No new marked
   run or synthetic observation was created. This completes installation and
   preservation, not fresh hosted serving, performance, quality or Sprint 015.
-  STATUS owns the current guarded receipt-forward rollout; broader policy
+  STATUS owns the current #232F prepared-input consumer packet; broader policy
   alignment, certified historical availability and the other sprint gates stay open.
 
 - Sixth source packet: accepted through [PR #374](https://github.com/Kajooja/Kajo/pull/374),
