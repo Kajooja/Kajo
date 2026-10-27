@@ -33,7 +33,7 @@ test('dependency containment accepts Windows/POSIX installs and rejects escapes'
 
 test('all locked instances contain the exact security corrections', async () => {
   const receipt = await securityPatches();
-  assert.deepEqual(new Set(receipt.map(value => value.name)), new Set(['braces', 'node-forge', 'zod']));
+  assert.deepEqual(new Set(receipt.map(value => value.name)), new Set(['braces', 'node-forge', 'zod', 'deepmerge']));
 });
 
 test('source corrections are idempotent and reject unrelated edits or partial patches', async () => {
@@ -173,10 +173,56 @@ test('both distributed browser bundles reject the same malformed signatures', as
   }
 });
 
-test('negative controls reproduce both defects in pristine upstream source', async () => {
+test('deepmerge rejects prototype injection in both bundles and preserves normal merge options', async () => {
+  const correction = corrections.find(value => value.name === 'deepmerge');
+  for (const file of correction.files.filter(value => value.path.startsWith('dist/'))) {
+    const source = await readFile(resolve(projectRoot, 'node_modules/deepmerge', file.path), 'utf8');
+    const load = code => {
+      const sandbox = { module: { exports: {} }, exports: {} };
+      runInNewContext(code, sandbox, { timeout: 1000 });
+      return sandbox.module.exports;
+    };
+    const merge = load(source), original = load(originalSource(source, file));
+    const payload = () => JSON.parse('{"__proto__":{"kajoPoison":true}}');
+    const plainPrototype = Object.getPrototypeOf(merge({}, {}));
+    for (const target of [Object.create(null), null, undefined, 0, false, payload()]) {
+      assert.equal(original(target, payload()).kajoPoison, true, 'Pristine control must reproduce returned-object poisoning');
+      const result = merge(target, payload());
+      assert.equal(result.kajoPoison, undefined);
+      assert.equal(Object.hasOwn(result, '__proto__'), false);
+      assert.equal(Object.getPrototypeOf(result), plainPrototype);
+    }
+    assert.equal(original(payload(), {}).kajoPoison, true, 'Target-copy control must reproduce poisoning');
+    assert.equal(merge(payload(), {}).kajoPoison, undefined);
+    for (const clone of [true, false]) {
+      assert.equal(merge({ session: null }, { session: payload() }, { clone }).session.kajoPoison, undefined);
+    }
+    const hostile = Object.create(null);
+    Object.defineProperty(hostile, '__proto__', { enumerable: true, get() { throw new Error('Forbidden getter reached'); } });
+    assert.doesNotThrow(() => merge(hostile, {}));
+    assert.doesNotThrow(() => merge(Object.create(null), hostile));
+    const symbol = Symbol('feature'), sourceValue = { enabled: true }, date = new Date(0);
+    const ordinary = merge({ nested: { left: 1 }, list: [1], [symbol]: { left: 1 } },
+      { nested: { right: 2 }, list: [2], [symbol]: { right: 2 }, date });
+    assert.deepEqual(JSON.parse(JSON.stringify(ordinary)), { nested: { left: 1, right: 2 }, list: [1, 2], date: date.toISOString() });
+    assert.equal(ordinary[symbol].left, 1); assert.equal(ordinary[symbol].right, 2);
+    assert.equal(ordinary.date, date);
+    assert.equal(merge({}, { nested: sourceValue }, { clone: false }).nested, sourceValue);
+    assert.notEqual(merge({}, { nested: sourceValue }).nested, sourceValue);
+    const customized = merge({ nested: { left: 1 }, list: [1] }, { nested: { right: 2 }, list: [2] }, {
+      customMerge: key => key === 'nested' ? () => ({ chosen: true }) : undefined,
+      arrayMerge: (_target, next) => next,
+    });
+    assert.deepEqual(JSON.parse(JSON.stringify(customized)), { nested: { chosen: true }, list: [2] });
+    assert.equal(merge.all([{}, payload(), { valid: 1 }]).valid, 1);
+    assert.equal(({}).kajoPoison, undefined);
+  }
+});
+
+test('negative controls reproduce braces and RSA defects in pristine upstream source', async () => {
   const temporary = await mkdtemp(join(tmpdir(), 'kajo-security-controls-'));
   try {
-    for (const correction of corrections.filter(value => value.name !== 'zod')) {
+    for (const correction of corrections.filter(value => ['braces', 'node-forge'].includes(value.name))) {
       const directory = join(temporary, correction.name);
       await cp(resolve(projectRoot, 'node_modules', correction.name), directory, { recursive: true });
       for (const file of correction.files) {

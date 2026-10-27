@@ -502,6 +502,11 @@ in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 `scripts/dependencies/security-patches.mjs` installs/verifies the exact October
 braces depth and node-forge DigestAlgorithm corrections. `security-patches.test.mjs`
 reproduces unpatched defects and tests corrected installed consumers.
+The October 27 performance CI repair extends the same owner to deepmerge 4.3.1's
+`__proto__` source/target-copy guards in the exact source and CJS/UMD bundles,
+with pristine negative controls and normal merge-option coverage. The low
+deepmerge leaf still requires its own verified correction under Expo's high
+meta-findings; the audit classification policy is unchanged.
 `audit-dependencies.mjs` / `audit-dependencies.test.mjs` preserve raw npm findings
 and fail on unmitigated advisories or unverifiable patches. The correction contract
 is in ARCHITECTURE; `dependency-audit-native-2026-10-05.json` records the actual

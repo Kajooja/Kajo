@@ -13,11 +13,20 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current handoff — native prediction performance baseline / Sprint 015
 
-The twelfth bounded source packet is branch `test/native-prediction-performance`,
+The twelfth bounded source packet is [PR #388](https://github.com/Kajooja/Kajo/pull/388),
+branch `test/native-prediction-performance`,
 based on accepted main `4891bfd235f10f3b28c66ef294694e6e01f710fb` /
 [PR #387](https://github.com/Kajooja/Kajo/pull/387). It adds a disposable native
 PostgreSQL measurement job through the existing installer and authenticated
 Discovery/Taste RPCs. It changes no migration, serving scorer or hosted state.
+
+The first CI attempt stopped at the fresh advisory audit: the newly reviewed
+deepmerge advisory reached Expo's high meta-findings. The bounded build repair
+uses the existing exact-archive/source correction owner for deepmerge 4.3.1,
+rejecting `__proto__` on both source and target copying. Pristine controls
+reproduce the defect; all 32 security/audit regressions pass locally. Package
+identity, raw findings and audit policy remain unchanged. Require a fresh
+successful audit and all six final-source jobs after this repair.
 
 The predeclared [Sprint 015 measurement protocol](sprints/SPRINT-015.md#native-database-performance-protocol)
 has 12 cohorts: 40/1000 synthetic Items × Personal MOVIE Discovery / two-member

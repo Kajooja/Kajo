@@ -2104,6 +2104,20 @@ The corrections are temporary compatibility backports. Review/remove each when
 a fixed upstream release is available; changed source/version fails until reviewed.
 All normal checks, actual APK build and owner device acceptance remain required.
 
+The October 27 native performance gate additionally encountered
+[GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4), a low
+`deepmerge` leaf reached by high-severity Expo meta-findings. No fixed release is
+listed. The exact 4.3.1 archive/source correction rejects `__proto__` in both the
+source guard and target-copy loop, independent of target shape, across `index.js`
+and both CJS/UMD bundles. This closes reproduced null-prototype, primitive/null
+placeholder, own-key and nested returned-object poisoning from
+[deepmerge#273](https://github.com/TehShrike/deepmerge/issues/273). It does not
+rename the package, relax advisory traversal or claim every generic merge is safe.
+Pristine-source negative controls and installed-bundle tests cover both loops,
+forbidden getters, cloning, arrays, symbols, dates and custom merge callbacks.
+All reachable advisory leaves must still qualify before an Expo parent is marked
+mitigated; a low leaf cannot borrow another package's correction.
+
 The October 24 Discovery build also encounters
 [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5).
 The compatible v4 lock leaf must use the published 4.6.7 fix; Expo CLI's declared
