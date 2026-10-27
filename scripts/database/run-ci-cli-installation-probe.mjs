@@ -46,7 +46,7 @@ import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { sharedPredictionCutoffSmokeSql } from './shared-prediction-cutoff.mjs';
 import { nativeCandidateRequestSmokeSql, nativeAcquisitionSmokeSql, verifyNativeAcquisitionUpgrade } from './native-candidate-request.mjs';
-import { verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './native-prediction-adapter.mjs';
+import { verifyNativePredictionAdapter, verifyNativeTasteConsumer, verifyNativeDiscoveryParity } from './native-prediction-adapter.mjs';
 import { verifyNativeV4ReceiptUpgrade, verifyNativeV4Receipt, verifyNativeV4ReceiptConcurrency } from './native-v4-receipt.mjs';
 import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption, verifySharedPreparedHostedVariant } from './shared-prepared-consumption.mjs';
 import { verifySharedPreparedConcurrency } from './shared-prepared-consumption-concurrency.mjs';
@@ -93,6 +93,10 @@ try {
     assert.equal(deadlineRollback.absent, true, 'Timed-out server statement left partial DDL');
     const sqlStatementDeadline = { status: 'PASS', serverTimeoutMs: 5000, dockerTimeoutMs: 10_000,
       rollback: 'owned test table absent after server statement cancellation' };
+    const nativeDiscoveryParity = await verifyNativeDiscoveryParity(exec);
+    assert.equal(nativeDiscoveryParity.status, 'PASS');
+    assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), expected,
+      'Discovery parity changed the installed source');
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
     const reconciliationIndex = files.findIndex(file => file.name.endsWith('_shared_forecast_outcome_reconciliation.sql'));
@@ -489,7 +493,7 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
-      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer,
+      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,

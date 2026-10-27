@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
-import { nativePredictionAdapterFixtureSql, verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './native-prediction-adapter.mjs';
+import { runIsolatedSqlProbe } from './ci-supabase-stack.mjs';
+import { nativePredictionAdapterFixtureSql, verifyNativePredictionAdapter, verifyNativeTasteConsumer,
+  verifyNativeDiscoveryParity } from './native-prediction-adapter.mjs';
 
 test('actual native sources and independent frozen replay cross the Kajo adapter and generic conformance boundary', async t => {
   const db = new PGlite();
@@ -84,4 +86,54 @@ test('actual committed V4 Taste commands reach native input conformance and pres
     assert.equal(report.cleanup, 'CANONICAL_ROWS_RESTORED');
     t.diagnostic(JSON.stringify(report));
   } finally { await db.close(); }
+});
+
+test('all supported Discovery scope, mode, domain and acquisition inputs match frozen native shadow replay', async t => {
+  const db = new PGlite();
+  let failure;
+  try {
+    await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;
+      create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}',is_anonymous boolean default false);
+      create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+      grant usage on schema public,auth to anon,authenticated,service_role;`);
+    for (const file of (await buildFreshInstallation()).files) await db.exec(`begin;${file.sql}commit;`);
+    const tables = (await db.query(`select format('%I.%I',n.nspname,c.relname) name from pg_class c
+      join pg_namespace n on n.oid=c.relnamespace where c.relkind='r' and n.nspname in('public','private','auth') order by 1`)).rows;
+    const snapshot = async connection => Promise.all(tables.map(async ({ name }) => [name,
+      (await connection.query(`select to_jsonb(r) value from ${name} r order by to_jsonb(r)::text`)).rows]));
+    const before = await snapshot(db), installed = await db.dumpDataDir();
+    await db.close();
+    const report = await verifyNativeDiscoveryParity(async (sql, options) => {
+      // Validate the caller options through the actual native runner contract;
+      // the SQL itself executes in the installed PGlite snapshot below.
+      await runIsolatedSqlProbe(() => '', 'pglite-contract-check', sql, options);
+      // Match the native runner's distinct psql connections. Reusing one WASM
+      // session for these rollback fixtures reproducibly fails on its third
+      // batch; the same batch passes from this identical installed snapshot.
+      const connection = new PGlite({ loadDataDir: installed });
+      let batchFailure;
+      try {
+        const result = (await connection.exec(sql)).flatMap(result => result.rows.map(row => row.snapshot));
+        assert.deepEqual(await snapshot(connection), before, 'Every batch must restore every canonical row');
+        return result;
+      } catch (error) { batchFailure = error; throw error; }
+      finally {
+        try { await connection.close(); }
+        catch (error) { throw new AggregateError(batchFailure ? [batchFailure, error] : [error], 'Discovery batch and cleanup failures'); }
+      }
+    });
+    assert.equal(report.status, 'PASS');
+    assert.equal(report.cases.length, 54);
+    assert.equal(report.publicRpcCases, 24);
+    assert.ok(report.comparedCandidates >= 270);
+    assert.equal(report.absoluteTolerance, 1e-12);
+    assert.ok(report.maxAbsoluteScoreDifference <= report.absoluteTolerance);
+    assert.equal(report.predictiveQuality, 'NOT_EVALUATED');
+    assert.equal(report.cleanup, 'ROLLED_BACK');
+    t.diagnostic(JSON.stringify(report));
+  } catch (error) { failure = error; throw error; }
+  finally {
+    try { if (!db.closed) await db.close(); }
+    catch (error) { throw new AggregateError(failure ? [failure, error] : [error], 'Discovery parity and cleanup failures'); }
+  }
 });

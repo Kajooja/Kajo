@@ -83,6 +83,14 @@ Committed 0/5/10 answers, exact retries, immutable old sources and retained/fres
 other-Profile controls share this verifier across PGlite and native PostgreSQL.
 The report explicitly exposes the V4 recognition-pool versus Discovery
 acquisition/selection boundary; it does not claim four-consumer same-pool serving.
+`verifyNativeDiscoveryParity` extends the same adapter/worker comparison to all
+54 Personal/Shared × mode × BOOK/MOVIE/mixed-domain × legacy/empty-catalogue-
+prefix/seen-catalogue-prefix cases. The 24 supported BOOK/MOVIE first-page cases
+call authenticated public page/feed RPCs and verify their delivered identities,
+scores, ranks and exact retries. Mixed-domain and explicit seen-prefix controls
+use their actual private contracts. Six rollback-only batches retain full input
+comparisons after catalogue mutation and restore canonical rows. The PGlite test
+and existing native CLI gate run this verifier; no adapter or scorer is copied.
 Fixtures and snapshots are disposable. The original adapter packet changed no
 SQL; the separate FINAL-input forward above preserves existing formulas, public
 APIs, forecasts and accounts. STATUS owns actual hosted installation.
