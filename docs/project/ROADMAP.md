@@ -4,6 +4,22 @@ Roadmap order is outcome-based, not tied to fixed two-week timeboxes. A sprint e
 
 This file owns execution order. `STATUS.md` owns the exact next task. `MVP.md` owns release requirements. `LAUNCH_LOOP.md` owns the Taste-first acquisition flow. Historical sprint files preserve implementation detail and must not be replaced by this summary.
 
+## Friend network and temporary joint sessions — owner refinement 2026-10-27
+
+[ADR-0013](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+replaces required permanent-group creation/selection with temporary accepted
+SharedSessions from Friends. The internal SharedProfile retains authorized joint
+memory; different accepted participant sets remain isolated. Same-set history
+reuse is the working design assumption; legacy groups/data are not merged/reset.
+
+Engine-first order below remains. Apply exact roster/source isolation now to
+Sprint 015's genuine #232F consumer using the existing authorized Profile basis.
+Build Friend/session lifecycle, versioned input binding, legacy migration and
+replacement navigation in Phase 16.2 after its actual dependencies. Do not claim
+that legacy Profile fixtures implement session participation or require broad
+social UI before the current engine packet. Dated fixed-group plans below retain
+their history; this refinement and the updated Phase 16 scope govern the target.
+
 ## Engine V1 first — owner decision 2026-10-25
 
 This is the current execution order. It supersedes older “next”, near-term and
@@ -104,7 +120,7 @@ After Engine V1 acceptance, complete the retained functional backlog in this ord
 2. Web/public Taste entry, server-backed anonymous identity, minimum retention/
    abuse/measurement, browser/app continuation and Google/Apple conversion
    (Phase 15). The engine and own-Profile guided policy are reused, not rebuilt.
-3. Preview, personal invites, Friends lifecycle, explicit Shared creation,
+3. Preview, personal invites, Friends lifecycle, temporary Shared sessions,
    coordinated rating and bounded group decisions (Phase 16). Preserve the
    existing distinction between friendship, membership and private history.
 4. Remaining telemetry, privacy, support and operating flows (Phase 17.1–17.2).
@@ -614,7 +630,7 @@ release requirements. Historical sprint plans do not override this order.
 | #238 dependencies | Recorded source advisories resolved through #296; ongoing MVP-OPS-005 maintenance. | Accepted compatible decoder/UUID/Vitest fixes, audit receipt and required CI. Actual web/native link round-trips remain under 15.1 / MVP-ACQ-007; Node parser tests do not close them. |
 | #160 security | Immediate accepted-source deployment/platform follow-up; complete abuse/privacy gate in 17.2, production recheck in 19.0. | #295 fixes source configuration/input validation. Hosted verification, password protection, supported security upgrade and distributed abuse/anti-enumeration remain. Public-entry controls must pass before external users, even when built ahead of their numbered operations phase. |
 | #184 identity conversion | Complete provider conversion in 15.1; server-backed anonymous identity is a prerequisite within 15.0. | Same logical User/PersonalProfile, ownership-proved collisions, interruption/retry and real Google/Apple browser/app configuration. Minimum anonymous retention/abuse/measurement precedes real Taste acceptance; no email-only merge or duplicate taste state. |
-| #232 Shared rounds | Evidence/eligibility contracts 14.1–14.2; genuine #232F consumer remains queued; coordinated user flow 16.3. | Personal Taste/setup and explicit Shared creation first. Participant/round provenance, individual answers, atomic completion/correction, membership races and bounded rewatch. Known evidence defects cannot be deferred; advanced Shared consumer/model enhancements are not a serial prerequisite to Personal source work. |
+| #232 Shared rounds | Evidence/eligibility contracts 14.1–14.2; genuine #232F consumer remains queued; coordinated user flow 16.3. | Personal Taste/setup and authorized joint context first; the October 27 product successor uses accepted temporary sessions. Participant/round provenance, individual answers, atomic completion/correction, membership races and bounded rewatch. Known evidence defects cannot be deferred; advanced Shared consumer/model enhancements are not a serial prerequisite to Personal source work. |
 | #200 history navigation | Scheduled 17.0, before visual browse refinements. | Discovery Katsotut/Luetut must use canonical active-Profile/ItemType history and contextual Lists, with cold entry, permission/error handling and real-origin return. Reuse #229 and accepted cold-history work. |
 | #199 grid | Owner-promoted append/compact-layout correction in the current native packet (2026-10-06); remaining broad UX stays 17.0 after accepted #229. | BOOK/MOVIE append must pass beyond the old 50-candidate window without recycling/resetting Items, preserve exact origins/order and report genuine eligible-catalogue exhaustion separately from limits/expiry. One-row ItemType/Löydä/history and unused bottom-space removal are included. Server forward, CI/APK and real gesture/small-screen/large-text acceptance remain separate. Old poster/token/import defect remains superseded; no new MOVIE acquisition. |
 | #239 cards | Shared feed/Ohita and the October 22–23 compact viewport, direct rating, List star, reverse undo and quiet durable-navigation refinements are current Sprint 014 work, required MVP-UX-006/007. Discovery retains the active card plus five prepared successors. Broader collection/detail polish stays 17.0. | Reuse Saved/Shared Endorsement, multi-destination commands, installed skip authority and exact origins. Validate forward advance after durable local admission, latest-prefix refill and stable recovery. Positive advance never adds Ohita; durably admitted undo can show an inert cached prior Item, but only ordered acknowledgements plus fresh same-Item delivery restore actionable state. Account-scoped help, accessibility actions and usable controls/credits remain required. |
@@ -754,7 +770,7 @@ The milestone may close only after:
 - Taste Test establishes useful first-session taste and its holdout challenge is truthful,
 - anonymous → Google/Apple conversion preserves the same PersonalProfile,
 - personal invite → Friend works without automatically creating a SharedProfile,
-- Friends → explicit SharedProfile creation is easy and consent-based,
+- Friends → temporary SharedSession is easy and consent-based, with isolated joint context/history and no required permanent-group picker,
 - the link-to-app funnel is observable and abuse-safe,
 - closed beta validates the complete flow,
 - production/privacy/recovery/store gates and owner acceptance pass,
@@ -1065,7 +1081,7 @@ Requirements: `MVP-ACQ-005..007`.
 
 Exit: personalized preview before primary auth CTA; auth does not reset cold start; campaign/referral attribution survives exactly once; funnel measured separately from reward; experiments versioned.
 
-## Phase 16 — Friend viral loop and Shared creation
+## Phase 16 — Friend network and temporary Shared sessions
 
 ### 16.0 — Personal Friend invite
 
@@ -1082,25 +1098,32 @@ Requirements: `MVP-FRIEND-005..007`.
 
 Exit: both users see the connection; remove/block/reinvite behavior is safe under replay; enumeration/spam protection; Friendship independent of Shared membership.
 
-### 16.2 — SharedProfile creation from Friends
+### 16.2 — Temporary joint browsing from Friends
 
-Requirements: `MVP-GROUP-001..004` and existing SharedProfile requirements.
+Requirements: `MVP-GROUP-001..005`, `MVP-NAV-005` and retained SharedProfile
+requirements. The October 27 direction supersedes the named-group creation UX.
 
-Planned compact creation flow: **2–5 total people including the creator**, with
-the creator occupying one of at most five member slots. A `+` slot selects an
-authorized accepted Friend or generates an opaque invitation that can be shown,
-copied or shared through the OS share sheet, including WhatsApp where available.
-Friend invite/safety lifecycle under 16.0–16.1 comes first. The receiver follows
-the same app/Taste/link continuation and explicitly accepts the relevant Friend
-or group permissions; sending/opening a link never creates either relationship.
-Friendship grants no private Personal history access. The compact UI bound does
-not redefine existing generic 2-N SharedProfile storage.
+After 16.0–16.1's Friend/safety lifecycle, implement in bounded packets:
 
-Exit: short explicit two-person creation; each additional participant accepts
-canonical membership; pending slots/invites are distinct from accepted members;
-expiry/revocation/retry and blocked/removed relationships remain safe. Use the
-canonical joint/common-fit predictor; Friend removal does not rewrite Shared
-history/membership. This October 9 plan is not delivered UI or acceptance.
+1. Server-owned SharedSession/SharedSessionInvite lifecycle: **2–5 total people
+   including the initiator**, explicit roster acceptance, pending/declined/expired
+   states, all-pair block checks, safe revoke/end/leave and exact retries.
+2. Resolve an authorized internal SharedProfile for the exact accepted set;
+   retain same-set eligible history, isolate changed sets and preserve legacy
+   named profiles without automatic merge. Version the session/input adapter;
+   bind actual lifecycle/roster receipts through the common prediction boundary.
+3. Replace required group naming/picking with Friends → choose people → invite
+   → joint browsing. Show participants and resume/leave; provide authorized
+   retained Lists/history. Links use explicit Friend and session consent through
+   the same app/Taste/auth continuation, with show/copy/OS-share where supported.
+4. Verify A–B–C → A–B–Z → A–B–C, concurrent starts, changed/pending roster,
+   restart/stale queued cards, expiry/block/deletion, delayed rounds and legacy
+   history/access preservation on server and representative accessible devices.
+
+Exit: no permanent group creation/selection is required for the normal flow;
+only the actual accepted active roster contributes to its joint context. Keep
+the canonical scorer, Personal privacy, source erasure and generic legacy 2-N
+storage. This remains planned functionality, not delivered by ADR-0013.
 
 ### 16.3 — Shared experience rating and controlled rewatch
 
@@ -1120,7 +1143,7 @@ N-member server/CI/device cases must pass; completion alone is not satisfaction.
 Requirements: `MVP-SOCIAL-010..012`. Implement after 16.3's evidence and controlled
 rewatch contracts and the Friend/membership foundations, before the complete beta.
 
-Offer an optional Shared session for “what should we watch/read today?” with at
+Within the accepted SharedSession, offer an optional “what should we watch/read today?” mode with at
 most five current canonical BOOK/MOVIE suggestions from the same Shared
 predictor and inherited `DiscoveryMode` (`FOR_YOU`, `SURPRISE`, `RISK`). An optional
 Tinder-like card sequence has accessible non-gesture controls. Proposed behavior:
@@ -1214,7 +1237,7 @@ Test the intended path, not merely pre-created accounts:
 
 ```text
 link → Taste Test → challenge → preview → Google/Apple → Kajo
-     → invite Friend → Friendship → explicit SharedProfile → joint recommendation
+     → invite Friend → Friendship → accepted SharedSession → joint recommendation
 ```
 
 Exit: clean external users complete it without developer intervention; useful initial recommendations; no critical identity/taste/invite/privacy defects; delayed outcomes collected; major funnel/UX defects fixed; owner acceptance on representative Android/iOS devices.

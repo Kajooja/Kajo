@@ -45,7 +45,9 @@ implementation and measured-usefulness gates.
 Prediction targets a `Profile`, never a User directly.
 
 - `PersonalProfile` = one person's learned Kajo.
-- `SharedProfile` = persistent 2-N person Kajo with its own evidence, memory and joint taste.
+- `SharedProfile` = durable internal joint context with its own evidence, memory
+  and taste. The October 27 target uses it through temporary accepted
+  `SharedSession`s; it is not a permanent group the user must name/select.
 
 A SharedProfile is not a simple average of member profiles.
 
@@ -85,7 +87,13 @@ Important invariant:
 
 > **Friendship is not SharedProfile membership.**
 
-A personal invite does not automatically create a joint profile. Friends appear on a lightweight Friends surface and can explicitly create a SharedProfile in one short consent-based flow.
+A personal invite does not automatically create a joint profile or join a
+session. Friends appear on a lightweight Friends surface: select the people,
+invite them and browse together after explicit acceptance. A–B–C today and
+A–B–Z tomorrow are different joint contexts. Ending a session preserves
+authorized history; the same people may use their joint memory again.
+[ADR-0013](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md)
+owns this planned successor and preservation of existing named groups.
 
 This preserves the natural path:
 
@@ -94,7 +102,7 @@ one user
 → invite next person
 → both have useful PersonalProfiles
 → Friendship
-→ optional SharedProfile
+→ optional temporary SharedSession
 → joint recommendations
 ```
 
@@ -200,8 +208,8 @@ Kajo is not primarily a feed-based social network.
 The first social layers are:
 
 1. consent-based `Friendship`,
-2. persistent `SharedProfile`,
-3. Shared Lists/Endorsement/messages.
+2. temporary accepted `SharedSession` with a durable internal `SharedProfile`,
+3. context-scoped Shared Lists/Endorsement/messages and authorized joint history.
 
 Later optional friend-review feeds may exist only if they help people make choices without turning Kajo into endless scrolling.
 
@@ -221,7 +229,7 @@ Initial functional objects:
 - screen/projector → movies,
 - window/curtain → DiscoveryMode,
 - fireplace → ambient identity,
-- restrained social navigation → Friends/SharedProfiles.
+- restrained social navigation → Friends and active SharedSession.
 
 Graphics can evolve substantially without rewriting domain/event/prediction contracts.
 
@@ -250,7 +258,7 @@ Important measures include:
 - Taste Test completion and honest holdout quality,
 - Taste → account activation,
 - invite → Friend conversion,
-- Friends → SharedProfile creation.
+- Friends → accepted SharedSession and later confirmed joint outcomes.
 
 Installs, swipes and time spent are not North Stars.
 
@@ -262,7 +270,7 @@ Keep separate:
 
 - Identity/Auth,
 - Personal/Shared taste state,
-- Friend/Shared social relationships,
+- Friend relationships, temporary Shared sessions and durable joint contexts,
 - acquisition/Taste sessions,
 - Event/Prediction evidence.
 
@@ -278,7 +286,7 @@ The first release requires:
 - web/app Taste links,
 - anonymous → Google/Apple conversion,
 - Friends through personal invite links,
-- explicit Friends → SharedProfile creation,
+- explicit Friends → temporary SharedSession with no required permanent-group picker,
 - Lists/search/core Shared flows,
 - funnel/evaluation telemetry,
 - privacy/abuse/recovery/operations,

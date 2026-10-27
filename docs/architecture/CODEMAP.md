@@ -373,6 +373,25 @@ use synthetic actors and do not measure native prediction quality.
 
 ## Prepared Shared prediction inputs — #232F, active source only
 
+### October 27 session-direction audit — implementation boundary
+
+Current named-group creation/selection lives in
+`apps/mobile/src/features/profiles/SharedProfilesScreen.tsx`,
+`sharedProfileOperations.ts`, `ActiveProfileContext.tsx` and the bottom Profile
+control. These use existing Profile/member invitation RPCs; they do not implement
+the new Friend-based SharedSession lifecycle in [ADR-0013](decisions/0013-friend-network-and-temporary-shared-sessions.md).
+Do not hide those controls before a compatible lifecycle and authorized legacy
+history path exist.
+
+The prepared-input producer below freezes full current Profile enrollment and
+source captures. Its references are producer/getter/erasure code and verification
+fixtures; it still supplies no genuine ranking consumer or session authorization.
+Sprint 015 continues that consumer with exact participant/enrollment-set isolation.
+The future session adapter must bind real lifecycle/roster receipts rather than
+infer them from Profile IDs. No planned session path is listed as delivered code.
+
+### Existing producer and verification
+
 `20261009094421_shared_round_prediction_inputs.sql` adds private immutable input
 and reverse-source binding tables, the internal pre-first-response capture/getter,
 whole-parent source-deletion invalidation and a guarded #232D eraser extension.

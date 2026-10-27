@@ -35,6 +35,7 @@ For engine or external-data work, also read the **Predictive Memory Engine**, **
 | What are product/runtime/service boundaries? | [ARCHITECTURE](architecture/ARCHITECTURE.md) |
 | Where does implemented code actually live? | [CODEMAP](architecture/CODEMAP.md) |
 | Why were durable decisions made? | [ADRs](architecture/decisions/README.md) |
+| How do temporary Friend-based sessions retain safe joint memory? | [ADR-0013](architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md), [DOMAIN_MODEL](domain/DOMAIN_MODEL.md#shared-sessions-from-friends) |
 | Why is portability/public-data research now part of Phase 14? | [ADR-0008](architecture/decisions/0008-portable-predictive-memory-engine-and-external-priors.md) |
 
 ## Documentation boundaries

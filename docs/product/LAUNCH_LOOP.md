@@ -2,7 +2,7 @@
 
 Status: **canonical MVP launch specification**
 
-Product decision: **2026-09-07**, sequential Taste refinement **2026-10-14**, engine-first priority and personal expected-rating objective **2026-10-25**
+Product decision: **2026-09-07**, sequential Taste refinement **2026-10-14**, engine-first priority and personal expected-rating objective **2026-10-25**, Friend-based temporary Shared sessions **2026-10-27**
 
 Tracking: **#215**, adaptive source foundation **[#336](https://github.com/Kajooja/Kajo/issues/336)**
 
@@ -43,7 +43,10 @@ full Kajo
 invite another person
 ```
 
-For a personal invite, successful conversion additionally produces a consented Friend relationship with the inviter. It does **not** create a SharedProfile automatically. Friends can create a two-person or larger SharedProfile explicitly in one short flow.
+For a personal invite, successful conversion additionally produces a consented
+Friend relationship with the inviter. It does not join a Shared session or create
+a SharedProfile automatically. Friends can explicitly invite the people for a
+temporary joint browsing session, without naming or selecting a permanent group.
 
 The desired user experience is: **use Kajo first, register only after Kajo has shown why it is useful.**
 
@@ -61,7 +64,7 @@ A release candidate must support all of the following:
 6. Convert the anonymous visitor to the same canonical Kajo identity through Google or Apple without losing taste/history.
 7. Continue into the mobile product with the cold start already completed.
 8. If the link was a personal invite, create the Friend relationship only after the receiver accepts and converts.
-9. Show that Friend in the friends surface and allow creation of a SharedProfile from one or more Friends.
+9. Show that Friend in the friends surface and allow an explicit temporary SharedSession with the selected people, using an authorized internal SharedProfile.
 10. Allow the activated user to create the next Taste link or personal invite.
 
 This is the first complete Kajo growth loop.
@@ -99,13 +102,23 @@ Properties:
 
 ### 3.3 SharedProfile/group invite
 
-Existing SharedProfile membership invitations remain a separate concept. A group invite grants no friendship automatically unless a later explicit product decision changes that rule.
-The planned compact creation flow can show/copy/share this opaque invitation
-through the OS share sheet or WhatsApp where available. A receiver uses the same
-app/Taste/link continuation, reusing accepted Personal setup where present, and
-explicitly accepts group membership. If Friendship is also offered, it requires
-its own clear consent; link delivery/opening grants no private Personal history
-access and creates no automatic Friend or group relationship.
+Existing SharedProfile membership invitations remain a separate legacy concept.
+Do not reinterpret their tokens as session participation or automatic Friendship.
+Their retained history/access and safe transition remain explicit migration gates.
+
+### 3.4 Shared session invite — October 27 target
+
+A `SharedSessionInvite` offers participation in one declared session/roster, with
+opaque receiver-bound, expiring/revocable, replay-safe authorization. A receiver
+sees who is taking part and explicitly accepts. Sending/opening a link grants
+no membership, Friendship or private history. Friends are selected from the
+authorized network; a new Friend follows the distinct Friend-consent flow first,
+then explicitly joins the session if its invitation is still valid. Existing
+Personal setup is reused through app/Taste/auth continuation.
+
+Show/copy/OS-share, including WhatsApp where available, deliver this correctly
+typed invitation. A changed/expired/revoked roster cannot be accepted through an
+old token; pending recipients do not become participants or prediction inputs.
 
 ## 4. Anonymous identity and conversion
 
@@ -427,30 +440,35 @@ copy button. Deliver with Phase 16 link flows, not the current collection fixes.
 Apply the presentation to the appropriate invitation type only once its URL,
 consent and lifecycle exist; a Friend link must not silently join a SharedProfile.
 
-## 9. SharedProfile creation from Friends
+## 9. Temporary joint browsing from Friends
 
-Friends are a lightweight social graph. SharedProfile remains the learned recommendation target for joint use.
+The October 27 direction is a persistent Friend network with temporary
+`SharedSession`s. A chooses B and C today, then B and Z tomorrow; the normal flow
+does not create, name or select permanent groups. SharedProfile remains the
+internal learned joint target under [ADR-0013](../architecture/decisions/0013-friend-network-and-temporary-shared-sessions.md).
 
-Canonical two-person path:
+Planned Phase 16.2 flow:
 
-```text
-Friends
-  ↓ select friend
-Create yhteinen Kajo
-  ↓ explicit confirmation
-SharedProfile
-```
+1. Open Friends and choose “Selaa yhdessä”; select **2–5 total people including
+   the initiator**, using the compact participant slots.
+2. Send correctly scoped invitations. Show accepted, pending, declined and
+   expired states separately; each participant accepts the proposed roster.
+3. Activate the accepted session and show its people, ordinary joint discovery,
+   Lists and an accessible leave/end action. No group name/setup is required.
+4. End/leave to return to Personal. Later joint browsing starts by inviting people
+   again; authorized history for that same exact set may remain useful.
 
-Planned Phase 16.2 creation uses **2–5 total people including the creator**.
-Show at most five member slots, with the creator occupying one. Each `+` slot
-selects an authorized accepted Friend or generates an opaque invitation with
-show, copy and OS-share actions, including WhatsApp where available. For 3–5
-people, collect each person's explicit canonical membership acceptance; pending
-slots are not accepted members. Expiry, revocation, rate limits, replay and
-block/remove safety under 16.0–16.1 precede this UI. The compact creation bound
-does not replace existing generic 2-N SharedProfile membership support.
+B and C do not automatically become Friends. Partial acceptance is not permission
+to rank for everyone invited: revise/reconfirm the roster or wait. Once active,
+changing participants ends new choices on the old roster and starts a newly
+accepted session/context. A–B–C history never becomes A–B–Z history. Session end
+does not delete retained joint Lists or confirmed experiences; permitted history
+is reached through the session/history surfaces without a permanent group picker.
 
-Do not make every friendship a SharedProfile. This keeps the friend graph lightweight and makes joint learning intentional.
+Friendship, session participation and legacy Profile membership are distinct.
+Expiry, revoke, block, replay and privacy controls precede this UI. The compact
+bound does not rewrite generic 2-N legacy storage. No real-time synchronized
+scroll position or public social feed is implied by joint browsing.
 
 Personal Taste setup precedes joint rating. Preserve an existing completed setup
 and the bounded recognition-aware cold-start exit; do not force a repeat test or
@@ -463,7 +481,7 @@ the group shortcut is not a substitute for the planned Taste/usefulness gates.
 
 ### Planned joint decision for today — ROADMAP 16.4
 
-After 16.3's evidence/rewatch delivery, offer an optional Shared session for
+After 16.3's evidence/rewatch delivery, offer an optional mode within SharedSession for
 “what should we watch/read today?” before the complete beta. At most five current
 BOOK/MOVIE options come from the same canonical Shared predictor and inherited
 DiscoveryMode/risk policy; an optional Tinder-like card sequence does not create
@@ -504,11 +522,17 @@ FRIEND_INVITE_CREATED
 FRIEND_INVITE_OPENED
 FRIEND_INVITE_ACCEPTED
 FRIEND_RELATIONSHIP_CREATED
-SHARED_PROFILE_CREATE_STARTED
-SHARED_PROFILE_CREATED
+SHARED_SESSION_INVITE_CREATED
+SHARED_SESSION_INVITE_ACCEPTED
+SHARED_SESSION_STARTED
+SHARED_SESSION_ENDED
 ```
 
 Only Item responses that meet canonical taste/evidence semantics should enter recommendation learning. Link opens, auth clicks and friend conversions are growth telemetry, not evidence that the user likes an Item.
+
+These are target telemetry concepts, not delivered Event names. Legacy
+SHARED_PROFILE_CREATE_STARTED/CREATED records retain their original meaning;
+creating an internal context is not a substitute for successful session activation.
 
 Every funnel event includes only the minimum required attribution/session/version data. Campaign attribution, invite identifiers and experiments must not leak another user's private Profile data.
 
@@ -544,9 +568,9 @@ Primary launch-loop metrics:
 - recommendation preview → later save/consumption/rating,
 - invites created per activated User,
 - invite open → Friend conversion,
-- Friends → SharedProfile creation,
+- Friends → accepted SharedSession start, including invite/partial-acceptance drop-off,
 - successful discoveries per active Profile,
-- SharedProfile successful choice/outcome rate.
+- SharedSession successful choice and separately confirmed Shared round outcomes.
 
 The long-term North Star remains valuable experiences found, not swipes or raw time spent.
 
@@ -607,7 +631,7 @@ schedule and substantial engine sprint definitions are in [ROADMAP](../project/R
 2. Deliver and evaluate practical Engine V1 through Sprints 015–021, including the shared owned-app Taste/Discovery loop, personal expected-rating/response-style model, useful state/memory, honest readiness and operating acceptance. Existing authenticated flows can provide this evidence; they do not certify anonymous/public readiness.
 3. Complete core UX and measured end-to-end performance: navigation, Lists/history/search, recovery, accessible actions and the general duration work package (Phase 17.0).
 4. Complete web/public acquisition: browser/installed-app Taste; server-backed anonymous identity, bounded retention/deletion/abuse controls and measurement; Google/Apple conversion preserving the same Profile; and the complete conversion funnel (Phase 15).
-5. Complete recommendation preview, personal Friend invite/safety lifecycle, compact explicit SharedProfile creation, Shared rounds/rewatch and bounded joint decisions (Phase 16).
+5. Complete recommendation preview, personal Friend invite/safety lifecycle, temporary Shared sessions from Friends, legacy-group transition, Shared rounds/rewatch and bounded joint decisions (Phase 16).
 6. Complete remaining telemetry, privacy, support and operating flows (Phase 17.1–17.2).
 7. Complete UI/visual polish and representative accessibility/device verification against those working flows.
 8. Run the closed external beta of the complete link-to-Kajo loop, resolve failures, and complete store/public release acceptance.

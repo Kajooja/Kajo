@@ -14,6 +14,11 @@ ADRs preserve **why** durable decisions were made. Create one for material archi
 
 ## Current design refinement
 
+- [0013](0013-friend-network-and-temporary-shared-sessions.md) — persistent Friend
+  network with temporary consented joint browsing sessions; internal SharedProfile
+  memory, exact participant-set isolation and legacy preservation. Refines the
+  fixed-group UX of ADR-0002/0007 without changing engine-first execution order.
+
 - [0012](0012-personal-expected-rating-engine-v1.md) — personal expected
   post-experience rating with learned response-scale behavior; current List/rating/
   Ohita semantics, evidence-gated Engine V1 completion and engine-first priority.
