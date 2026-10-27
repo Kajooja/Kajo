@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-27**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, nine bounded source packets accepted; five SQL forwards installed; remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, nine bounded source packets accepted; six SQL forwards installed; remaining sprint gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,12 +11,13 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — guarded Shared prepared-input rollout / Sprint 015, #232F
+## Current handoff — prospective Shared outcome reconciliation / Sprint 015, #232F
 
 The ninth bounded source packet is accepted through
-[PR #383](https://github.com/Kajooja/Kajo/pull/383); the previous five SQL forwards
-are installed. The new Shared consumption forward below is **not installed**.
-Do not repeat the producer, V4 receipt binding or accepted consumer implementation.
+[PR #383](https://github.com/Kajooja/Kajo/pull/383), and its exact approved Shared
+consumption forward is installed and preservation-verified below. All six SQL
+forwards are installed. Continue the remaining evaluation boundary without
+repeating the producer, V4 receipt binding, consumer or hosted migration.
 
 **Owner refinement — 2026-10-27:** joint browsing starts from a persistent Friend
 network with temporary accepted sessions, without required permanent-group
@@ -34,23 +35,21 @@ frozen FINAL owners. A separate immutable binding records actual input/feature
 use; producer artifacts keep `INPUT_CAPTURE_ONLY` / `NOT_RECORDED`.
 The ordinal baseline is not a calibrated expected-rating model or public delivery.
 
-**Next action:** obtain exact-file approval for the single new hosted forward
-[`20261027085219_shared_prepared_input_consumption.sql`](../../supabase/migrations/20261027085219_shared_prepared_input_consumption.sql),
-SHA-256 `fb6d278cf4462177958883610d3c6b68a1c21c6d769deba422b8612d745cd84f`. Repository publication/merge authorization
-remains applicable; the owner's earlier hosted approval covered only the exact
-V4 receipt migration recorded below, not this different write. A READ ONLY run
-of the new migration's exact predecessor/security preflight passed on October 27;
-no hosted mutation, synthetic forecast, account reset or model activation occurred.
+**Next action:** audit the existing #232C immutable outcome captures, #232E ordinal
+diagnostics/reports and #232F consumed-input bindings, then implement one bounded
+prospective Shared forecast-to-outcome reconciliation packet through those owners.
+Join subsequently matured individual responses to the actual frozen, never-answered
+forecast while preserving first-answer identity, corrections, withdrawal and the
+real full-Profile enrollment generation. Declare eligibility, selection, maturity,
+cohort and non-comparable cases before quality reporting or model admission.
+An `EVALUATION` forecast has no delivery/exposure proof; keep that distinction and
+never retrospectively mark an input-only producer artifact as consumed.
 
-After approval, refresh the accepted source and take a fresh bounded preservation
-snapshot of all existing rows, complete function identities/bodies/metadata,
-table/access/default metadata and migration history. Apply only the accepted file
-through the migration owner. Verify its stored bytes, the five permitted body
-changes, seven closed private helpers and one RLS/owner-only binding table; preserve
-all old rows and unrelated definitions. Record advisors and real observed runtime
-separately. Any predecessor drift or preservation failure stops the affected
-rollout; do not rewrite migration history or drop retained evidence as a rollback.
-The private consumer can remain unused while a corrective forward is reviewed.
+The hosted receipt closes this single-file installation/preservation gate. It
+does not establish fresh hosted consumption, measured quality or a session flow.
+Repository publication/merge authorization remains applicable. A later production
+write requires its own exact scope and preservation checks; no repeat approval
+or deployment is needed for the completed forward below.
 
 Future actual session inputs require a versioned producer/adapter with real
 lifecycle/roster receipts. No synthetic session ID or hidden permanent-group
@@ -63,6 +62,50 @@ reconciliation, native/hosted performance and predictive quality. Unlike retaine
 recognition and Discovery selection policies remain non-comparable; guided
 policy/readiness keeps its Sprint 019 dependencies. Existing phone/runtime and
 release gates remain recorded without blocking authorized independent source work.
+
+## Hosted Shared prepared-input consumption — 2026-10-27
+
+The owner explicitly approved the linked single migration after #383 merged.
+Fresh READ ONLY preflight verified its exact predecessor bodies, function/security
+metadata and a full preservation snapshot. The accepted file
+[`20261027085219_shared_prepared_input_consumption.sql`](../../supabase/migrations/20261027085219_shared_prepared_input_consumption.sql)
+was then installed once through the migration owner. Provider history version
+`20261027114910`, name `shared_prepared_input_consumption`, retains one statement
+with the exact approved SHA-256
+`fb6d278cf4462177958883610d3c6b68a1c21c6d769deba422b8612d745cd84f`.
+The provider version is distinct from the source filename; neither history was
+rewritten.
+
+All **6465 fixed existing rows** across **67** existing public/private tables
+retained their full-row digests and identities: **zero** missing/changed rows and
+zero additional rows in those tables. All **1994** old schema objects,
+**270** existing function identities/metadata, **265** unrelated function bodies,
+**24** default-privilege records and **93** old migration records were unchanged.
+The five permitted bodies match the source-derived replacements, including the
+reviewed hosted common-fit format variant. Exactly seven closed private INVOKER
+helpers and one empty RLS/owner-only consumption table were added; the table's
+24 new schema objects match the declared columns, constraints, indexes and
+triggers. Neither `anon`, `authenticated` nor `service_role` has access to the
+new table or EXECUTE permission on the new helpers. Existing access did not expand.
+Private identities, snapshots and environment details stay outside Git.
+
+READ ONLY probes reject missing and unbound consumption markers. All **49**
+historical PredictionRuns retain their previous unmarked consumption/FINAL
+validation behavior. There are still **zero** prepared inputs, consumption
+bindings, consumed Shared forecasts, V4 receipt-marked runs or FINAL-marked runs
+in this hosted snapshot. No synthetic forecast, answer, cohort, account reset or
+serving activation was created. Installation and rejection checks therefore do
+not claim fresh production consumption, device behavior or predictive usefulness.
+
+The only advisor change is one expected
+[RLS-without-policy INFO finding](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy)
+for the new private closed table, increasing that count from 53 to **54**.
+The existing
+[leaked-password protection warning](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection),
+seven [unindexed-foreign-key INFO findings](https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys)
+and 58 [unused-index INFO findings](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index)
+are unchanged. Their prior #160/#184 dispositions remain; the new table's absent
+API grants/policies are intentional.
 
 ## Accepted Shared prepared-input consumption — #383
 
@@ -100,14 +143,16 @@ rejection and unknown semantic-body rejection pass. The exact reviewed hosted
 common-fit comment/format variant is also rollback-rehearsed, preserving metadata;
 arbitrary normalization or unreviewed semantic variants are not admitted.
 
-**Implementation evidence:** all five required gates pass in
-[CI #785](https://github.com/Kajooja/Kajo/actions/runs/40486671110) on `9b9b9e0adc2e772e9fa043c32ef7a6cd05139714`. Its tested PR merge
-`1f8655c57a1449215eb141094b885d3d6243b4a4` and implementation source share tree
-`725b4d3519b2fde0956117cbf99b2a6efdb6a4fa`. The downloaded native report was independently checked
-against the entire source/migration manifest; SHA-256
-`07af3e6db786d17d1b57a3e143a7bd00e277c3feb8779afc4d85b2fca7eec943`. The final receipt-only documentation head must also pass
-the same five gates before #383 merges; the PR retains that final head/run/merge
-receipt. Later production installation requires the separate preservation receipt.
+**Accepted source evidence:** all five required gates pass in final-source
+[CI #786](https://github.com/Kajooja/Kajo/actions/runs/40490626249) on
+`1e5a6963418fd31e8ab6971a1923679dd55be7da`. The tested PR merge
+`4f8b471d976b503311ea6b4840506f3bf19bbc40`, final source and accepted #383 merge
+`0ec9bd1085f522e686533120f56b1545d65ad1e4` share tree
+`1e87ea0d0a2ce5086309974cbca5ed3823ffbcb0`.
+The downloaded native report was independently checked against the entire
+52-migration/source manifest; SHA-256
+`3eba1b9e9c923cbae806244dd2d921d0cdb33a8962b024f9ef755994b9edfebd`.
+The separate hosted installation/preservation receipt is recorded above.
 
 **Validation:** 388 database, 332 engine, 904 mobile, 451 catalogue, 50 dependency,
 72 research, 11 acceptance and 32 Edge tests pass in CI, with lint/typecheck,
