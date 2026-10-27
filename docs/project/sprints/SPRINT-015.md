@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — ten source packets; six SQL forwards installed; reconciliation rollout and remaining acceptance open**
+Status: **IN PROGRESS — ten accepted source packets; seven SQL forwards installed; remaining parity, performance and quality acceptance open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -16,8 +16,9 @@ The October 27 [session direction](../../architecture/decisions/0013-friend-netw
 makes joint browsing temporary and Friend-based while keeping an internal
 SharedProfile memory context. The bounded #232F consumer is accepted source
 on the existing full-Profile enrollment basis; its exact hosted forward is installed
-and preservation-verified. The next source packet supplies prospective outcome
-reconciliation; its source/native acceptance and guarded rollout remain distinct.
+and preservation-verified. The tenth packet's prospective outcome reconciliation
+is also accepted and installed; fresh hosted outcomes and quality remain separate
+acceptance gates. Continue with remaining supported native four-consumer parity.
 Require exact-set isolation (including overlapping A–B–C/A–B–Z), real enrollment
 generations and source withdrawal. Same-set reuse cannot restore revoked or
 erased lineage. Do not invent a session ID or claim existing fixtures prove the
@@ -86,9 +87,10 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 1–3, 10–13, 30, 37, 40–44, 49–51. Requirements `MVP-DATA-001..004`,
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
-The current bounded packet supplies the private read-only prospective Shared
-forecast-to-outcome join through #232C/#232F; finish source acceptance and its
-guarded rollout. #232E's exposed same-pool pair diagnostic stays unchanged because
+The private read-only prospective Shared forecast-to-outcome join through
+#232C/#232F is accepted and its guarded rollout complete. Continue remaining
+supported four-consumer parity through the existing owners. #232E's exposed
+same-pool pair diagnostic stays unchanged because
 these single-target EVALUATION runs are not comparable rating forecasts or exposed
 policy choices. Maturity, selection, experience units and nonadmitted cohorts are
 explicit; first-response identities, corrections and withdrawal are preserved.
@@ -116,16 +118,33 @@ does not become an invented pass.
 
 ## Delivery record
 
-- Tenth source packet: `shared-forecast-outcome-v1` reconciles a consumed frozen
+- Tenth source packet: accepted through [PR #385](https://github.com/Kajooja/Kajo/pull/385).
+  `shared-forecast-outcome-v1` reconciles a consumed frozen
   forecast with one immutable outcome capture for the exact experience/enrollment.
   It adds one closed STABLE INVOKER reader and no copied table or scorer. Tests
   cover missing/partial/mature/immature outcomes, 0/5/10, first UNKNOWN before a
   later numeric answer, corrections, clear/cancel, leave/rejoin, wrong context,
   closed grants and input/outcome withdrawal. The populated forward preserves
   every previous function body/metadata, default and canonical row; the same
-  verifier runs in the native CLI gate. No exposed-policy quality, numeric-rating
-  accuracy, cohort admission or hosted execution is inferred. STATUS and the PR
-  receipt own final CI/native/merge evidence and the guarded single-file rollout.
+  verifier runs in the native CLI gate. All five final-source
+  [CI #790](https://github.com/Kajooja/Kajo/actions/runs/40553559104) gates pass on
+  `42fd7d4072fd4bdb7d372e0751ac4c56a756459d`; accepted merge
+  `93afd7b3b6f3740a10b7408a080bf9ca2555a2b6` has the exact tested tree.
+  The independently checked native report proves all 16 cases, preservation of
+  276 existing functions, the complete source manifest and canonical cleanup.
+  No exposed-policy quality, numeric-rating accuracy or cohort admission is
+  inferred. STATUS owns the full source/report and separate hosted receipts.
+- Hosted tenth-packet forward: explicitly approved and installed once on October
+  27 as provider version `20261027200523`, name
+  `shared_forecast_outcome_reconciliation`. Stored bytes match the accepted SQL.
+  All 6465 old rows across 68 tables, 2018 old schema objects, 277 old function
+  bodies/metadata, 24 default-privilege records and 94 old history records are
+  unchanged. Exactly one source-matching owner-only STABLE INVOKER reader is
+  added; no table or data row is added. Five invalid-input rejections and absent-
+  outcome reads for all 49 retained runs pass. There are no hosted consumption
+  bindings or outcome captures, so no fresh linked pair or quality is claimed.
+  Advisor findings are unchanged apart from observation timestamps. Remaining
+  four-consumer parity, performance and declared quality gates stay open.
 
 - Ninth source packet: accepted through [PR #383](https://github.com/Kajooja/Kajo/pull/383).
   Private #232F consumption computes from the prepared vectors through existing
