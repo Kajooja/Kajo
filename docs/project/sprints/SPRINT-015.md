@@ -118,6 +118,15 @@ does not become an invented pass.
 
 ## Delivery record
 
+- Eleventh packet in progress on `test/native-four-consumer-parity`: extend the
+  accepted native adapter/FINAL/shadow verifier to 54 Discovery combinations,
+  including 24 authenticated public page/feed cases and exact delivered outputs
+  and retries. The existing committed Taste/explicit-evaluation comparisons,
+  Shared prepared-input proof, receipt-witness distinctions and unlike-policy
+  exclusions stay intact. This is executable coverage, without another scorer,
+  SQL forward or hosted write. Source/native CI acceptance is pending; STATUS
+  owns the exact handoff. After this bounded coverage passes, establish the
+  native/hosted performance baseline and predeclare eligible quality targets.
 - Tenth source packet: accepted through [PR #385](https://github.com/Kajooja/Kajo/pull/385).
   `shared-forecast-outcome-v1` reconciles a consumed frozen
   forecast with one immutable outcome capture for the exact experience/enrollment.

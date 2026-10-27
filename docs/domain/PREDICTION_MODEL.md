@@ -3268,6 +3268,32 @@ the frozen source or replay. The same JavaScript verification runs against
 PGlite and the native PostgreSQL CLI installation. Test inputs remain synthetic
 fixtures, not observed user outcomes or a production quality evaluation.
 
+The Discovery coverage extension uses those same adapter, comparator and native
+shadow owners for 54 cases: Personal/Shared × FOR_YOU/SURPRISE/RISK ×
+BOOK/MOVIE/mixed domain × legacy/empty catalogue prefix/seen catalogue prefix.
+The 24 supported BOOK/MOVIE first-page cases enter through authenticated public
+page/feed RPCs; their actual delivered Item identities, scores, ranks and exact
+replies must match the retained source. Mixed-domain and explicit seen-prefix
+cases use private request owners, because the public page contracts require one
+domain. Every complete retained pool is compared with its actual baseline shadow
+after current catalogue mutation, including suppressed and unselected candidates.
+The absolute score tolerance remains `1e-12`; scope, input, eligibility, identity,
+rank and selection remain exact. These are disposable native SQL fixtures.
+
+The four-consumer coverage boundary is deliberately not one equal-policy claim:
+
+| Comparison | Supported evidence | Boundary |
+|---|---|---|
+| Discovery → baseline shadow | Complete frozen same-policy pool across the 54-case matrix | Actual shadow worker recomputes score, rank, eligibility and selection; no new exposure |
+| Taste V4 → independent explicit evaluation | Same receipt, transaction cutoff and requested retained pool before/after committed 0/5/10 | Only validated capture self-references are rebound; differing receipt witnesses remain reported, not full-input matches |
+| Taste/explicit evaluation → frozen computation | Native FINAL score/rank replay, including unavailable requested Items and empty evaluation | Evaluation remains non-delivery; the score helper is not labelled as a shadow-worker run |
+| Taste V4 → ordinary Discovery | Actual same-Profile captures expose retained differences | Recognition pool, acquisition, domain, intent/selection, eligibility clock and policy differ; common guided policy belongs to Sprint 019 |
+
+The separate Shared prepared-input consumer retains its existing actual native
+adapter/replay and enrollment/withdrawal checks. These coverage additions change
+no SQL, public API, score formula, historical prediction or model admission.
+Native CI and hosted/runtime acceptance remain separately recorded in STATUS.
+
 This bounded adapter admits precision-preserving fresh request-owner runs and
 requires lossless export of their floating-point columns. Existing page writers
 pin `extra_float_digits=3`; the rollback-only fixture declares the same setting

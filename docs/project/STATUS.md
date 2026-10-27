@@ -11,15 +11,39 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — remaining native four-consumer parity / Sprint 015
+## Current handoff — native parity coverage extension / Sprint 015
 
-The tenth bounded source packet is accepted through
-[PR #385](https://github.com/Kajooja/Kajo/pull/385). Its read-only prospective
-forecast/outcome join through the existing #232C/#232F owners is installed and
-preservation-verified. All ten source packets and seven hosted forwards remain
-accepted. Do not repeat the producer, V4 receipt binding, consumer, reconciliation
-reader or completed migrations. The next bounded packet closes the remaining
-supported same-input parity coverage across the four native consumers.
+The eleventh bounded packet is in progress on
+`test/native-four-consumer-parity`, based on accepted main
+`bf079ee2ba977665d6724b5047e5962b2f483f09` / [PR #386](https://github.com/Kajooja/Kajo/pull/386).
+It extends the existing native adapter/FINAL/shadow verifier to 54 Discovery
+scope/mode/domain/acquisition combinations. Twenty-four cases use authenticated
+public page/feed RPCs and check actual delivered identities, scores, ranks and
+exact retries. Mixed-domain and explicit seen-prefix cases retain their private
+request contracts. Complete frozen pools, including suppressed/unselected Items,
+must match actual baseline shadow after catalogue mutation at `1e-12` absolute
+score tolerance; all nonnumeric inputs and identities remain exact.
+
+The existing seven committed Taste/explicit-evaluation comparisons and Shared
+prepared-input checks remain their owners. Different valid receipt witnesses
+are not full-input matches, and unlike Taste/Discovery policies remain explicitly
+non-comparable. PREDICTION_MODEL records the four-consumer coverage matrix.
+Source/native CI acceptance of this extension is pending. It adds no migration,
+serving change or hosted operation. All ten accepted source packets and seven
+installed forwards remain accepted; do not repeat their implementation or rollout.
+
+Local focused verification passes all three native adapter/consumer tests. The
+new matrix compares 810 candidates with zero score differences; every rollback
+batch restores all canonical rows. PGlite batches use independent copies of the
+same installed database, matching the native runner's separate connections; this
+avoids its reproduced repeated-session WASM failure without weakening assertions.
+
+**Next action:** finish all five required CI gates, independently verify the
+native 54-case report and retained Taste/Shared proofs, then integrate the exact
+tested source. Once that source is accepted on main, continue with native/hosted
+performance acceptance and separately predeclared quality cohorts using a
+supported target. No old input-only artifact is retrospectively marked consumed
+and no fresh hosted observation is claimed by source tests or installation.
 
 **Owner refinement — 2026-10-27:** joint browsing starts from a persistent Friend
 network with temporary accepted sessions, without required permanent-group
@@ -28,6 +52,8 @@ retains SharedProfile as the internal learned context. Same-set authorized histo
 reuse is the working assumption; A–B–C and A–B–Z are isolated contexts. Session
 end is not history deletion, and legacy named groups are not merged/reset.
 Session lifecycle/navigation remains planned Phase 16 work under engine-first order.
+
+### Retained tenth-packet source and installation receipt
 
 `sharedProfileOperations.ts` and `SharedProfilesScreen.tsx` still use named
 Profile/member RPCs. The accepted private evaluation consumer uses the truthful
@@ -74,16 +100,6 @@ and report SHA-256
 `9f402fae8d022bcb1c377bfb430e7869437cffe6c8cca2ec74d054093c700b39`.
 The separate platform, two-clean-installation and populated-upgrade reports also
 match the tested merge and pass preservation/rollback/cleanup checks.
-
-**Next action:** inventory and close the remaining native same-input parity gaps
-across Taste, Discovery, explicit evaluation and shadow through the accepted
-identity/acquisition/FINAL owners. For supported identical inputs, compare exact
-scope, eligibility, candidate identity and scores at the declared tolerance;
-record incompatible retained policies explicitly instead of forcing equality or
-reimplementing accepted adapters. Follow with native/hosted performance acceptance
-and separately predeclared quality cohorts using a supported target. No old
-input-only artifact is retrospectively marked consumed and no fresh hosted
-observation is claimed by source tests or the installation below.
 
 The hosted consumption and reconciliation receipts close their installation/
 preservation gates. They do not establish fresh hosted consumption, measured

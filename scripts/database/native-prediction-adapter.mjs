@@ -369,6 +369,137 @@ export async function verifyNativePredictionAdapter(exec) {
 const sqlLiteral = value => "'" + String(value).replaceAll("'", "''") + "'";
 const jsonLiteral = value => sqlLiteral(JSON.stringify(value)) + '::jsonb';
 
+// Complete the supported Discovery dimensions through the existing native
+// adapter and replay owner. Each rollback-only batch stays below the native
+// transport budget. Mixed-domain and seen-prefix requests are private contracts;
+// BOOK/MOVIE first pages additionally exercise their authenticated public RPCs.
+export async function verifyNativeDiscoveryParity(execSql) {
+  const { normalizeKajoNativePrediction, compareFrozenRankings } = await adapter();
+  const source = { kind: 'generator', id: 'native-discovery-parity-fixture', version: '1', parentRefs: [] };
+  const tolerance = { absoluteTolerance: 1e-12 };
+  const cases = [];
+  let comparedCandidates = 0, maxAbsoluteScoreDifference = 0;
+  for (const profileType of ['PERSONAL', 'SHARED']) for (const mode of ['FOR_YOU', 'SURPRISE', 'RISK']) {
+    const stage = 'native-discovery-parity-' + profileType.toLowerCase() + '-' + mode.toLowerCase();
+    let fixture;
+    try {
+      [fixture] = await execSql(`begin;set local extra_float_digits=3;
+${await nativeCandidateRequestFixtureSql()}
+create temp table parity_sources(name text primary key,prediction_id uuid,evaluation_receipt jsonb,
+  request jsonb,response jsonb,entrypoint text) on commit drop;
+create temp table parity_preserved(body jsonb) on commit drop;
+do $matrix$
+declare actor uuid:='ab157000-0000-4000-8000-000000000001'; profile uuid; domain text; branch text;
+  session uuid:='ab157000-0000-4000-8000-000000000810'; prediction uuid; request jsonb; response jsonb;
+  entrypoint text; replay jsonb; seen uuid[]:=array['ab157000-0000-4000-8000-000000000100',
+    'ab157000-0000-4000-8000-000000000120']::uuid[];
+begin
+  perform set_config('request.jwt.claim.sub',actor::text,true);
+  select id into strict profile from public.profiles where
+    case when ${sqlLiteral(profileType)}='PERSONAL' then owner_user_id=actor and profile_type='PERSONAL'
+      else id='ab157000-0000-4000-8000-000000000900' end;
+  insert into public.event_sessions(id,actor_user_id,profile_id,started_at,created_at,context)
+    values(session,actor,profile,now()-interval '5 minutes',now()-interval '5 minutes','{}');
+  foreach domain in array array[null,'BOOK','MOVIE']::text[] loop
+    foreach branch in array array['LEGACY','CATALOG_EMPTY','CATALOG_SEEN'] loop
+      prediction:=gen_random_uuid();request:=null;response:=null;
+      if domain is not null and branch<>'CATALOG_SEEN' then
+        request:=jsonb_build_object('version',case when branch='LEGACY' then 1 else 3 end,
+          'requestId',gen_random_uuid(),'profileId',profile,'sessionId',session,
+          'discoveryMode',${sqlLiteral(mode)},'itemType',domain,'limit',5,'context','{}'::jsonb);
+        if branch='CATALOG_EMPTY' then request:=request||'{"cursor":null,"replacesChainId":null}';end if;
+        perform set_config('role','authenticated',true);
+        if branch='LEGACY' then
+          entrypoint:='public.rank_items_page_v1';response:=public.rank_items_page_v1(request);
+          if public.rank_items_page_v1(request) is distinct from response then raise exception 'Page exact retry changed';end if;
+        else
+          entrypoint:='public.rank_items_feed_v1';response:=public.rank_items_feed_v1(request);
+          if public.rank_items_feed_v1(request) is distinct from response then raise exception 'Feed exact retry changed';end if;
+        end if;
+        perform set_config('role','none',true);
+        prediction:=(response->>'predictionId')::uuid;
+      elsif branch='LEGACY' then
+        entrypoint:='private.rank_items_with_identity_v1';
+        perform * from private.rank_items_with_identity_v1(prediction,profile,${sqlLiteral(mode)},domain,5,
+          jsonb_build_object('sessionId',session));
+      else
+        entrypoint:='private.rank_items_catalog_with_identity_v1';
+        perform * from private.rank_items_catalog_with_identity_v1(
+          case when branch='CATALOG_SEEN' then seen else '{}'::uuid[] end,branch='CATALOG_SEEN',
+          prediction,profile,${sqlLiteral(mode)},domain,5,jsonb_build_object('sessionId',session));
+      end if;
+      if not private.validate_native_final_source_v1(prediction) then raise exception 'Missing current FINAL input';end if;
+      insert into parity_sources values(coalesce(domain,'MIXED')||'/'||branch,prediction,null,request,response,entrypoint);
+    end loop;
+  end loop;
+  insert into parity_preserved select jsonb_build_object('runs',
+    (select jsonb_agg(to_jsonb(r) order by r.id) from private.prediction_runs r join parity_sources s on s.prediction_id=r.id),
+    'candidates',(select jsonb_agg(to_jsonb(c) order by c.prediction_id,c.item_id)
+      from private.prediction_candidates c join parity_sources s on s.prediction_id=c.prediction_id));
+  insert into private.shadow_prediction_jobs(source_prediction_id,genome_id)
+    select r.id,r.genome_id from private.prediction_runs r join parity_sources s on s.prediction_id=r.id on conflict do nothing;
+  -- Replay must consume the retained inputs after current catalogue changes.
+  update public.items set tags=array['later-parity-catalogue'],discoverable=false where id::text like 'ab157000-%';
+  replay:=private.process_shadow_prediction_jobs_v1(250);
+  if (replay->>'failed')::integer<>0 or (replay->>'processed')::integer<9 then
+    raise exception 'Discovery parity replay failed: %',replay;end if;
+  if (select body from parity_preserved) is distinct from jsonb_build_object('runs',
+    (select jsonb_agg(to_jsonb(r) order by r.id) from private.prediction_runs r join parity_sources s on s.prediction_id=r.id),
+    'candidates',(select jsonb_agg(to_jsonb(c) order by c.prediction_id,c.item_id)
+      from private.prediction_candidates c join parity_sources s on s.prediction_id=c.prediction_id)) then
+    raise exception 'Discovery parity replay changed its source';end if;
+end;$matrix$;
+select jsonb_build_object('observedAt',clock_timestamp(),'cases',${nativeCasesSql('select * from parity_sources')},
+  'deliveries',(select jsonb_object_agg(name,jsonb_build_object('request',request,'response',response,'entrypoint',entrypoint))
+    from parity_sources)) snapshot;rollback;`, { stage, timeoutMs: 120_000 });
+    } catch (error) {
+      await execSql('rollback;', { stage: stage + '-cleanup' }).catch(() => {});
+      throw new Error(`${stage}: ${error.message}`, { cause: error });
+    }
+    assert.equal(fixture.cases.length, 9);
+    for (const sample of fixture.cases) {
+      const [domain, branch] = sample.name.split('/');
+      const actual = normalizeKajoNativePrediction({ ...sample, source, snapshotObservedAt: fixture.observedAt });
+      assert.equal(sample.scope.profile.type, profileType);
+      assert.equal(actual.mode, mode);
+      assert.equal(actual.itemType, domain === 'MIXED' ? null : domain);
+      assert.equal(actual.intent, 'DELIVERY');
+      assert.equal(actual.acquisition.policy, branch === 'LEGACY' ? 'LEGACY_DISCOVERY' : 'CATALOG_CHAIN');
+      assert.equal(actual.acquisition.reminderSpent, branch === 'CATALOG_SEEN');
+      assert.deepEqual(actual.acquisition.seenObjectIds, branch === 'CATALOG_SEEN'
+        ? ['ab157000-0000-4000-8000-000000000100', 'ab157000-0000-4000-8000-000000000120'] : []);
+      assert.ok(actual.candidates.length > 0 && actual.candidates.some(c => c.selected));
+      assert.equal(sample.replay.kind, 'BASELINE_SHADOW_WORKER');
+      const comparison = compareFrozenRankings(actual, nativeReplayView(sample, actual), tolerance);
+      assert.equal(comparison.conforms, true, `${stage}/${sample.name}: ${JSON.stringify(comparison.mismatches)}`);
+      const { request, response, entrypoint } = fixture.deliveries[sample.name];
+      if (domain !== 'MIXED' && branch !== 'CATALOG_SEEN') {
+        assert.equal(entrypoint, branch === 'LEGACY' ? 'public.rank_items_page_v1' : 'public.rank_items_feed_v1');
+        assert.equal(response.predictionId, actual.predictionId);
+        for (const key of ['requestId', 'profileId', 'sessionId', 'discoveryMode', 'itemType']) assert.equal(response[key], request[key]);
+        for (const item of response.items) {
+          assert.equal(item.prediction_id, actual.predictionId);
+          assert.equal(item.item_type, domain);
+        }
+        assert.deepEqual(response.items.map(item => ({ id: item.item_id, score: item.score, rank: item.rank })),
+          actual.candidates.filter(c => c.selected).map(c => ({ id: c.objectId, score: c.score, rank: c.rank })));
+      } else assert.equal(response, null);
+      comparedCandidates += comparison.comparedCandidates;
+      maxAbsoluteScoreDifference = Math.max(maxAbsoluteScoreDifference, comparison.maxAbsoluteScoreDifference);
+      cases.push({ profileType, mode, domain, branch, entrypoint, candidates: comparison.comparedCandidates,
+        selected: actual.candidates.filter(c => c.selected).length, status: 'PASS' });
+    }
+  }
+  assert.equal(new Set(cases.map(c => [c.profileType, c.mode, c.domain, c.branch].join('/'))).size, 54);
+  return { status: 'PASS', version: 'native-discovery-parity-v1', source: 'SYNTHETIC_FIXTURE_NATIVE_SQL',
+    scope: 'FROZEN_SAME_POLICY_BASELINE', cases, comparedCandidates,
+    publicRpcCases: cases.filter(c => c.entrypoint.startsWith('public.')).length,
+    absoluteTolerance: tolerance.absoluteTolerance, maxAbsoluteScoreDifference,
+    identityEligibilityRanksSelection: 'EXACT', frozenAfterCatalogMutation: true, exactPublicRetries: true,
+    acquisitionOwner: 'native-candidate-acquisition-v1', scoringInput: 'native-final-scoring-input-v1',
+    historicalReconstruction: 'UNAVAILABLE', predictiveQuality: 'NOT_EVALUATED', cleanup: 'ROLLED_BACK' };
+}
+
 // Independent captures have distinct IDs. Rebind only validated self-references
 // for comparison, never scope, clocks, state, inputs, ranks or scores. The
 // persisted records and both original normalized captures remain untouched.

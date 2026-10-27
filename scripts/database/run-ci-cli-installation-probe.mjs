@@ -46,7 +46,7 @@ import { personalTasteChallengeSmokeSql } from './personal-taste-challenge.mjs';
 import { personalEvaluationSmokeSql } from './personal-evaluation-scoring.mjs';
 import { sharedPredictionCutoffSmokeSql } from './shared-prediction-cutoff.mjs';
 import { nativeCandidateRequestSmokeSql, nativeAcquisitionSmokeSql, verifyNativeAcquisitionUpgrade } from './native-candidate-request.mjs';
-import { verifyNativePredictionAdapter, verifyNativeTasteConsumer } from './native-prediction-adapter.mjs';
+import { verifyNativePredictionAdapter, verifyNativeTasteConsumer, verifyNativeDiscoveryParity } from './native-prediction-adapter.mjs';
 import { verifyNativeV4ReceiptUpgrade, verifyNativeV4Receipt, verifyNativeV4ReceiptConcurrency } from './native-v4-receipt.mjs';
 import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption, verifySharedPreparedHostedVariant } from './shared-prepared-consumption.mjs';
 import { verifySharedPreparedConcurrency } from './shared-prepared-consumption-concurrency.mjs';
@@ -423,6 +423,8 @@ try {
     assert.match(nativeCandidateRequest?.nativeCandidateRequest, /^PASS:/);
     const nativePredictionAdapter = await verifyNativePredictionAdapter(exec);
     assert.equal(nativePredictionAdapter.status, 'PASS');
+    const nativeDiscoveryParity = await verifyNativeDiscoveryParity(exec);
+    assert.equal(nativeDiscoveryParity.status, 'PASS');
     const personalSequentialTaste = await verifyPersonalSequentialTaste(execConcurrentSql);
     assert.equal(personalSequentialTaste.status, 'PASS');
     const personalTastePools = await verifyPersonalTastePools(execConcurrentSql);
@@ -489,7 +491,7 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
-      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer,
+      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,
