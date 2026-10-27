@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-27**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, ten bounded source packets; six SQL forwards installed; reconciliation rollout and remaining sprint gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, ten accepted source packets; seven SQL forwards installed; remaining parity, performance and quality gates open.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,14 +11,15 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — Shared reconciliation acceptance and guarded rollout / Sprint 015, #232F
+## Current handoff — remaining native four-consumer parity / Sprint 015
 
-The tenth bounded source packet adds a read-only prospective forecast/outcome
-join through the existing #232C/#232F owners. Its branch is
-`feat/232f-shared-outcome-reconciliation`. The first nine packets, including
-[PR #383](https://github.com/Kajooja/Kajo/pull/383), and all six earlier hosted
-forwards remain accepted. The new single-function forward is not installed.
-Do not repeat the producer, V4 receipt binding, consumer or earlier migrations.
+The tenth bounded source packet is accepted through
+[PR #385](https://github.com/Kajooja/Kajo/pull/385). Its read-only prospective
+forecast/outcome join through the existing #232C/#232F owners is installed and
+preservation-verified. All ten source packets and seven hosted forwards remain
+accepted. Do not repeat the producer, V4 receipt binding, consumer, reconciliation
+reader or completed migrations. The next bounded packet closes the remaining
+supported same-input parity coverage across the four native consumers.
 
 **Owner refinement — 2026-10-27:** joint browsing starts from a persistent Friend
 network with temporary accepted sessions, without required permanent-group
@@ -53,36 +54,41 @@ Metrics/reward/learning remain unavailable. Future quality sampling must predecl
 eligible cohort, horizon/maturity, overlap and a comparable forecast target before
 examining test outcomes. The earlier ordinal diagnostic remains unchanged.
 
-**Publication checkpoint:** the owner explicitly approved publication of this
-ten-file packet and its merge after successful required CI on October 27. This
-resolves the earlier automatic-review rejection; the exact approved tree
-`73b6597af5450aca66731d6f3a5a8ede9633f12e` is published as source commit
-`9a3bec58abe4fcaf2bac294957beaebdd977ec49`. The approval receipt changes only
-STATUS; executable source remains byte-identical to the approved packet.
-Required final-head GitHub/native CI must pass before integration. The new
-production forward is not installed.
-Local lint/typecheck, 391 database, 332 engine, 904 mobile, 451 catalogue,
-50 dependency, 72 research and 11 acceptance tests pass. Root `npm run check`
-stopped at the Deno npm-registry connection refusal, so no full local pass is
-claimed. All four explicitly labelled local demo exports pass; these are not
-configured production exports. Required GitHub/native CI and configured exports
-remain separate acceptance gates.
+**Accepted source:** all five required gates pass in final-source
+[CI #790](https://github.com/Kajooja/Kajo/actions/runs/40553559104) on
+`42fd7d4072fd4bdb7d372e0751ac4c56a756459d`. The tested PR merge
+`ca37b518f65c496a30b62017e84ae0b2209d9583`, final source and accepted #385 merge
+`93afd7b3b6f3740a10b7408a080bf9ca2555a2b6` share tree
+`9daf4542f136e7b29b885bcde3a4d942737e083c`. This completes the owner's exact-packet
+publication/CI-gated merge approval; the earlier automatic-review rejection is
+resolved. All configured exports and the 32 Edge tests pass in CI. The earlier
+local registry failure is not relabelled as a full local root-check pass.
 
-**Next action:** run required final-head CI and integrate only after all five gates
-pass. Then prepare the guarded
-single-file rollout of
-[`20261027171145_shared_forecast_outcome_reconciliation.sql`](../../supabase/migrations/20261027171145_shared_forecast_outcome_reconciliation.sql)
-with fresh predecessor/security and full-row/function/default/history preservation
-checks. Follow with remaining four-consumer parity and performance acceptance;
-quality cohorts need the separately supported target above. No old input-only
-artifact is retrospectively marked consumed and no fresh hosted observation is
-claimed by source tests.
+The downloaded native report matches all 53 canonical installation files and
+source metadata. All 16 reconciliation cases pass; old rows, 276 existing
+function bodies/metadata and defaults are unchanged, exactly one private reader
+is added, and canonical fixture/stack cleanup passes. Native artifact
+`12757948759` has ZIP SHA-256
+`29e6d0729a09fd6f9adbf2df168ce822c41ae64782d33e41555bec78ef959139`
+and report SHA-256
+`9f402fae8d022bcb1c377bfb430e7869437cffe6c8cca2ec74d054093c700b39`.
+The separate platform, two-clean-installation and populated-upgrade reports also
+match the tested merge and pass preservation/rollback/cleanup checks.
 
-The earlier hosted consumption receipt closes that installation/preservation gate. It
-does not establish fresh hosted consumption, measured quality or a session flow.
-The exact-packet repository publication/merge approval is recorded above. A later production
-write requires its own exact scope and preservation checks; no repeat approval
-or deployment is needed for the completed forward below.
+**Next action:** inventory and close the remaining native same-input parity gaps
+across Taste, Discovery, explicit evaluation and shadow through the accepted
+identity/acquisition/FINAL owners. For supported identical inputs, compare exact
+scope, eligibility, candidate identity and scores at the declared tolerance;
+record incompatible retained policies explicitly instead of forcing equality or
+reimplementing accepted adapters. Follow with native/hosted performance acceptance
+and separately predeclared quality cohorts using a supported target. No old
+input-only artifact is retrospectively marked consumed and no fresh hosted
+observation is claimed by source tests or the installation below.
+
+The hosted consumption and reconciliation receipts close their installation/
+preservation gates. They do not establish fresh hosted consumption, measured
+quality or a session flow. Both exact forwards have explicit owner approval and
+are complete; no repeat approval or deployment is needed.
 
 Future actual session inputs require a versioned producer/adapter with real
 lifecycle/roster receipts. No synthetic session ID or hidden permanent-group
@@ -95,6 +101,41 @@ reconciliation, native/hosted performance and predictive quality. Unlike retaine
 recognition and Discovery selection policies remain non-comparable; guided
 policy/readiness keeps its Sprint 019 dependencies. Existing phone/runtime and
 release gates remain recorded without blocking authorized independent source work.
+
+## Hosted Shared forecast/outcome reconciliation — 2026-10-27
+
+The owner explicitly approved the linked single migration after #385 merged.
+Fresh READ ONLY preflight rechecked the exact dependency bodies/security metadata
+and complete preservation snapshot. The accepted file
+[`20261027171145_shared_forecast_outcome_reconciliation.sql`](../../supabase/migrations/20261027171145_shared_forecast_outcome_reconciliation.sql)
+was installed once through the migration owner. Provider history version
+`20261027200523`, name `shared_forecast_outcome_reconciliation`, retains one
+statement with the exact approved SHA-256
+`8fdd0f4330323a489ae231adef8d8a449012296acb5b0dafa48e4c8f4c942e2a`.
+The provider version is distinct from the source filename; neither history was
+rewritten.
+
+All **6465** fixed existing rows across **68** public/private tables retained their
+identities and full-row digests: zero missing/changed rows and zero additional
+rows. All **2018** existing schema objects, **277** existing function bodies and
+metadata, **24** default-privilege records and **94** prior migration records are
+unchanged. Exactly one private STABLE INVOKER reader was added, with the exact
+source body, parameters and configuration. It adds no table or copied artifact;
+`anon`, `authenticated` and `service_role` have no EXECUTE permission, and its
+ACL grants EXECUTE only to the owner. Private identities, snapshots and environment
+details stay outside Git.
+
+READ ONLY smoke rejects five invalid requests and returns `SOURCE_UNAVAILABLE`
+with no metric/reward/learning admission for absent sources. All **49** retained
+PredictionRuns return that expected result with an absent outcome capture. There
+remain **zero** prepared inputs, consumption bindings, consumed Shared forecasts
+and outcome captures in this snapshot. No synthetic forecast, answer, cohort,
+account reset or serving activation was created. Installation and rejection
+checks do not establish a fresh hosted forecast/outcome pair, device behavior or
+predictive usefulness.
+
+Advisor findings, metadata and counts match the preflight; only observation
+timestamps changed. The previously recorded #160/#184 dispositions below remain.
 
 ## Hosted Shared prepared-input consumption — 2026-10-27
 
