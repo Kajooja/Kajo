@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-27**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, ten accepted source packets; seven SQL forwards installed; remaining parity, performance and quality gates open.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, ten preceding accepted source packets, current parity coverage packet; seven SQL forwards installed; final-source, performance and quality gates tracked below.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -13,7 +13,8 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current handoff — native parity coverage extension / Sprint 015
 
-The eleventh bounded packet is in progress on
+The eleventh bounded source packet is
+[PR #387](https://github.com/Kajooja/Kajo/pull/387), branch
 `test/native-four-consumer-parity`, based on accepted main
 `bf079ee2ba977665d6724b5047e5962b2f483f09` / [PR #386](https://github.com/Kajooja/Kajo/pull/386).
 It extends the existing native adapter/FINAL/shadow verifier to 54 Discovery
@@ -28,7 +29,8 @@ The existing seven committed Taste/explicit-evaluation comparisons and Shared
 prepared-input checks remain their owners. Different valid receipt witnesses
 are not full-input matches, and unlike Taste/Discovery policies remain explicitly
 non-comparable. PREDICTION_MODEL records the four-consumer coverage matrix.
-Source/native CI acceptance of this extension is pending. It adds no migration,
+The PR's final-source checks and native report own acceptance of this extension.
+It adds no migration,
 serving change or hosted operation. All ten accepted source packets and seven
 installed forwards remain accepted; do not repeat their implementation or rollout.
 
@@ -38,9 +40,9 @@ batch restores all canonical rows. PGlite batches use independent copies of the
 same installed database, matching the native runner's separate connections; this
 avoids its reproduced repeated-session WASM failure without weakening assertions.
 
-**Next action:** finish all five required CI gates, independently verify the
-native 54-case report and retained Taste/Shared proofs, then integrate the exact
-tested source. Once that source is accepted on main, continue with native/hosted
+**Next action:** verify #387's five required final-source CI gates, native 54-case
+report and retained Taste/Shared proofs before integrating the exact tested tree.
+If current main already contains that accepted packet, continue with native/hosted
 performance acceptance and separately predeclared quality cohorts using a
 supported target. No old input-only artifact is retrospectively marked consumed
 and no fresh hosted observation is claimed by source tests or installation.

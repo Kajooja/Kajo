@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — ten accepted source packets; seven SQL forwards installed; remaining parity, performance and quality acceptance open**
+Status: **IN PROGRESS — ten preceding accepted source packets plus current parity coverage packet; seven SQL forwards installed; final-source, performance and quality acceptance remain separate gates**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -118,14 +118,15 @@ does not become an invented pass.
 
 ## Delivery record
 
-- Eleventh packet in progress on `test/native-four-consumer-parity`: extend the
+- Eleventh source packet [PR #387](https://github.com/Kajooja/Kajo/pull/387),
+  branch `test/native-four-consumer-parity`: extend the
   accepted native adapter/FINAL/shadow verifier to 54 Discovery combinations,
   including 24 authenticated public page/feed cases and exact delivered outputs
   and retries. The existing committed Taste/explicit-evaluation comparisons,
   Shared prepared-input proof, receipt-witness distinctions and unlike-policy
   exclusions stay intact. This is executable coverage, without another scorer,
-  SQL forward or hosted write. Source/native CI acceptance is pending; STATUS
-  owns the exact handoff. After this bounded coverage passes, establish the
+  SQL forward or hosted write. Its final-source PR checks/native report own
+  acceptance; STATUS owns the exact handoff. After this bounded coverage passes, establish the
   native/hosted performance baseline and predeclare eligible quality targets.
 - Tenth source packet: accepted through [PR #385](https://github.com/Kajooja/Kajo/pull/385).
   `shared-forecast-outcome-v1` reconciles a consumed frozen
