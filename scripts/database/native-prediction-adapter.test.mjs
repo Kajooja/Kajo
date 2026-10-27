@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
+import { runIsolatedSqlProbe } from './ci-supabase-stack.mjs';
 import { nativePredictionAdapterFixtureSql, verifyNativePredictionAdapter, verifyNativeTasteConsumer,
   verifyNativeDiscoveryParity } from './native-prediction-adapter.mjs';
 
@@ -102,7 +103,10 @@ test('all supported Discovery scope, mode, domain and acquisition inputs match f
       (await connection.query(`select to_jsonb(r) value from ${name} r order by to_jsonb(r)::text`)).rows]));
     const before = await snapshot(db), installed = await db.dumpDataDir();
     await db.close();
-    const report = await verifyNativeDiscoveryParity(async sql => {
+    const report = await verifyNativeDiscoveryParity(async (sql, options) => {
+      // Validate the caller options through the actual native runner contract;
+      // the SQL itself executes in the installed PGlite snapshot below.
+      await runIsolatedSqlProbe(() => '', 'pglite-contract-check', sql, options);
       // Match the native runner's distinct psql connections. Reusing one WASM
       // session for these rollback fixtures reproducibly fails on its third
       // batch; the same batch passes from this identical installed snapshot.

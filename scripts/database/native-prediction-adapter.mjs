@@ -380,7 +380,7 @@ export async function verifyNativeDiscoveryParity(execSql) {
   const cases = [];
   let comparedCandidates = 0, maxAbsoluteScoreDifference = 0;
   for (const profileType of ['PERSONAL', 'SHARED']) for (const mode of ['FOR_YOU', 'SURPRISE', 'RISK']) {
-    const stage = 'native-discovery-parity-' + profileType.toLowerCase() + '-' + mode.toLowerCase();
+    const stage = 'native-discovery-parity-' + profileType.toLowerCase() + '-' + mode.toLowerCase().replaceAll('_', '-');
     let fixture;
     try {
       [fixture] = await execSql(`begin;set local extra_float_digits=3;

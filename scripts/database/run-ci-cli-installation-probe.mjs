@@ -93,6 +93,10 @@ try {
     assert.equal(deadlineRollback.absent, true, 'Timed-out server statement left partial DDL');
     const sqlStatementDeadline = { status: 'PASS', serverTimeoutMs: 5000, dockerTimeoutMs: 10_000,
       rollback: 'owned test table absent after server statement cancellation' };
+    const nativeDiscoveryParity = await verifyNativeDiscoveryParity(exec);
+    assert.equal(nativeDiscoveryParity.status, 'PASS');
+    assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), expected,
+      'Discovery parity changed the installed source');
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
     const reconciliationIndex = files.findIndex(file => file.name.endsWith('_shared_forecast_outcome_reconciliation.sql'));
@@ -423,8 +427,6 @@ try {
     assert.match(nativeCandidateRequest?.nativeCandidateRequest, /^PASS:/);
     const nativePredictionAdapter = await verifyNativePredictionAdapter(exec);
     assert.equal(nativePredictionAdapter.status, 'PASS');
-    const nativeDiscoveryParity = await verifyNativeDiscoveryParity(exec);
-    assert.equal(nativeDiscoveryParity.status, 'PASS');
     const personalSequentialTaste = await verifyPersonalSequentialTaste(execConcurrentSql);
     assert.equal(personalSequentialTaste.status, 'PASS');
     const personalTastePools = await verifyPersonalTastePools(execConcurrentSql);
