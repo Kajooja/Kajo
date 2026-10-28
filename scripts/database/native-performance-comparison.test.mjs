@@ -4,6 +4,8 @@ import test from 'node:test';
 import { performanceProtocol, summarizePerformance } from './native-prediction-performance.mjs';
 import { performanceComparisonProtocol, performanceComparisonInstallations, skipPrefilterMigration,
   summarizePerformanceComparison } from './native-performance-comparison.mjs';
+import { skipHistories, expectedSkipHistoryInventory } from './native-skip-history-fixture.mjs';
+import { summarizeSkipHistoryComparison } from './native-skip-history-comparison.mjs';
 
 // Synthetic parser fixtures, never native timing evidence.
 function runs() {
@@ -105,4 +107,79 @@ test('comparison freezes the reviewed prefix instead of silently measuring later
   assert.deepEqual(variants.CANDIDATE.manifest.files, ['old', 'candidate']);
   assert.deepEqual(variants.BASELINE.history, ['old']);
   assert.throws(() => performanceComparisonInstallations({ files: [{ name: 'old.sql' }] }));
+});
+
+function historyRuns() {
+  return runs().map(run => {
+    for (const [field, original, diagnostic] of [['historyPerformance', 'performance', false], ['historyDiagnostics', 'diagnostics', true]]) {
+      const collection = structuredClone(run[original]);
+      collection.protocol = performanceProtocol({ skipHistory: true, profileFunctions: diagnostic });
+      collection.protocolSha256 = createHash('sha256').update(JSON.stringify(collection.protocol)).digest('hex');
+      collection.historyFixtureSha256 = 'a'.repeat(64);
+      collection.cohorts = skipHistories.flatMap(history => run[original].cohorts.filter(c => c.catalogSize === 1000).map(c => {
+        const cohort = structuredClone(c);
+        cohort.skipHistory = history;
+        cohort.historyInventory = expectedSkipHistoryInventory(history, 1000);
+        cohort.historyPreserved = true;
+        if (diagnostic && history === 'CATALOGUE_HISTORY' && cohort.operation.startsWith('discovery-')) {
+          cohort.samples[0].functionTiming.skipDecision.calls = 501;
+        }
+        return cohort;
+      }));
+      run[field] = collection;
+    }
+    return run;
+  });
+}
+
+test('history envelope retains original effect rules and admits all declared history pairs only', () => {
+  const result = summarizeSkipHistoryComparison(historyRuns());
+  assert.equal(result.decision, 'ADMITTED_IN_DECLARED_HISTORY_ENVELOPE');
+  assert.equal(result.plannedMeasurements, 2880);
+  assert.equal(result.warmupsCompleted, 288);
+  assert.equal(result.diagnosticObservations, 72);
+  assert.equal(result.pairs[0].cohorts.length, 12);
+  assert.equal(result.pairs[0].mechanisms[0].expectedReduction, 0);
+  assert.equal(result.pairs[0].mechanisms[3].expectedReduction, 500);
+  assert.equal(result.pairs[0].mechanisms[5].expectedReduction, 0);
+});
+
+test('history regressions and mechanism failures cannot hide behind an empty-history speedup', () => {
+  for (const mutate of [
+    values => {
+      const c = values[1].historyPerformance.cohorts[0];
+      c.samples.forEach(s => { s.executionMs = 180; });
+      c.summary = summarizePerformance(c.samples, 20, 20, []);
+    },
+    values => {
+      const c = values[5].historyPerformance.cohorts[7];
+      c.samples.forEach(s => { s.executionMs = 2.31; });
+      c.summary = summarizePerformance(c.samples, 20, 20, []);
+    },
+    values => { values[2].historyDiagnostics.cohorts[0].samples[0].functionTiming.skipDecision.calls--; },
+    values => {
+      const c = values[1].historyPerformance.cohorts[6];
+      c.samples[0].tempReadBlocks = 1;
+      c.summary = summarizePerformance(c.samples, 20, 20, []);
+    },
+    values => retime(values[1], 6, 169),
+  ]) {
+    const values = historyRuns(); mutate(values);
+    assert.equal(summarizeSkipHistoryComparison(values).decision, 'NOT_ADMITTED');
+  }
+});
+
+test('history inventory, canonical preservation, protocol and raw completeness are required', () => {
+  for (const mutate of [
+    v => { v[0].historyPerformance.cohorts[0].historyInventory.commands = 0; },
+    v => { v[1].historyPerformance.cohorts[0].historyPreserved = false; },
+    v => { v[2].historyPerformance.historyFixtureSha256 = 'b'.repeat(64); },
+    v => { v[3].historyDiagnostics.cohorts.pop(); },
+    v => { v[4].historyPerformance.cohorts[0].samples.pop(); },
+    v => { v[5].historyPerformance.environment.serverVersion = 'different'; },
+    v => { v[0].historyDiagnostics.sourceSha256 = 'different'; },
+    v => { v[1].historyPerformance.cleanup = 'FAIL'; },
+  ]) {
+    const values = historyRuns(); mutate(values); assert.throws(() => summarizeSkipHistoryComparison(values));
+  }
 });

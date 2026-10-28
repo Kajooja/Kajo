@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — thirteen accepted source packets; current bounded skip-read optimization/comparison packet; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
+Status: **IN PROGRESS — accumulated skip-history comparison complete and NOT_ADMITTED; next bounded diagnosis; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -245,6 +245,69 @@ histories, unrelated Profiles and invalid clocks, with exact acquisition rows,
 metadata, retained source records and public retries. Run the same populated
 forward verifier in real PostgreSQL and the existing latest-source parity gate.
 All six original/current CI gates remain mandatory before source acceptance.
+
+## Accumulated skip-history comparison
+
+[Issue #392](https://github.com/Kajooja/Kajo/issues/392) continues accepted
+[PR #391](https://github.com/Kajooja/Kajo/pull/391), main `2f6f381`. Its empty-history
+effect is accepted only in the declared synthetic scope. This packet adds no
+serving function, schema or migration and does not rewrite the accepted forward.
+It uses the same exact 53/54-entry installations, six stacks and BC/CB/BC order.
+
+`native-skip-history-envelope-v1` retains the complete original empty-history
+comparison and adds two 1000-Item histories. Both cover Personal/Shared MOVIE
+Discovery and Personal Taste NEXT, fresh and exact retry, with two warmups and
+20 trials per cohort; six separate function observations follow each history
+collection. Totals are **2880 measurements, 288 excluded warmups and 72 separate
+diagnostics**. Collection order within each stack is empty baseline, empty
+diagnostics, history baseline, history diagnostics; every collection restores
+all canonical rows before the next starts. Contract tests use a smaller fixture
+and are never native timing evidence.
+
+| History | Retained synthetic rows and interpretation |
+|---|---|
+| `CATALOGUE_HISTORY` | Each current Item has four expired skip sources in both target Profiles. Balanced per-domain quarters add active, reversed, future or erased sources. A third PersonalProfile has an active skip on every current Item. Exactly 11500 command rows, including 500 withdrawals, 500 erased and 500 future rows; each target has 250 active / 750 elapsed current-Item decisions. |
+| `OFF_CATALOGUE_HISTORY` | 10000 nondiscoverable Items have one expired source in each target Profile. The unrelated PersonalProfile has active history on every current Item. Exactly 21000 command rows; all 1000 current-Item decisions in either target have no active source. |
+
+Direct ledger seeding is an isolated retained-state fixture, not evidence for
+public writer admission. Inventory, real skip decisions and ANALYZE precede
+warmups. Full ledger hashes must remain equal across each cohort; exact retries
+also compare retained skip-source lineage. Reports contain synthetic counts and
+hashes, never actor/Item identities or response bodies. Logical row cleanup does
+not claim physical dead-tuple, cache or WAL reset.
+
+**Predeclared admission:** keep #391's original empty-history rules, then require
+every history cohort in every pair to stay within **max(5 ms, 5%)** fresh or
+**max(0.3 ms, 10%)** retry p50 regression allowances, with zero candidate temporary
+reads/writes. These reuse the previously declared engineering allowances; no
+minimum history speedup is required. Catalogue-history skip-call counts must stay
+equal. Off-catalogue Discovery must remove exactly 500 calls; Taste stays equal.
+No pooling, tail gate, production SLO, device or predictive-quality admission.
+
+A complete losing comparison is **NOT_ADMITTED** and does not expand #391's
+accepted scope. Record the failed cohort and a concrete successor before hosted
+activation; do not tune thresholds after seeing results. All six CI gates,
+source/fixture/protocol/worker identities, raw denominators and six stack cleanups
+remain required. STATUS owns the final source receipt and next action.
+
+### Recorded history outcome and successor
+
+[PR #393](https://github.com/Kajooja/Kajo/pull/393) completes the declared
+comparison as **NOT_ADMITTED**. CI #808 passes all six source gates and all
+latency/resource criteria, but pair 1 catalogue-history Personal Discovery has
+502 baseline versus 503 candidate skip-decision calls, violating equality. The
+earlier complete CI #807 result is also retained, including its four failed
+latency comparisons. No threshold or result was revised after measurement.
+[STATUS](../STATUS.md#completed-history-comparison-evidence) retains exact source,
+artifact hashes, denominators, preservation proofs and the earlier losing result;
+the PR retains all paired p50/p95 values.
+
+The next bounded packet is [Issue #394](https://github.com/Kajooja/Kajo/issues/394):
+attribute acquisition versus downstream calls with repeated no-forward controls
+and explicit input/clock witnesses, and investigate the earlier latency failures.
+Do not infer causality from total root-RPC calls, widen the accepted scope, install
+the forward or relax v1 criteria. Any justified successor protocol is versioned
+and predeclared before fresh evidence; this diagnosis changes no serving SQL.
 
 ## Evidence and completion rules
 

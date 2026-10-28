@@ -8,6 +8,7 @@ import { collectNativePredictionPerformance } from './native-prediction-performa
 import { performanceSeriesProtocol, summarizePerformanceSeries } from './native-performance-series.mjs';
 import { performanceComparisonProtocol, performanceComparisonInstallations,
   summarizePerformanceComparison } from './native-performance-comparison.mjs';
+import { skipHistoryComparisonProtocol, summarizeSkipHistoryComparison } from './native-skip-history-comparison.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
 const hostInventory = () => ({ platform: platform(), kernel: release(), node: process.version,
@@ -15,18 +16,20 @@ const hostInventory = () => ({ platform: platform(), kernel: release(), node: pr
   resourceScope: 'RUNNER_HOST_INVENTORY_NOT_CONTAINER_LIMITS_OR_PEAK_USAGE' });
 
 try {
-  const comparison = process.argv[3] === '--compare-skip-prefilter';
+  const histories = process.argv[3] === '--compare-skip-history';
+  const comparison = histories || process.argv[3] === '--compare-skip-prefilter';
   assert.ok(process.argv.length === (comparison ? 4 : 3),
-    'Usage: node scripts/database/run-ci-prediction-performance.mjs <new-report.json> [--compare-skip-prefilter]');
+    'Usage: node scripts/database/run-ci-prediction-performance.mjs <new-report.json> [--compare-skip-prefilter|--compare-skip-history]');
   const installation = await buildFreshInstallation();
   const variants = comparison ? performanceComparisonInstallations(installation) : null;
-  const protocol = comparison ? performanceComparisonProtocol() : performanceSeriesProtocol();
+  const protocol = histories ? skipHistoryComparisonProtocol() : comparison ? performanceComparisonProtocol() : performanceSeriesProtocol();
   const count = comparison ? protocol.order.length : protocol.baselineRuns;
-  const report = { format: comparison ? 'kajo-native-prediction-performance-comparison-v1' : 'kajo-native-prediction-performance-series-v1', status: 'FAIL', protocol,
+  const report = { format: histories ? 'kajo-native-skip-history-envelope-v1' : comparison ? 'kajo-native-prediction-performance-comparison-v1' : 'kajo-native-prediction-performance-series-v1', status: 'FAIL', protocol,
     protocolSha256: hash(JSON.stringify(protocol)),
     runnerSourceSha256: hash(await readFile(new URL(import.meta.url))),
     seriesSourceSha256: hash(await readFile(new URL('native-performance-series.mjs', import.meta.url))),
     ...(comparison ? { comparisonSourceSha256: hash(await readFile(new URL('native-performance-comparison.mjs', import.meta.url))) } : {}),
+    ...(histories ? { historyComparisonSourceSha256: hash(await readFile(new URL('native-skip-history-comparison.mjs', import.meta.url))) } : {}),
     job: { runId: process.env.GITHUB_RUN_ID, attempt: process.env.GITHUB_RUN_ATTEMPT, job: process.env.GITHUB_JOB },
     runs: [] };
   try {
@@ -38,13 +41,20 @@ try {
         const performance = await collectNativePredictionPerformance(exec);
         const diagnostics = (comparison || index === count) && performance.status === 'PASS'
           ? await collectNativePredictionPerformance(exec, { profileFunctions: true }) : undefined;
-        return { installed, performance, ...(diagnostics ? { diagnostics } : {}) };
+        const historyPerformance = histories && diagnostics?.status === 'PASS'
+          ? await collectNativePredictionPerformance(exec, { skipHistory: true }) : undefined;
+        const historyDiagnostics = historyPerformance?.status === 'PASS'
+          ? await collectNativePredictionPerformance(exec, { skipHistory: true, profileFunctions: true }) : undefined;
+        return { installed, performance, ...(diagnostics ? { diagnostics } : {}),
+          ...(histories ? { historyPerformance, historyDiagnostics } : {}) };
       });
       // The lifecycle has verified container/volume cleanup before the next run.
       report.runs.push({ index, ...(comparison ? { variant } : {}), runtime, host: hostInventory(), ...result });
       assert.equal(result.performance.status, 'PASS', 'Incomplete baseline; artifact retains failed/missing denominators');
+      if (histories) assert.equal(result.historyDiagnostics?.status, 'PASS', 'Incomplete history collection');
     }
-    if (comparison) report.comparison = summarizePerformanceComparison(report.runs);
+    if (histories) report.comparison = summarizeSkipHistoryComparison(report.runs);
+    else if (comparison) report.comparison = summarizePerformanceComparison(report.runs);
     else report.repeatability = summarizePerformanceSeries(report.runs);
     report.status = 'PASS';
   } finally {
