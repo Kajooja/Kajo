@@ -9,7 +9,8 @@ declare expected record; actual record; original text; definition text; rewritte
         jsonb_build_object('consumedSuppressed',coalesce(a.consumed,false),'rating',a.rating,
           'notInterested',coalesce(a.not_interested,false),'saved',coalesce(a.saved,false)),eligibility_at) end policy$old$;
   new_policy constant text := $new$      case when not is_taste then
-        case when eligibility_at >= 'epoch'::timestamptz and eligibility_at < '10000-01-01'::timestamptz
+        case when acquisition in('LEGACY_DISCOVERY','CATALOG_CHAIN')
+          and eligibility_at >= 'epoch'::timestamptz and eligibility_at < '10000-01-01'::timestamptz
           and not exists(select 1 from potential_skips p where p.item_id=i.id)
         then private.resurfacing_before_contextual_skip_v1(scope_profile_id,i.id,
           jsonb_build_object('consumedSuppressed',coalesce(a.consumed,false),'rating',a.rating,

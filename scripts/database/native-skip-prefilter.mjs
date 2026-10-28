@@ -32,6 +32,10 @@ export async function verifyNativeSkipPrefilter(execSql, migration) {
       requestId: randomUUID(), expectedRevision: start.revision };
     const question = await call('taste_session_v2', next);
     assert.equal(question.status, 'QUESTION');
+    const answered = await call('taste_session_v2', { operation: 'ANSWER', profileId, sessionId: start.sessionId,
+      requestId: randomUUID(), expectedRevision: question.revision, questionId: question.questionId,
+      answer: { kind: 'UNKNOWN' } });
+    assert.equal(answered.status, 'NEEDS_NEXT');
     const feedRequest = { version: 3, requestId: randomUUID(), profileId, sessionId: randomUUID(),
       discoveryMode: 'FOR_YOU', itemType: 'MOVIE', limit: 5, context: {}, cursor: null, replacesChainId: null };
     const page = await call('rank_items_feed_v1', feedRequest);
@@ -97,6 +101,7 @@ export async function verifyNativeSkipPrefilter(execSql, migration) {
       create temp table skip_cases(value jsonb);
       do $parity$ declare p uuid;m text;d text;acq text;delta interval;request jsonb;before_rows jsonb;after_rows jsonb;
         native_request jsonb;cutoff timestamptz;cases integer:=0;catalog_before jsonb;catalog_after jsonb;errors integer:=0;
+        observed record;before_calls integer;after_calls integer;
       begin
         foreach p in array array['${profileId}'::uuid,'ab157000-0000-4000-8000-000000000900'::uuid] loop
           foreach m in array array['FOR_YOU','SURPRISE','RISK'] loop
@@ -152,7 +157,33 @@ export async function verifyNativeSkipPrefilter(execSql, migration) {
           raise exception using errcode='KJ009';
         exception when sqlstate 'KJ009' then null;end;
         if catalog_after is distinct from catalog_before then raise exception 'Skip prefilter changed Taste catalogue';end if;
+        -- NEXT also calls acquisition through explicit-canonical evaluation.
+        -- Observe that real nested call graph on each source in rolled-back
+        -- subtransactions, so Discovery-only savings cannot escape their scope.
+        select prosrc,pg_get_functiondef(oid) definition into strict observed from pg_proc
+          where oid='private.contextual_skip_decision_v1(uuid,uuid,timestamptz,boolean)'::regprocedure;
+        execute replace(observed.definition,observed.prosrc,regexp_replace(observed.prosrc,'\\mbegin\\M',
+          'begin perform set_config(''kajo.skip_calls'',(current_setting(''kajo.skip_calls'')::integer+1)::text,true);','i'));
+        request:=jsonb_build_object('operation','NEXT','profileId','${profileId}','sessionId','${start.sessionId}',
+          'requestId',gen_random_uuid(),'expectedRevision',${answered.revision});
+        begin
+          execute (select definition from skip_functions where proname='acquire_native_candidates_v1');
+          perform set_config('kajo.skip_calls','0',true);
+          perform public.taste_session_v2(request);
+          before_calls:=current_setting('kajo.skip_calls')::integer;
+          raise exception using errcode='KJ009';
+        exception when sqlstate 'KJ009' then null;end;
+        begin
+          perform set_config('kajo.skip_calls','0',true);
+          perform public.taste_session_v2(request);
+          after_calls:=current_setting('kajo.skip_calls')::integer;
+          raise exception using errcode='KJ009';
+        exception when sqlstate 'KJ009' then null;end;
+        execute observed.definition;
+        if before_calls<1 or after_calls is distinct from before_calls then
+          raise exception 'Skip prefilter changed nested Taste/evaluation calls: % -> %',before_calls,after_calls;end if;
         insert into skip_cases values(jsonb_build_object('status','PASS','acquisitionCases',cases,'tasteCatalogues',1,'invalidClockRejections',errors,
+          'tasteSkipCalls',jsonb_build_object('baseline',before_calls,'candidate',after_calls),
           'unchangedFunctions',(select count(*)-1 from skip_functions),'preservedFunctionMetadata',true));
       end;$parity$;
       select value from skip_cases;rollback;`, 'populated-parity');
