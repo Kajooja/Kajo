@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-28**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, skip-call diagnosis #394 in progress after mixed accumulated-history results; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, #394 diagnostic source complete in PR #395; historical call drift and off-catalogue Taste retry latency remain unresolved; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -28,19 +28,62 @@ has 502 baseline versus 503 candidate skip-decision calls; equality was required
 That rule is unchanged. The final #809 success does not resolve the preceding
 failures or establish repeatable broader activation.
 
-**Active task:** [Issue #394](https://github.com/Kajooja/Kajo/issues/394), branch
-`test/native-skip-call-diagnosis`. Implement the [predeclared diagnostic protocol](sprints/SPRINT-015.md#native-skip-call-diagnostic-protocol)
-with the original collection prelude, repeated baseline/baseline and
-candidate/candidate controls, scoped acquisition/availability traces and exact
-same-transaction input/clock comparisons. Run the six source gates and inspect
-native evidence before concluding a cause. This packet changes no serving SQL,
-schema or hosted state and supplies no rollout admission. Original v1 criteria
-and every losing result remain unchanged.
+**Active source packet:** [PR #395](https://github.com/Kajooja/Kajo/pull/395), branch
+`test/native-skip-call-diagnosis`, implements the [predeclared diagnostic protocol](sprints/SPRINT-015.md#native-skip-call-diagnostic-protocol)
+for [Issue #394](https://github.com/Kajooja/Kajo/issues/394). All six gates pass on
+executable head `1240b57d8a8fdd3706f26b6ff71bbc89efa13ef6` in CI #811. The PR owns
+final source-head acceptance after this documentation receipt; an unmerged PR
+is not accepted main. Inspect its final required checks before source integration.
+
+**Diagnostic result:** all six original observations and 18 original-body controls
+report 503 calls; all 18 traces attribute **500 to acquisition and three to trailing
+availability**. Historical 501/502 totals did not reproduce and remain unresolved.
+Same-transaction acquisition inputs/full rows match, with exact native clock
+witnesses, retries and restored functions/data. Separate public requests have
+different clocks and slightly different scores; these traces do not prove exact
+full-RPC score equality. Candidate replay plans expose extra dense-history ledger
+work, not a demonstrated cause of public latency. No rollout admission is emitted.
+
+**One next diagnostic packet after PR #395 source acceptance:** predeclare and
+observe the actual `OFF_CATALOGUE_HISTORY` Taste **exact-retry** path after the
+same physical prelude, with repeated same-variant controls, scoped call graphs,
+retained-response query plans and exact input/receipt witnesses. CI #811 pair 3
+has p50 **7.710 → 10.553 ms** (increase 2.843 ms, allowed 0.771 ms); p95 is
+7.862 → 10.826 ms. This measurement precedes the new observer. Existing function
+profiles cover fresh calls, so acquisition blame is unsupported. Keep #394 open;
+availability-order/plan controls for historical 501/502 remain a subsequent
+unresolved investigation, not a second implicit active packet. No serving SQL,
+schema or hosted change is justified by this evidence. Original v1 criteria and
+every losing result remain unchanged.
 
 The #391 forward remains uninstalled in the hosted application. Keep its earlier
 acceptance limited to the declared empty-skip synthetic scope. This work admits
 no production traffic envelope, latency SLO, phone speed or predictive quality;
 hosted/device observations and separately predeclared quality sampling remain open.
+
+### Completed diagnostic evidence
+
+[CI #811](https://github.com/Kajooja/Kajo/actions/runs/40714431007), tested merge
+`4a65ec799e46ee58e35bcd11b1e50f4c8e78773d`, tree
+`e57cd3f347bab9a2619a99e689bc4c765cd46c67`, passes all six source gates,
+**2263 tests and four configured iOS/Android exports**. Diagnostic artifact
+`12830758100`, JSON SHA-256
+`0b385e0110c677b10c45a755f6aa1266127abadb27ef43b6d5b6bc5da5cfa0a6`,
+was independently verified from raw observations, quantiles and native microsecond
+clock witnesses. All 2880 measurements, 288 warmups, 72 original diagnostics,
+18 controls, 18 traces and six stack cleanups are present. Its `admission` is
+`NONE`; the retry failure is retained as a descriptive original-rule failure.
+The [Sprint receipt](sprints/SPRINT-015.md#native-skip-call-diagnostic-result--ci-811)
+records plan limitations, physical-state observations and timing ranges.
+
+Native preservation artifact `12829402944`, JSON SHA-256
+`585f898738c4baff3df16d11506016bf3ed9310e148ff55df8f94c1f5f5dc6fe`,
+independently passes all 54 source identities, 126 acquisition comparisons,
+actual nested Taste calls 39/39, 276 unchanged functions/all metadata, invalid
+clocks, exact retries and all 91 canonical tables. It retains 54 Discovery
+cases/810 exact candidates with zero score difference, seven exact-input Taste
+evaluations/21 sources, seven Shared lock proofs and 16 reconciliations.
+Canonical and owned-stack cleanup pass. No hosted operation occurred.
 
 ### Completed history comparison evidence
 
