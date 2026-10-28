@@ -103,8 +103,10 @@ export function summarizeFunctionTiming(rows, rootName) {
   const sorted = [...rows].sort((a, b) => b.selfMs - a.selfMs
     || JSON.stringify([a.schema, a.name, a.arguments]).localeCompare(JSON.stringify([b.schema, b.name, b.arguments])));
   const limit = performanceProtocol({ profileFunctions: true }).functionTiming.topSelfTimeLimit;
+  const skipDecision = rows.find(row => row.schema === 'private' && row.name === 'contextual_skip_decision_v1'
+    && row.arguments === 'uuid, uuid, timestamp with time zone, boolean') ?? null;
   return { trackedFunctions: rows.length, omittedFunctions: Math.max(0, rows.length - limit),
-    root, topSelfTime: sorted.slice(0, limit) };
+    root, skipDecision, topSelfTime: sorted.slice(0, limit) };
 }
 
 const functionTimingSql = `select coalesce(jsonb_agg(jsonb_build_object(

@@ -47,6 +47,23 @@ job keeps collection outside the long historical migration probe. All original
 five gates plus this completeness/cleanup gate precede the Android artifact;
 there is no performance SLO, model admission or hosted load-test command.
 
+The bounded #390 successor uses `native-performance-comparison.{mjs,test.mjs}`
+to compare three baseline/candidate pairs in BC/CB/BC order. The existing runner's
+`--compare-skip-prefilter` mode uses six fresh stacks and keeps protocol, installation
+and per-run source identities. The declared effect and regression rules are in
+Sprint 015. The original baseline-series mode remains available; a frozen
+comparison never silently incorporates later SQL forwards.
+
+`20261028081350_native_skip_acquisition_prefilter.sql` changes only
+`acquire_native_candidates_v1`: its materialized potential-skip superset now also
+avoids redundant empty-history reads for Discovery. Actual skip decisions,
+source IDs, expiry/reversal/erasure and invalid-clock validation remain owned by
+the unchanged existing functions. `native-skip-prefilter.{mjs,test.mjs}` compares
+the populated predecessor against the forward, including complete acquisition
+rows, defaults/function metadata and exact public retries. The existing native
+CLI gate runs the same verifier. This source is not a hosted installation;
+STATUS records source, measured effect and rollout separately.
+
 ## Native ranking adapter and conformance — Sprint 015
 
 `20261026201946_native_v4_receipt_forecast_binding.sql` adds private INVOKER
