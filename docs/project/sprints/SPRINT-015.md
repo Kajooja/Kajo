@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — accumulated skip-history comparison complete and NOT_ADMITTED; next bounded diagnosis; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
+Status: **IN PROGRESS — native skip-call evidence collected under #394; next diagnose actual Taste exact retries; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -293,21 +293,178 @@ remain required. STATUS owns the final source receipt and next action.
 ### Recorded history outcome and successor
 
 [PR #393](https://github.com/Kajooja/Kajo/pull/393) completes the declared
-comparison as **NOT_ADMITTED**. CI #808 passes all six source gates and all
+comparison with mixed repeat observations. CI #808 is **NOT_ADMITTED**, passing all six source gates and all
 latency/resource criteria, but pair 1 catalogue-history Personal Discovery has
 502 baseline versus 503 candidate skip-decision calls, violating equality. The
 earlier complete CI #807 result is also retained, including its four failed
 latency comparisons. No threshold or result was revised after measurement.
 [STATUS](../STATUS.md#completed-history-comparison-evidence) retains exact source,
 artifact hashes, denominators, preservation proofs and the earlier losing result;
-the PR retains all paired p50/p95 values.
+the PR retains all paired p50/p95 values. Final CI #809 individually passes the
+unchanged rules on a different worker; its success does not erase #807/#808 or
+establish repeatable broader activation. STATUS retains the accepted source and
+all three result identities.
 
-The next bounded packet is [Issue #394](https://github.com/Kajooja/Kajo/issues/394):
+The bounded successor is [Issue #394](https://github.com/Kajooja/Kajo/issues/394):
 attribute acquisition versus downstream calls with repeated no-forward controls
 and explicit input/clock witnesses, and investigate the earlier latency failures.
 Do not infer causality from total root-RPC calls, widen the accepted scope, install
 the forward or relax v1 criteria. Any justified successor protocol is versioned
 and predeclared before fresh evidence; this diagnosis changes no serving SQL.
+Its measured receipt and single next diagnostic follow below.
+
+## Native skip-call diagnostic protocol
+
+Predeclared for [Issue #394](https://github.com/Kajooja/Kajo/issues/394), before
+new native evidence: `native-skip-call-series-v1` / report format
+`kajo-native-skip-call-diagnostics-v1`. This is a diagnostic protocol with **no
+rollout admission**, not a revised interpretation of any v1 comparison.
+
+- Retain six fresh owned stacks in **B,C,C,B,B,C** order, exact 53/54-entry
+  installations and the complete original empty measurements → empty function
+  observations → history measurements → first catalogue-history Personal
+  function observation. No instrumented function or reference DDL precedes
+  that original target observation. All earlier 20-sample measurements and
+  two warmups per cohort retain their declared SQL and thresholds.
+- Before cleaning that target fixture, run **three additional original-body
+  authenticated root observations**, each with transaction-local function
+  counts captured before two exact verification retries. Then run **three
+  separate traced observations**. Preserve every attempt, source identity,
+  observed input/clock witness and failure; do not retry missing observations
+  into a successful sample. Three stacks per variant supply additional
+  baseline/baseline and candidate/candidate controls without a forward change.
+- Scoped transaction-local instrumentation distinguishes acquisition calls from
+  trailing availability calls. Capture actual acquisition input, skip Item/clock
+  witnesses and availability inputs. In the same transaction, compare complete
+  baseline/candidate acquisition rows with the **identical captured JSON and
+  clocks**, including eligibility, source lineage and all output fields.
+  Cross-connection public requests do not pretend to share wall-clock inputs.
+  Retain invalid-clock controls and exact public response/frozen-source retries.
+- Capture relevant acquisition/availability query plans through closed diagnostic
+  copies with explicit inputs. Label separate query replays as replays, not
+  original nested cached plans. PostgreSQL requires the acquisition EXPLAIN
+  copies to be VOLATILE; only those closed `pg_temp` copies use that metadata.
+  Their query bodies/inputs remain exact, the fixture has no concurrent writer,
+  and original/parity functions retain STABLE. This diagnostic plan difference
+  prevents claims of identical original snapshot/planning behavior.
+  Do not subtract instrumentation overhead from
+  timings or treat instrumented times as uninstrumented performance evidence.
+  Snapshot function definitions/metadata and verify their restoration after
+  rollback; retain full canonical-row and skip-ledger cleanup checks.
+- Report same-variant counts and per-stack timing ranges without pooled samples
+  or cross-worker comparisons. Native attribution requires observed scoped
+  counts and exact parity; absent reproduction is an unresolved result, not
+  proof that the historical variation was harmless. Explain all four #807
+  timing failures separately where evidence supports it; no guessed common cause.
+- Instrumentation changes physical cache/catalog/dead-tuple state even after
+  rollback. Subsequent function observations belong to this new protocol.
+  Original rule calculations may be reported descriptively, but the diagnostic
+  report must not emit a v1 admission. No vacuum, heap rewrite, plan setting or
+  hosted operation is silently inserted to make a comparison pass.
+
+Reports may retain **synthetic fixture** identities, input clocks and plan
+expressions for causal inspection; this is a deliberate scope difference from
+the aggregate-only timing artifacts. Real user data, tokens and environment
+secrets remain excluded. Raw CI artifacts keep the existing seven-day retention;
+the PR records hashes and durable conclusions. All six CI gates remain required.
+The performance job's execution deadline increases from 45 to 60 minutes to
+accommodate separate diagnostics; no measured latency allowance changes.
+
+### Prior timing audit motivating the diagnostics
+
+Recomputing raw nearest-rank quantiles preserves all four #807 failures. Within
+that worker, B runs 1/4/5 and C runs 2/3/6 give these exploratory p50 ranges:
+
+| 1000-Item cohort | Baseline p50 range, ms | Candidate p50 range, ms | Failed paired increase, ms |
+| --- | --- | --- | --- |
+| Empty-history fresh Taste | 106.489–107.471 | 103.056–113.890 | 7.401 |
+| Off-catalogue Taste exact retry | 5.174–5.547 | 5.267–6.986 | 1.439 |
+| Catalogue Personal fresh Discovery | 132.837–135.226 | 129.891–140.877 | 7.908 |
+| Catalogue Shared fresh Discovery | 162.333–167.197 | 163.249–175.115 | 12.782 |
+
+The slower retry has first-/last-half medians 6.986/6.972 ms: its single 15.670 ms
+outlier does not explain p50. Its 2682 shared hits per sample differ from the
+paired baseline's 2437, despite zero shared reads and temporary reads/writes.
+Warmup timings were not retained. Neither CPU scheduling nor physical heap/plan
+state can be inferred from those counters alone.
+
+The separate Shared-history diagnostic has 503 skip calls in all six stacks;
+empty Taste has 50. Personal call-count drift therefore cannot explain every
+failed timing. Catalogue acquisition self times also merit inspection: Personal
+B 3.963/3.704/3.306 versus C 6.118/5.887/6.056 ms. These are separate single
+instrumented fresh calls, not components that may be subtracted from measured
+p50. There is no exact-retry function-profile observation in the old protocol.
+The original report hashes in STATUS identify this retained evidence.
+
+### Native skip-call diagnostic result — CI #811
+
+[PR #395](https://github.com/Kajooja/Kajo/pull/395), source head
+`1240b57d8a8fdd3706f26b6ff71bbc89efa13ef6`, source tree
+`e57cd3f347bab9a2619a99e689bc4c765cd46c67`, passed all six required gates in
+[CI #811](https://github.com/Kajooja/Kajo/actions/runs/40714431007), tested merge
+`4a65ec799e46ee58e35bcd11b1e50f4c8e78773d`: **2263 tests and four configured
+iOS/Android exports**. This records measured executable evidence, not an already
+merged branch. PR #395 owns the final source-head receipt after these documentation
+changes and their required checks.
+
+Performance artifact `12830758100`, ZIP SHA-256
+`e73906ad9b041b0e61703fcdaaaa0e540ad256869f9d463ca7c13365e5005541`,
+JSON SHA-256
+`0b385e0110c677b10c45a755f6aa1266127abadb27ef43b6d5b6bc5da5cfa0a6`,
+was independently verified against raw quantiles, source/installation identities,
+scoped witnesses and summaries. The AMD EPYC 7763 worker, four logical CPUs,
+Node 22.23.3 and PostgreSQL 17.6 completed **2880 measurements, 288 warmups,
+72 original diagnostics, 18 additional controls and 18 traces**. All 91 canonical
+tables and six owned stacks were restored; scoped observations preserve 72 exact
+verification retries and original function bodies/metadata.
+
+Every original target observation and additional control reports **503** skip
+calls. Every trace attributes them to **500 acquisition + 3 trailing availability**
+calls. The earlier 501/502 totals were **not reproduced**; their cause remains
+unresolved. All 18 baseline/candidate private replays preserve 500 complete
+acquisition rows at identical captured inputs and PostgreSQL-microsecond clocks,
+including invalid-clock rejection. Fresh public controls and traces have different
+wall-clock inputs: selected identities and each request's frozen exact retries
+are preserved, but this is not fixed-clock full-RPC score equivalence.
+
+Separate query replays identify additional dense-history work: the baseline
+`potential_skips` CTE never executes, while the candidate scans 11500 command
+rows, retains 4500 and materializes 1000 distinct Item IDs once. Depending on
+physical ledger size, that CTE records 235 or 1286 shared hits. Availability replays
+use an Items index-only scan in five stacks and a sequential scan in one; all
+traces still visit the same three Items. The acquisition EXPLAIN copies are
+VOLATILE; none of these replay plans is an original nested cached plan or
+quantifies a causal public-RPC latency
+effect. Physical-state differences and successful parity do not explain the
+historical call-count drift.
+
+The only failed descriptive original-rule comparison is **pair 3 off-catalogue
+Taste exact retry**: p50 **7.710 → 10.553 ms**, increase **2.843 ms** against the
+unchanged **0.771 ms** allowance; p95 **7.862 → 10.826 ms** remains exploratory.
+The slower cohort's first-/last-half medians are 10.565/10.534 ms. Its measurement
+precedes the observer, and existing function profiles cover fresh calls only;
+neither instrumentation nor acquisition is an established explanation.
+
+The four previously affected cohorts retain separate per-stack p50 ranges;
+neither observations nor workers are pooled. PR #395 retains every paired
+p50/p95 value from this run.
+
+| 1000-Item cohort | Baseline p50 range, ms | Candidate p50 range, ms |
+| --- | --- | --- |
+| Empty-history fresh Taste | 195.330–195.496 | 194.066–196.396 |
+| Off-catalogue Taste exact retry | 7.673–7.729 | 7.654–10.553 |
+| Catalogue Personal fresh Discovery | 240.325–241.763 | 242.577–244.133 |
+| Catalogue Shared fresh Discovery | 303.748–304.109 | 305.186–306.990 |
+
+**Default next diagnostic within #394:** inspect the actual off-catalogue Taste
+exact-retry path before broader activation. Preserve the unresolved historical
+501/502 acquisition-versus-availability attribution as a separate follow-up within
+that issue. A detailed successor protocol still needs declaration before new
+evidence; this receipt does not prescribe an implementation or change thresholds.
+The diagnostic report grants **no rollout admission**. #807/#808 remain
+NOT_ADMITTED, #809 retains its individual passing result, and no serving SQL,
+schema or hosted state changes. Phone, production-SLO and predictive-quality
+acceptance remain separate open gates.
 
 ## Evidence and completion rules
 

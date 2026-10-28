@@ -98,7 +98,20 @@ test('actual RPC measurement contracts, authenticated retries and failure cleanu
     }
     assert.equal(diagnostics.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
     for (const profileFunctions of [false, true]) {
-      const history = await collectNativePredictionPerformance(exec, { contractTest: true, skipHistory: true, profileFunctions });
+      let observations = 0;
+      const observeHistoryCohort = profileFunctions ? async context => {
+        observations++;
+        assert.equal(context.catalogSize, 40);
+        assert.equal(context.request.profileId, context.profileId);
+        assert.equal(context.request.itemType, 'MOVIE');
+        assert.equal(context.originalSample.functionTiming.root.calls, 1);
+        assert.ok(context.originalSample.functionTiming.skipDecision.calls >= 20);
+        assert.match(context.call, /select public.rank_items_feed_v1/);
+        assert.match(context.auditSql, /skipSources/);
+      } : undefined;
+      const history = await collectNativePredictionPerformance(exec,
+        { contractTest: true, skipHistory: true, profileFunctions, observeHistoryCohort });
+      assert.equal(observations, profileFunctions ? 1 : 0, 'Observe only the original affected cohort');
       assert.equal(history.status, 'PASS');
       assert.equal(history.cohorts.length, profileFunctions ? 6 : 12);
       assert.ok(history.cohorts.every(c => c.historyPreserved && c.summary.succeeded === 1));
@@ -107,6 +120,17 @@ test('actual RPC measurement contracts, authenticated retries and failure cleanu
       assert.ok(history.cohorts.some(c => c.historyInventory.offCatalogueItems > 0));
       assert.equal(history.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
     }
+    await assert.rejects(collectNativePredictionPerformance(exec, { contractTest: true,
+      skipHistory: true, profileFunctions: true,
+      observeHistoryCohort() { throw new Error('Injected observer failure'); } }), error => {
+      assert.match(error.message, /Injected observer failure/);
+      assert.equal(error.performanceReport.status, 'FAIL');
+      assert.equal(error.performanceReport.failure.phase, 'OBSERVER');
+      assert.equal(error.performanceReport.cohorts[0].summary.succeeded, 1);
+      assert.equal(error.performanceReport.cohorts[1].summary.missing, 1);
+      assert.equal(error.performanceReport.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
+      return true;
+    });
     injectFailure = true;
     const failed = await collectNativePredictionPerformance(exec, { contractTest: true, skipHistory: true });
     assert.equal(failed.status, 'FAIL');
@@ -115,4 +139,11 @@ test('actual RPC measurement contracts, authenticated retries and failure cleanu
     assert.equal(failed.cohorts[0].summary.metrics.executionMs, null);
     assert.equal(failed.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
   } finally { await db.close(); }
+});
+
+test('scoped history observer cannot be attached to ordinary timing collections', async () => {
+  let executed = false;
+  await assert.rejects(collectNativePredictionPerformance(async () => { executed = true; },
+    { observeHistoryCohort() {} }), /separate function-diagnostic/);
+  assert.equal(executed, false);
 });
