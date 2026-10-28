@@ -3,7 +3,8 @@ import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
 import { runIsolatedSqlProbe } from './ci-supabase-stack.mjs';
-import { collectNativePredictionPerformance, explainMetrics, performanceProtocol, summarizePerformance } from './native-prediction-performance.mjs';
+import { collectNativePredictionPerformance, explainMetrics, performanceProtocol,
+  summarizeFunctionTiming, summarizePerformance } from './native-prediction-performance.mjs';
 
 test('performance quantiles retain sparse samples, failures, missing denominators and root-only resources', () => {
   const plan = [{ 'Planning Time': 0.2, 'Execution Time': 10, Plan: {
@@ -26,6 +27,23 @@ test('performance quantiles retain sparse samples, failures, missing denominator
   assert.deepEqual(protocol.catalogSizes, [40, 1000]);
   assert.equal(protocol.samplesPerCohort, 20);
   assert.equal(protocol.tail, 'EXPLORATORY_NO_LATENCY_SLO');
+  assert.equal(protocol.trackFunctions, 'none');
+  assert.deepEqual(summarizePerformance([sample], 1, 1, [], { quantiles: false }),
+    { planned: 1, attempted: 1, succeeded: 1, failed: 0, cancelled: 0, missing: 0 });
+});
+
+test('function diagnosis preserves inclusive root and bounded self-time ordering without summing totals', () => {
+  const root = { schema: 'public', name: 'rank_items_feed_v1', arguments: 'jsonb', calls: 1, totalMs: 50, selfMs: 0.1 };
+  const rows = [root, ...Array.from({ length: 30 }, (_, index) => ({ schema: 'private', name: 'helper_' + index,
+    arguments: '', calls: 2, totalMs: 10, selfMs: index / 10 }))];
+  const timing = summarizeFunctionTiming(rows, root.name);
+  assert.deepEqual(timing.root, root); assert.equal(timing.trackedFunctions, 31);
+  assert.equal(timing.omittedFunctions, 6); assert.equal(timing.topSelfTime.length, 25);
+  assert.equal(timing.topSelfTime[0].name, 'helper_29');
+  assert.throws(() => summarizeFunctionTiming(rows.slice(1), root.name));
+  assert.throws(() => summarizeFunctionTiming([{ ...root, calls: 3 }], root.name));
+  assert.throws(() => summarizeFunctionTiming([root, root], root.name));
+  assert.throws(() => summarizeFunctionTiming([{ ...root, selfMs: NaN }], root.name));
 });
 
 test('actual RPC measurement contracts, authenticated retries and failure cleanup preserve canonical rows', async () => {
@@ -65,6 +83,20 @@ test('actual RPC measurement contracts, authenticated retries and failure cleanu
     assert.equal(report.cohorts.length, 12);
     assert.ok(report.cohorts.every(cohort => cohort.summary.succeeded === 1 && cohort.summary.missing === 0));
     assert.equal(report.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
+    const diagnostics = await collectNativePredictionPerformance(exec, { contractTest: true, profileFunctions: true });
+    assert.equal(diagnostics.status, 'PASS');
+    assert.equal(diagnostics.protocol.trackFunctions, 'all');
+    assert.equal(diagnostics.cohorts.length, 6);
+    for (const cohort of diagnostics.cohorts) {
+      assert.equal(cohort.summary.succeeded, 1);
+      assert.equal(cohort.summary.metrics, undefined, 'Single diagnostic observations have no quantiles');
+      const timing = cohort.samples[0].functionTiming;
+      assert.equal(timing.root.calls, 1, 'Function capture precedes the two verification retries');
+      assert.ok(timing.trackedFunctions > 1);
+      assert.ok(timing.topSelfTime.length <= 25);
+      assert.ok(timing.topSelfTime.some(row => row.schema === 'private'));
+    }
+    assert.equal(diagnostics.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
     injectFailure = true;
     const failed = await collectNativePredictionPerformance(exec, { contractTest: true });
     assert.equal(failed.status, 'FAIL');

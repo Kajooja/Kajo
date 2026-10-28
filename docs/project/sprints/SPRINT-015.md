@@ -102,11 +102,15 @@ acceptance remain open.
 
 ## Native database performance protocol
 
-`native-prediction-performance-v1` is an exploratory synthetic baseline, declared
+`native-prediction-performance-v2` is an exploratory synthetic baseline, declared
 before native measurement. The existing empty-install guard and CI-only owned
 Supabase lifecycle isolate it from hosted/user data. The protocol, its SHA-256,
 measurement source/fixture hashes, exact migration manifest, tested commit,
 pinned image/CLI and selected PostgreSQL settings travel with the report.
+Version 1 remains the historical PR #388 baseline; version 2 explicitly sets
+transaction-local `track_functions=none` for baseline trials and adds separate
+function diagnostics. Its source/protocol hash is not retrospectively substituted
+into version 1 receipts.
 
 The fixed matrix is 40 and 1000 Items (half BOOK, half MOVIE), Personal MOVIE
 Discovery / two-member Shared MOVIE Discovery / Personal Taste NEXT, and fresh
@@ -148,9 +152,38 @@ text, plan tree, response, actor/Item identity or rating label enters the artifa
 Artifacts expire after seven days; the reviewed acceptance receipt must retain
 the report identity and essential measurements in repository/PR history.
 
+`native-prediction-performance-series-v1` predeclares three serial baseline runs
+in one CI job/process: 720 measured trials and 72 warmups. Each run builds a new
+owned stack through the same installer; its container and volumes must be gone
+before the next run. Exact migration/source/fixture/protocol hashes, application
+snapshot, CLI, PostgreSQL image digest, selected database settings, CPU model/core
+count, host memory, kernel and Node version must agree. Equivalent registry mirrors
+are compared by image digest. Per-cohort run p50/p95 values and their min/max/spread
+remain separate; samples are never pooled into a larger apparent tail estimate.
+One worker does not fix CPU frequency, scheduling or background load, and future
+CI jobs may still use different hardware. This is baseline variation, not an
+admitted regression budget or speed requirement.
+
+Only after the third baseline and canonical-row cleanup, six fresh-command
+cohorts (three operations × two catalogue sizes) each run once with
+`SET LOCAL track_functions=all`. They reuse the same fixture/RPC/EXPLAIN owner,
+with no warmup or cache flush. `pg_stat_xact_user_functions` is captured immediately
+after the measured call, before source audits or verification retries. The root
+RPC must have exactly one call. No global statistics reset or asynchronous flush
+is needed. Reports retain the root, up to 25 functions ordered by self time, and
+tracked/omitted function counts, qualified names, argument types, call counts,
+total milliseconds and self milliseconds. Inclusive function totals must not be
+summed; self time is elapsed time, not CPU time. Inlined functions and other schemas
+are outside this view's coverage, so the rows are not a complete SQL plan or
+additive decomposition of statement time. These single observations have no
+quantiles and are never merged into the baseline. Instrumentation overhead is
+not removed or claimed equivalent to disabled tracking. See PostgreSQL 17
+[transaction statistics](https://www.postgresql.org/docs/17/monitoring-stats.html)
+and [function tracking](https://www.postgresql.org/docs/17/runtime-config-statistics.html).
+
 The gate accepts completeness, actual RPC/source correctness and cleanup, not
-speed, recommendation quality or phone performance. Compare independent native
-runs first, then predeclare a supported effect/budget and repeat the same
+speed, recommendation quality or phone performance. Compare same-worker native
+repetitions first, then predeclare a supported effect/budget and repeat the same
 conditions before accepting a performance intervention. Hosted cumulative
 statistics are separate observations; absent current-generation samples cannot
 be replaced by this synthetic distribution. The wider action-to-visible,
