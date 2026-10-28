@@ -343,9 +343,15 @@ the source PR own deployment acceptance and the next device gate.
 | Actual SQL producer → plan → outcomes → coverage regression | `scripts/database/working-outcomes-kajo.test.mjs` |
 | Private owner Working report, native identity guards and filesystem contract | `packages/prediction-engine/scripts/working-report.mjs`, shared `private-report-files.mjs`, `scripts/research/working-report.test.mjs`; root `engine:working` |
 | Future Working cohort declaration and complete supplied-inventory reconciliation | `packages/prediction-engine/scripts/working-cohort.mjs`, `scripts/research/working-cohort.test.mjs`; root `engine:working:cohort` |
+| Expected-rating evaluation feasibility over the existing v2 cohort | `packages/prediction-engine/scripts/working-quality-feasibility.mjs`, `scripts/research/working-quality-feasibility.test.mjs`; root `engine:working:feasibility` |
 
 STATUS owns exact source/native acceptance. These private producers retain exact
 OFF and UNKNOWN commit availability; they add no serving API or quality admission.
+The feasibility entry point reuses complete cohort/native/outcome validation,
+binds the target, source identity, temporal roles and numerical requirements,
+and reports roster/domain label/experience coverage with synthetic separation.
+Rank scores remain unavailable as numeric forecasts; no metrics, fitting,
+quality admission or hosted operation is added.
 
 ## Native memory/serving decay parity — active source only
 

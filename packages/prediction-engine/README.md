@@ -538,6 +538,67 @@ native activation and quality admission remain false. An independently retained
 operator/native receipt, exact implementation/backend checkpoint and current
 scope/complete inventory are still needed before real observed coverage is claimed.
 
+## Expected-rating evaluation feasibility
+
+Before a numerical model experiment, inspect what a supplied **v2** cohort can
+actually support. This reuses the existing cohort, native source, alias, outcome
+and withdrawal checks; it does not replace either legacy report format.
+
+```bash
+npm run engine:working:feasibility -- EXPERIMENT DECLARATION INVENTORY REPORT
+```
+
+`working-quality-feasibility.mjs` exports `buildWorkingQualityFeasibility` for
+already-authorized in-memory inputs and `runWorkingQualityFeasibility` for the
+private-file command. The strict experiment uses
+`kajo-personal-working-quality-experiment-v1` with these fields:
+
+| Field | Meaning |
+| --- | --- |
+| `cohortDeclarationDigest` | Exact existing v2 declaration digest |
+| `sourceIdentity` | `repositoryCommit`, `migrationManifestSha256`, `modelVersion`, `baseModelVersion`, `policyVersion`; model/policy must match supplied sources |
+| `target` | `quantity: PERSONAL_OWN_SCALE_EXPECTED_RATING`, `conditioning: POST_EXPERIENCE_AND_REPORTED`, `scale: {min: 0, max: 10}` |
+| `analysisUnit`, `controls` | `PROFILE`; ordered `USER_MEAN`, `DOMAIN_PRIOR`, `CURRENT_RANKER_RANK_ONLY` |
+| `windows`, `dataRole` | Half-open `TRAIN`, `DEVELOPMENT`, `FINAL` `{startAt, endAt}` windows in milliseconds; one declared role containing the supplied cohort |
+| `acceptance` | `primaryMetric: PROFILE_MACRO_MSE`, `minimumUsefulImprovement`, `noninferiorityMargin` |
+| `coverage` | `minimumProfiles`, `minimumMatureNumericLabels`, `minimumLabelCoverage` |
+| `precision` | `intervalLevel`, `maximumIntervalWidth`, `method: PROFILE_CLUSTER_BOOTSTRAP` |
+| `resources` | `p50Ms`, `p95Ms`, `maxRssMiB`; p95 budget cannot be lower than p50 |
+| `thresholdRationale` | Rationale for numerical values selected from development/operational evidence |
+
+Numerical requirements, precision method and rationale may explicitly be `null`
+for feasibility planning. Every absent value is reported as missing and blocks
+evaluation; there are no guessed defaults. Supplied values must have valid ranges.
+Adjacent role windows are separated by at least the cohort's outcome horizon plus
+settlement delay. TRAIN/DEVELOPMENT support must also be captured strictly before
+the next role starts; later captures retain their reported labels but do not count
+as role-usable mature support. FINAL availability is bounded by the evaluation
+cutoff. This validates one supplied cohort; it does not prove that
+other exports are disjoint or that a final window was untouched. Commit and
+migration hashes are declarations, not authenticated repository/hosted receipts.
+
+The `kajo-personal-working-quality-feasibility-v1` report retains all roster
+Profiles, including zero-enrollment members, with BOOK/MOVIE and an explicit
+mixed-or-unspecified request-domain bucket. It reports frozen ranking pools,
+individual numeric labels, mature label/experience units and exclusion reasons.
+A zero rating is a label; a missing or tied partner does not erase it. Pair and
+label denominators remain separate. Request-domain labels do not invent each
+Item's domain, and repeated tags/pairs are not independent support. Engineering
+fixture counts contribute no supplied-native evidence.
+
+Current native scores are ranking scores, so numerical-forecast capability is
+always `UNSUPPORTED`, the target remains `NOT_EVALUABLE`, and no numerical metric,
+bootstrap interval or resource measurement is computed. Complete declared
+thresholds do not change that. User-mean/domain-prior controls are required but
+not fitted by this tool. An exposure and reported rating do not establish a new
+experience population or causal recommendation benefit. This explicit gap is an
+input to Sprint 016's numerical-baseline work, not another scorer or an admission.
+
+The same private-file, expiry and withdrawal rules apply. Reports include scoped
+aliases and remain private; files do not authenticate current authorization or
+inventory completeness. No database connection, model activation or hosted write
+is made. Quality, learning and native activation flags remain false.
+
 ## Bounded Working evaluation
 
 `./working-evaluation` is a separate descriptive boundary. It neither imports

@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — native skip-call evidence collected under #394; next diagnose actual Taste exact retries; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
+Status: **IN PROGRESS — expected-rating evaluation feasibility #396; optional skip-prefilter diagnosis #394 deferred under the October 28 priority decision; native/hosted performance and quality acceptance remain separate gates**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -19,8 +19,9 @@ on the existing full-Profile enrollment basis; its exact hosted forward is insta
 and preservation-verified. The tenth packet's prospective outcome reconciliation
 is also accepted and installed; fresh hosted outcomes and quality remain separate
 acceptance gates. Supported native four-consumer parity is accepted through
-#387; continue with measured native/hosted performance and separately declared
-quality targets.
+#387; native performance baselines are retained. Continue the required evaluation
+foundation and separately declared quality targets on the hosted predecessor;
+optional #391 tuning does not suspend this work.
 Require exact-set isolation (including overlapping A–B–C/A–B–Z), real enrollment
 generations and source withdrawal. Same-set reuse cannot restore revoked or
 erased lineage. Do not invent a session ID or claim existing fixtures prove the
@@ -90,8 +91,8 @@ EB-01 and EB-03 foundations; EB-12 integration slice. Architecture sections
 `MVP-PRED-006`, `MVP-ALG-002/003/009/010` and applicable #232 evidence.
 After Sprint 015 acceptance: [Sprint 016](SPRINT-016.md), user-specific expected ratings.
 The private read-only prospective Shared forecast-to-outcome join through
-#232C/#232F is accepted and its guarded rollout complete. Continue remaining
-native performance through the existing owners. #232E's exposed
+#232C/#232F is accepted and its guarded rollout complete. Retain remaining
+hosted/device performance acceptance through the existing owners. #232E's exposed
 same-pool pair diagnostic stays unchanged because
 these single-target EVALUATION runs are not comparable rating forecasts or exposed
 policy choices. Maturity, selection, experience units and nonadmitted cohorts are
@@ -99,6 +100,38 @@ explicit; first-response identities, corrections and withdrawal are preserved.
 [STATUS](../STATUS.md) owns the single handoff. Supported four-consumer parity is
 accepted; runtime/performance and separately predeclared predictive-quality
 acceptance remain open.
+
+### Expected-rating evaluation feasibility — #396
+
+The owner's **2026-10-28** priority instruction asks for further performance
+investigation only when material to development or MVP. #394 remains an open,
+deferred activation investigation for the optional #391 prefilter. Its historical
+failures, unchanged thresholds and uninstalled hosted status remain authoritative;
+neither a result-correctness failure nor an end-user SLO violation was established.
+Keep the predecessor serving baseline. Re-enter before broader #391 activation
+or on relevant baseline/runtime correctness, capacity or declared latency evidence.
+This does not close this sprint, MVP-UX-008 or the engine quality gate.
+
+[Issue #396](https://github.com/Kajooja/Kajo/issues/396) extends the existing Working
+cohort/report v2 validation with an executable feasibility boundary. It binds a
+Personal own-scale expected-rating target, source identities, Profile analysis,
+fixed controls and TRAIN/DEVELOPMENT/FINAL windows with outcome-horizon separation.
+Numerical acceptance, coverage, precision and resource declarations are checked
+when present; absent values remain missing rather than receiving invented defaults.
+Retain zero-enrollment roster members, domain coverage, individual mature numeric
+outcomes/experiences and missingness. Synthetic counts cannot become native support.
+Current frozen rank scores are not numerical rating forecasts: this boundary
+admits no model or quality, implements no scorer and changes no hosted state.
+Legacy v1/v2 reports and their authorization/withdrawal limits remain unchanged.
+
+Read-only hosted feasibility at **2026-10-28T18:09:54Z** found zero Personal
+Working enrollments/captures and zero Shared forecast consumptions/outcome
+captures. The 47 valid retained Taste panels across two sessions are not an
+untouched prospective cohort or certified own-scale numeric forecasts. No
+identity/label rows were exported. STATUS owns the baseline identity and the
+single active packet; the implementation PR owns final source/CI acceptance.
+This makes the next Sprint 016 numerical-baseline and evidence task explicit
+without repeating the accepted enrollment/parity machinery.
 
 ## Native database performance protocol
 
@@ -456,8 +489,9 @@ p50/p95 value from this run.
 | Catalogue Personal fresh Discovery | 240.325–241.763 | 242.577–244.133 |
 | Catalogue Shared fresh Discovery | 303.748–304.109 | 305.186–306.990 |
 
-**Default next diagnostic within #394:** inspect the actual off-catalogue Taste
-exact-retry path before broader activation. Preserve the unresolved historical
+**Retained diagnostic successor within deferred #394:** inspect the actual
+off-catalogue Taste exact-retry path before broader #391 activation, if that
+optimization is selected again. Preserve the unresolved historical
 501/502 acquisition-versus-availability attribution as a separate follow-up within
 that issue. A detailed successor protocol still needs declaration before new
 evidence; this receipt does not prescribe an implementation or change thresholds.

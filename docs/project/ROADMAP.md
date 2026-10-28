@@ -22,6 +22,16 @@ their history; this refinement and the updated Phase 16 scope govern the target.
 
 ## Engine V1 first — owner decision 2026-10-25
 
+**Priority clarification — 2026-10-28:** investigate a performance deviation now
+when evidence makes it material to development or MVP. Optional optimization
+admission must not suspend unrelated required engine capabilities. Preserve
+failed comparisons and their activation restrictions; retain the working baseline
+while continuing the next required packet. #394 is deferred while the optional
+#391 skip-prefilter remains uninstalled. Revisit before its broader activation
+or when baseline/runtime evidence identifies a relevant correctness, capacity or
+declared end-to-end latency problem. This does not waive MVP-UX-008, change old
+thresholds or close the outstanding native/hosted/device/quality gates.
+
 This is the current execution order. It supersedes older “next”, near-term and
 phase-order wording below; dated source receipts and unmet acceptance requirements
 remain valid. [ADR-0012](../architecture/decisions/0012-personal-expected-rating-engine-v1.md)
