@@ -21,7 +21,7 @@ function imageDigest(image) {
   return image.split(' ')[1]; // Reviewed registry mirrors may name identical bytes differently.
 }
 
-function identity(run) {
+export function performanceRunIdentity(run) {
   const { runtime, installed, performance, host } = run;
   assert.equal(runtime.cleanup, 'PASS');
   assert.equal(installed.runtime.containerId, runtime.containerId);
@@ -39,7 +39,7 @@ function identity(run) {
   };
 }
 
-function verifyCollection(report, profileFunctions = false) {
+export function verifyPerformanceCollection(report, profileFunctions = false) {
   assert.equal(report.status, 'PASS');
   assert.equal(report.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
   assert.ok(Number.isInteger(report.canonicalTablesVerified) && report.canonicalTablesVerified > 0);
@@ -70,15 +70,15 @@ function verifyCollection(report, profileFunctions = false) {
 export function summarizePerformanceSeries(runs) {
   assert.equal(runs.length, performanceSeriesProtocol().baselineRuns, 'Incomplete baseline series');
   assert.equal(new Set(runs.map(run => run.runtime.containerId)).size, runs.length, 'Each run requires a fresh stack');
-  const reference = identity(runs[0]);
+  const reference = performanceRunIdentity(runs[0]);
   for (const [index, run] of runs.entries()) {
     assert.equal(run.index, index + 1);
-    verifyCollection(run.performance);
-    assert.deepEqual(identity(run), reference, 'Sources, settings or worker changed within baseline series');
+    verifyPerformanceCollection(run.performance);
+    assert.deepEqual(performanceRunIdentity(run), reference, 'Sources, settings or worker changed within baseline series');
     if (index < runs.length - 1) assert.equal(run.diagnostics, undefined, 'Diagnostics must follow all baselines');
   }
   const last = runs.at(-1);
-  verifyCollection(last.diagnostics, true);
+  verifyPerformanceCollection(last.diagnostics, true);
   for (const field of ['sourceSha256', 'fixtureSha256', 'canonicalTablesVerified']) {
     assert.equal(last.diagnostics[field], last.performance[field]);
   }

@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — eleven accepted source packets; current native performance baseline packet; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
+Status: **IN PROGRESS — thirteen accepted source packets; current bounded skip-read optimization/comparison packet; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -190,6 +190,62 @@ be replaced by this synthetic distribution. The wider action-to-visible,
 actionable, locally durable and server-acknowledged protocol remains owned by
 [ROADMAP](../ROADMAP.md#end-to-end-performance-measurement--2026-10-24).
 
+## Bounded skip-read comparison
+
+Issue #390 continues accepted #389. Before measuring any candidate, freeze
+`native-skip-prefilter-comparison-v1` in
+`scripts/database/native-performance-comparison.mjs`. The intervention is only
+`20261028081350_native_skip_acquisition_prefilter.sql`: a statement-local,
+materialized potential-source superset in the existing acquisition owner. A
+possible source still uses the unchanged full decision; no source means the
+unchanged pre-skip component. This is not cross-request caching. Pre-epoch invalid
+clocks still reach the full original validation. No scoring, history or source
+semantics change. EB-01/03 and EB-12 integration scope remains unchanged.
+
+The installer compares the exact predecessor prefix (53 entries) with that prefix
+plus the single forward (54). It records both actual schema/source snapshots and
+migration histories. Later forwards do not silently enter this frozen comparison.
+The benchmark and fixture bytes, settings, host, pinned database image/CLI and
+canonical table count must match. Each run starts and removes its own stack.
+
+Run six serial stacks in **baseline/candidate, candidate/baseline,
+baseline/candidate** order on one worker. Each uses the existing v2 12-cohort
+collection, with 240 measurements and 24 excluded warmups: **1440 measurements
+and 144 warmups** total. After each baseline collection and canonical cleanup,
+collect six separate function observations: **36 diagnostics** total. Record the
+skip-decision owner explicitly from the full tracked function set, even when
+outside the top-25 self-time display. Null means no tracked call, not truncation.
+Keep each pair's/run's p50 and p95 separate; never pool samples.
+
+**Predeclared decision:** every one of the three adjacent pairs must satisfy:
+
+- Both 1000-Item fresh Personal/Shared Discovery medians improve by at least
+  **max(8 ms, 5% of that pair's baseline median)**. Eight milliseconds exceeds
+  twice #389's largest fresh median spread (3.519 ms); five percent requires a
+  material relative saving beyond that observed variation. These are engineering
+  selection thresholds, not confidence intervals or a user-facing latency SLO.
+- Every cohort's median increase is at most **max(5 ms, 5%)** for fresh commands
+  or **max(0.3 ms, 10%)** for exact retries. These allowances exceed #389's observed
+  fresh/retry median ranges while bounding an unrelated regression. Evaluate
+  every pair, including 40-Item and unchanged Taste controls.
+- Separate Discovery diagnostics remove exactly one skip-decision call per MOVIE
+  in the no-skip synthetic catalogue (20 or 500). Other admission calls remain;
+  Taste call counts stay equal. Function overhead is never subtracted from timing.
+- No candidate temporary reads/writes. Report all per-run buffer and WAL counters;
+  no physical-I/O, peak-memory or tail noninferiority is inferred. The fixed
+  20-sample p95 values remain exploratory and have no statistical acceptance gate.
+
+A complete comparison failing any rule is **NOT_ADMITTED**; CI still distinguishes
+complete measurement from an admitted effect. Never loosen thresholds after
+viewing results. Incomplete data, changed identities, mismatched candidates or
+failed cleanup fail the correctness gate. The empty-skip fixture supports only
+that declared catalogue/history scope, not dense histories or all production
+traffic. Source tests separately cover active/expired/tied/reversed/future/erased
+histories, unrelated Profiles and invalid clocks, with exact acquisition rows,
+metadata, retained source records and public retries. Run the same populated
+forward verifier in real PostgreSQL and the existing latest-source parity gate.
+All six original/current CI gates remain mandatory before source acceptance.
+
 ## Evidence and completion rules
 
 Apply the [Engine V1 quantitative protocol](../ENGINE_BUILDOUT.md#engine-v1-quantitative-protocol)
@@ -210,6 +266,18 @@ quality gate stays open. A missing physical-device observation is recorded and
 does not become an invented pass.
 
 ## Delivery record
+
+- Thirteenth source packet [PR #389](https://github.com/Kajooja/Kajo/pull/389)
+  accepted as `7ce05559b433b1bcdb11a77b6e6e8fe2b01918d7` after all six CI #802
+  gates. Three same-worker baselines establish 0.651–3.519 ms fresh median
+  variation; separate 1000-Item Discovery diagnostics identify 501 skip-decision
+  calls per request. STATUS retains exact artifact/source identities; the PR
+  retains all cohort measurements. No migration, hosted or predictive-quality
+  acceptance follows from repeatability.
+- Twelfth source packet [PR #388](https://github.com/Kajooja/Kajo/pull/388)
+  accepted as `4a1a3bec2a231f89c9764d8966216308d3410523` after all six CI #800
+  gates. Native 12-cohort baseline, source manifests and canonical cleanup pass;
+  different-worker runs remain separate. STATUS retains its exact receipt.
 
 - Eleventh source packet [PR #387](https://github.com/Kajooja/Kajo/pull/387),
   branch `test/native-four-consumer-parity`: extend the

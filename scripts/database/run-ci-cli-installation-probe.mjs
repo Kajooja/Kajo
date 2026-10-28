@@ -51,6 +51,7 @@ import { verifyNativeV4ReceiptUpgrade, verifyNativeV4Receipt, verifyNativeV4Rece
 import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption, verifySharedPreparedHostedVariant } from './shared-prepared-consumption.mjs';
 import { verifySharedPreparedConcurrency } from './shared-prepared-consumption-concurrency.mjs';
 import { verifySharedForecastOutcomes } from './shared-forecast-outcomes.mjs';
+import { verifyNativeSkipPrefilter } from './native-skip-prefilter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
 import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
@@ -99,6 +100,11 @@ try {
       'Discovery parity changed the installed source');
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
+    const skipPrefilterIndex = files.findIndex(file => file.name.endsWith('_native_skip_acquisition_prefilter.sql'));
+    assert.ok(skipPrefilterIndex > 0);
+    await resetFromMigrations(files.slice(0, skipPrefilterIndex));
+    const nativeSkipPrefilter = await verifyNativeSkipPrefilter(execConcurrentSql, files[skipPrefilterIndex]);
+    assert.equal(nativeSkipPrefilter.status, 'PASS');
     const reconciliationIndex = files.findIndex(file => file.name.endsWith('_shared_forecast_outcome_reconciliation.sql'));
     assert.ok(reconciliationIndex > 0);
     await resetFromMigrations(files.slice(0, reconciliationIndex));
@@ -493,7 +499,7 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
-      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity,
+      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativeSkipPrefilter,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,

@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-28**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, twelve accepted source packets; current same-worker performance repeatability packet; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, thirteen accepted source packets; current bounded skip-read optimization/comparison packet; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,36 +11,63 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — native performance repeatability / Sprint 015
+## Current handoff — bounded native skip-read optimization / Sprint 015
 
-The thirteenth bounded source packet is branch
-`test/native-performance-repeatability`, based on accepted main
-`4a1a3bec2a231f89c9764d8966216308d3410523` /
-[PR #388](https://github.com/Kajooja/Kajo/pull/388). It repeats the existing native
-baseline three times serially on one CI worker, recreating and cleaning the owned
-stack each time. A separate six-observation function-timing diagnostic follows
-the third baseline. It changes no migration, scorer, hosted state or product flow.
+[Issue #390](https://github.com/Kajooja/Kajo/issues/390), branch
+`perf/contextual-skip-prefetch`, starts from accepted main
+`7ce05559b433b1bcdb11a77b6e6e8fe2b01918d7` /
+[PR #389](https://github.com/Kajooja/Kajo/pull/389). This is the fourteenth bounded
+source packet, not an accepted speed improvement or hosted installation.
 
-The [Sprint 015 measurement protocol](sprints/SPRINT-015.md#native-database-performance-protocol)
-predeclares 720 measured baseline trials and 72 excluded warmups, plus six separate
-fresh-command diagnostics. Sources, migration manifest, image digest, database
-settings and worker inventory must match across runs. Reports retain each run's
-p50/p95 and their ranges, without pooling samples or inventing an admitted latency
-budget. Function timings are transaction-local, captured before verification
-retries, and include only tracked non-inlined functions. Their instrumentation
-cost is not subtracted; they cannot replace the baseline distribution.
+One guarded additive forward extends the existing statement-local potential-skip
+superset to Discovery acquisition. Items without a possible source use the
+unchanged pre-skip resurfacing component. All potential histories still use the
+original composite decision, preserving cutoff, tied source IDs, reversals,
+erasure and expired-source lineage. Invalid clocks retain their original rejection.
+The migration changes one private function body and no grants, tables, scoring
+arithmetic, public signature, locking protocol or retained data.
 
-**Next action:** require all six final-source CI gates, independently inspect the
-complete series, source/runtime identity, diagnostic root-call counts and canonical/
-stack cleanup, then integrate the exact tested tree. If already accepted, use the
-same-worker variation and function owners to predeclare one bounded optimization
-and comparison budget before measuring its effect. Three repetitions characterize
-this worker only; they do not fix future CI hardware or establish a production SLO.
-Hosted current-path observations and phone action-to-visible/actionable/durable/
-server-ack timings remain open. Quality sampling remains a separate predeclared
-packet with a supported target; ordinal `final_score` is not a calibrated expected
-rating. Do not reuse #232E's exposed same-pool pair target for single-target
-EVALUATION captures.
+The [predeclared comparison](sprints/SPRINT-015.md#bounded-skip-read-comparison)
+uses six fresh owned stacks on one CI worker in BC/CB/BC order: 1440 measurements,
+144 excluded warmups and 36 separate function observations. The target and
+nonregression rules are fixed before native measurement; every pair must pass.
+Complete but losing measurements report NOT_ADMITTED. Sparse p95 remains
+exploratory; no production latency SLO, phone or recommendation-quality claim follows.
+
+**Next action:** finish the exact-head local/CI validation and independently inspect
+the source manifests, populated preservation/parity, paired raw measurements,
+diagnostic call reductions and six cleanups. Accept an effect only if the declared
+rule passes without changing its thresholds; otherwise retain the baseline and
+record the result. All six required CI gates remain mandatory. Any eventual
+hosted forward needs its separate preservation-checked rollout; none is performed
+by this source packet. Hosted current-path and physical-device timings remain open.
+
+Quality sampling remains a separate predeclared packet with a supported target;
+ordinal `final_score` is not a calibrated expected rating. Do not reuse #232E's
+exposed same-pool pair target for single-target EVALUATION captures.
+
+### Retained thirteenth-packet repeatability acceptance
+
+[PR #389](https://github.com/Kajooja/Kajo/pull/389) was accepted as main
+`7ce05559b433b1bcdb11a77b6e6e8fe2b01918d7`. All six required gates passed in
+[CI #802](https://github.com/Kajooja/Kajo/actions/runs/40646784344), head
+`4b98c8fb1033ee2a5dd93e855198fa70b6a84509`, tested merge
+`231244276bf210ce045da195c7d7fa85894e7e72`, exact accepted tree
+`85e7c08ff516ed77c841a776c261fdb3622cee08`. Performance artifact `12797924701`
+has JSON SHA-256 `500812d5c3595e6ce23784c62e6e9b512fc3d71e0f73ea5b6fc3041203ca4e43`.
+Three serial fresh stacks on one Intel Xeon Platinum 8573C worker supplied all
+720 measurements, 72 warmups and six separate diagnostics with zero missing,
+failed or cancelled trials. All 53 installation sources, 91-table restorations
+and three distinct stack cleanups match. The PR retains the full cohort table.
+
+Fresh median spreads were 0.651–3.519 ms. At 1000 Items, Personal/Shared Discovery
+had 501 `contextual_skip_decision_v1` calls and 36.523/36.654 ms self time in the
+separate diagnostic. This names a redundant-read candidate, not an accepted
+improvement. Native history artifact `12799392430`, JSON SHA-256
+`4594e92dbbeeb2b8f214f9b213afad588a27976e1650ad22315962ba83dac42b`, retains all
+54 Discovery cases/810 exact candidate comparisons, seven Taste/evaluation
+captures, 21 retained sources, seven Shared lock proofs and 16 reconciliations.
+No migration or hosted state changed in #389.
 
 ### Retained twelfth-packet native baseline acceptance
 
