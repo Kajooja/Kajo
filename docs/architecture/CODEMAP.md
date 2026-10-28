@@ -54,6 +54,16 @@ and per-run source identities. The declared effect and regression rules are in
 Sprint 015. The original baseline-series mode remains available; a frozen
 comparison never silently incorporates later SQL forwards.
 
+The #392 `--compare-skip-history` mode retains that comparison and adds the
+`native-skip-history-fixture.mjs` current/off-catalogue ledger regimes through the
+same authenticated RPC collector. It verifies per-Profile decisions, inventory,
+unchanged ledger hashes and exact-retry skip lineage before canonical cleanup.
+`native-skip-history-comparison.mjs` reuses the original identity/completeness
+checks and separately applies the predeclared history regression/mechanism rules.
+The history protocol, limits and losing-result disposition live in
+[Sprint 015](../project/sprints/SPRINT-015.md#accumulated-skip-history-comparison).
+There is no new serving owner, schema or hosted measurement entry point.
+
 `20261028081350_native_skip_acquisition_prefilter.sql` changes only
 `acquire_native_candidates_v1`: its materialized potential-skip superset now also
 avoids redundant empty-history reads for Discovery. Actual skip decisions,

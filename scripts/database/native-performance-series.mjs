@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { performanceProtocol, summarizePerformance } from './native-prediction-performance.mjs';
+import { expectedSkipHistoryInventory } from './native-skip-history-fixture.mjs';
 
 const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
-const key = cohort => JSON.stringify([cohort.catalogSize, cohort.operation, cohort.requestKind]);
+const key = cohort => JSON.stringify([...(cohort.skipHistory ? [cohort.skipHistory] : []),
+  cohort.catalogSize, cohort.operation, cohort.requestKind]);
 
 export function performanceSeriesProtocol() {
   return {
@@ -39,17 +41,23 @@ export function performanceRunIdentity(run) {
   };
 }
 
-export function verifyPerformanceCollection(report, profileFunctions = false) {
+export function verifyPerformanceCollection(report, profileFunctions = false, skipHistory = false) {
   assert.equal(report.status, 'PASS');
   assert.equal(report.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
   assert.ok(Number.isInteger(report.canonicalTablesVerified) && report.canonicalTablesVerified > 0);
-  const protocol = performanceProtocol({ profileFunctions });
+  const protocol = performanceProtocol({ profileFunctions, skipHistory });
   assert.deepEqual(report.protocol, protocol, 'Unexpected measurement protocol');
   assert.equal(report.protocolSha256, hash(protocol));
-  const expectedKeys = protocol.catalogSizes.flatMap(catalogSize => protocol.operations.flatMap(operation =>
-    protocol.requestKinds.map(requestKind => key({ catalogSize, operation, requestKind }))));
+  const expectedKeys = (protocol.skipHistories ?? [null]).flatMap(history => protocol.catalogSizes.flatMap(catalogSize =>
+    protocol.operations.flatMap(operation => protocol.requestKinds.map(requestKind =>
+      key({ ...(history ? { skipHistory: history } : {}), catalogSize, operation, requestKind })))));
   assert.deepEqual(report.cohorts.map(key), expectedKeys, 'Incomplete or reordered cohort matrix');
   for (const cohort of report.cohorts) {
+    if (skipHistory) {
+      assert.match(report.historyFixtureSha256, /^[0-9a-f]{64}$/);
+      assert.deepEqual(cohort.historyInventory, expectedSkipHistoryInventory(cohort.skipHistory, cohort.catalogSize));
+      assert.equal(cohort.historyPreserved, true);
+    }
     assert.equal(cohort.warmupsCompleted, protocol.warmupsPerCohort);
     assert.equal(cohort.warmupFailure, undefined);
     assert.equal(cohort.samples.length, protocol.samplesPerCohort);

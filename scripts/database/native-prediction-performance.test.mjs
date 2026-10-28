@@ -97,8 +97,18 @@ test('actual RPC measurement contracts, authenticated retries and failure cleanu
       assert.ok(timing.topSelfTime.some(row => row.schema === 'private'));
     }
     assert.equal(diagnostics.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
+    for (const profileFunctions of [false, true]) {
+      const history = await collectNativePredictionPerformance(exec, { contractTest: true, skipHistory: true, profileFunctions });
+      assert.equal(history.status, 'PASS');
+      assert.equal(history.cohorts.length, profileFunctions ? 6 : 12);
+      assert.ok(history.cohorts.every(c => c.historyPreserved && c.summary.succeeded === 1));
+      assert.ok(history.cohorts.every(c => c.historyInventory.commands === (c.skipHistory === 'CATALOGUE_HISTORY' ? 460 : 120)));
+      assert.ok(history.cohorts.some(c => c.historyInventory.erased > 0));
+      assert.ok(history.cohorts.some(c => c.historyInventory.offCatalogueItems > 0));
+      assert.equal(history.cleanup, 'ALL_CANONICAL_ROWS_RESTORED');
+    }
     injectFailure = true;
-    const failed = await collectNativePredictionPerformance(exec, { contractTest: true });
+    const failed = await collectNativePredictionPerformance(exec, { contractTest: true, skipHistory: true });
     assert.equal(failed.status, 'FAIL');
     assert.equal(failed.cohorts[0].summary.cancelled, 1);
     assert.equal(failed.cohorts[1].summary.missing, 1);

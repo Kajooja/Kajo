@@ -8,6 +8,11 @@ The Git repository is Kajo's permanent project memory. Chat conversations are te
 
 If conversation context conflicts with repository documentation, resolve the conflict explicitly before coding. Do not silently create a parallel truth.
 
+**Owner clarification — 2026-10-28:** Kajo's repository and conversations in this
+Kajo project are the project authority. Reconcile durable owner decisions into
+the repository. Unrelated files, projects or personal-context results do not
+define Kajo's development workflow or approval requirements.
+
 ## 2. Mandatory continuation/read order
 
 First synchronize repository metadata (`git fetch --all --prune` where a local checkout exists). Do not assume a stale `main` checkout contains the active handoff.
