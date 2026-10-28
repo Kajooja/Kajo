@@ -64,6 +64,19 @@ The history protocol, limits and losing-result disposition live in
 [Sprint 015](../project/sprints/SPRINT-015.md#accumulated-skip-history-comparison).
 There is no new serving owner, schema or hosted measurement entry point.
 
+The #394 `--diagnose-skip-history` successor inserts
+`native-skip-call-diagnostics.{mjs,test.mjs}` after the original affected
+catalogue-history Personal function observation. The collector's optional
+`observeHistoryCohort` hook supplies that live fixture only after its original
+sample and ledger audit. Repeated original-body root calls, scoped transaction
+traces and exact same-transaction acquisition comparisons separate acquisition
+from downstream availability. Closed diagnostic query copies expose plans;
+rollback/function metadata checks and canonical cleanup bound all changes to
+owned disposable stacks. The new report emits no rollout admission and retains
+the old comparison rules/results. [Sprint 015](../project/sprints/SPRINT-015.md#native-skip-call-diagnostic-protocol)
+owns its predeclared order, controls, physical-state limits and synthetic witness
+retention.
+
 `20261028081350_native_skip_acquisition_prefilter.sql` changes only
 `acquire_native_candidates_v1`: its materialized potential-skip superset now also
 avoids redundant empty-history reads for Discovery. Actual skip decisions,
