@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-10-27**
+Last updated: **2026-10-28**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, ten preceding accepted source packets, current parity coverage packet; seven SQL forwards installed; final-source, performance and quality gates tracked below.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, eleven accepted source packets; current native performance baseline packet; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,9 +11,59 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — native parity coverage extension / Sprint 015
+## Current handoff — native prediction performance baseline / Sprint 015
 
-The eleventh bounded source packet is
+The twelfth bounded source packet is [PR #388](https://github.com/Kajooja/Kajo/pull/388),
+branch `test/native-prediction-performance`,
+based on accepted main `4891bfd235f10f3b28c66ef294694e6e01f710fb` /
+[PR #387](https://github.com/Kajooja/Kajo/pull/387). It adds a disposable native
+PostgreSQL measurement job through the existing installer and authenticated
+Discovery/Taste RPCs. It changes no migration, serving scorer or hosted state.
+
+The first CI attempt stopped at the fresh advisory audit: the newly reviewed
+deepmerge advisory reached Expo's high meta-findings. The bounded build repair
+uses the existing exact-archive/source correction owner for deepmerge 4.3.1,
+rejecting `__proto__` on both source and target copying. Pristine controls
+reproduce the defect; all 32 security/audit regressions pass locally. Package
+identity, raw findings and audit policy remain unchanged. Require a fresh
+successful audit and all six final-source jobs after this repair.
+
+The predeclared [Sprint 015 measurement protocol](sprints/SPRINT-015.md#native-database-performance-protocol)
+has 12 cohorts: 40/1000 synthetic Items × Personal MOVIE Discovery / two-member
+Shared MOVIE Discovery / Personal Taste NEXT × fresh / exact retry. Each cohort
+has two warmups and 20 measured trials. Reports retain all success, failure,
+cancellation and missing denominators; p95 is exploratory, not an admitted SLO.
+PostgreSQL execution time and buffer/WAL counters exclude network, output
+serialization, commit acknowledgement and phone rendering. Instrumentation
+overhead is not subtracted. PGlite checks contracts only; its timings are not a
+native baseline. Complete canonical-row restoration and owned-stack cleanup
+are required even on failed collection.
+
+**Read-only hosted observation — 2026-10-27 23:51 UTC:** endpoint matching in
+authenticated top-level `pg_stat_statements` includes quoted PostgREST identifiers.
+Since the October 24 statistics reset, the retained aggregate has 169
+`taste_session_v2` calls (weighted mean execution 154.682 ms, min 2.340 ms, max
+578.563 ms) and two `rank_items_page_v1` calls (mean 200.092 ms, min 173.989 ms,
+max 226.196 ms); no matching feed statement is retained. These cumulative
+observations mix command kinds, cache states and potentially source generations;
+they are neither a Taste NEXT cohort nor per-request p50/p95. The separate
+inventory still had 49 historical PredictionRuns and zero marked FINAL/V4-receipt
+runs. Missing retained statements are not proof that no user ever called an
+endpoint. No statistics were reset and no hosted fixture/load was created.
+
+**Next action:** require the original five final-source CI gates plus the new
+native performance job, inspect its complete 240-trial report and source/runtime
+identity, then integrate the exact tested tree. If already accepted, repeat the
+declared baseline independently before fixing a comparison budget or choosing
+an optimization from measured evidence. Hosted current-path observations and
+phone action-to-visible/actionable/durable/server-ack timings remain open.
+Quality sampling is a separate predeclared packet with a supported target; the
+ordinal `final_score` is not a calibrated expected rating. Do not reuse #232E's
+exposed same-pool pair target for single-target EVALUATION captures.
+
+### Retained eleventh-packet parity acceptance
+
+The eleventh bounded source packet was accepted through
 [PR #387](https://github.com/Kajooja/Kajo/pull/387), branch
 `test/native-four-consumer-parity`, based on accepted main
 `bf079ee2ba977665d6724b5047e5962b2f483f09` / [PR #386](https://github.com/Kajooja/Kajo/pull/386).
@@ -29,7 +79,15 @@ The existing seven committed Taste/explicit-evaluation comparisons and Shared
 prepared-input checks remain their owners. Different valid receipt witnesses
 are not full-input matches, and unlike Taste/Discovery policies remain explicitly
 non-comparable. PREDICTION_MODEL records the four-consumer coverage matrix.
-The PR's final-source checks and native report own acceptance of this extension.
+All five final-source gates passed in CI run `40593623430` (#796), tested merge
+`cab8a33c124822ce6ab7ecaba1b358ded3d33387`, head
+`32cf13eb7247b603edd2d0c5dffa4b2e3ad9b2f6`. Accepted main `4891bfd` has the same
+tested tree `3e5e035b5bc9558fc45595d022c1ca8a7d53a374`. Native artifact
+`12776912045` / JSON SHA-256
+`1a452245893a10d6a7e9a0be9a4a4b9647e978a9074c9b44fbdfdee549c4d446`
+retains the 54 cases, 810 candidate comparisons with zero score differences,
+seven committed Taste/evaluation captures, 21 preserved sources, seven Shared
+lock proofs and 16 reconciliation cases. All 53 migration sources match.
 It adds no migration,
 serving change or hosted operation. All ten accepted source packets and seven
 installed forwards remain accepted; do not repeat their implementation or rollout.
@@ -40,12 +98,8 @@ batch restores all canonical rows. PGlite batches use independent copies of the
 same installed database, matching the native runner's separate connections; this
 avoids its reproduced repeated-session WASM failure without weakening assertions.
 
-**Next action:** verify #387's five required final-source CI gates, native 54-case
-report and retained Taste/Shared proofs before integrating the exact tested tree.
-If current main already contains that accepted packet, continue with native/hosted
-performance acceptance and separately predeclared quality cohorts using a
-supported target. No old input-only artifact is retrospectively marked consumed
-and no fresh hosted observation is claimed by source tests or installation.
+No old input-only artifact is retrospectively marked consumed and no fresh
+hosted observation is claimed by source tests or installation.
 
 **Owner refinement — 2026-10-27:** joint browsing starts from a persistent Friend
 network with temporary accepted sessions, without required permanent-group

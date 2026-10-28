@@ -26,6 +26,20 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Native prediction performance — Sprint 015
+
+`scripts/database/native-prediction-performance.{mjs,test.mjs}` owns the bounded
+synthetic PostgreSQL baseline and its PGlite contract-only tests. It reuses the
+existing candidate fixture and authenticated feed/Taste RPCs, validates exact
+retries and retained sources, reports execution/buffer/WAL distributions with
+failure denominators, and restores every canonical row. The fixed protocol and
+unmeasured boundaries are in [Sprint 015](../project/sprints/SPRINT-015.md#native-database-performance-protocol).
+`run-ci-prediction-performance.mjs` composes the existing fresh installer and
+CI-only owned-stack lifecycle. The separate `database-prediction-performance`
+job keeps collection outside the long historical migration probe. All original
+five gates plus this completeness/cleanup gate precede the Android artifact;
+there is no performance SLO, model admission or hosted load-test command.
+
 ## Native ranking adapter and conformance — Sprint 015
 
 `20261026201946_native_v4_receipt_forecast_binding.sql` adds private INVOKER
@@ -488,6 +502,11 @@ in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 `scripts/dependencies/security-patches.mjs` installs/verifies the exact October
 braces depth and node-forge DigestAlgorithm corrections. `security-patches.test.mjs`
 reproduces unpatched defects and tests corrected installed consumers.
+The October 27 performance CI repair extends the same owner to deepmerge 4.3.1's
+`__proto__` source/target-copy guards in the exact source and CJS/UMD bundles,
+with pristine negative controls and normal merge-option coverage. The low
+deepmerge leaf still requires its own verified correction under Expo's high
+meta-findings; the audit classification policy is unchanged.
 `audit-dependencies.mjs` / `audit-dependencies.test.mjs` preserve raw npm findings
 and fail on unmitigated advisories or unverifiable patches. The correction contract
 is in ARCHITECTURE; `dependency-audit-native-2026-10-05.json` records the actual

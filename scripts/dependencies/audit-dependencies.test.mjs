@@ -98,3 +98,13 @@ test('cycles without a real advisory leaf are blocked', () => {
 test('ordinary clean reports remain clean after verified source checks', () => {
   assert.deepEqual(classifyAudit({ auditReportVersion: 2, vulnerabilities: {}, metadata: { vulnerabilities: { moderate: 0, high: 0, critical: 0 } } }, verified), { mitigated: [], unmitigated: [] });
 });
+
+test('a low deepmerge leaf still requires its exact correction for a high Expo parent', () => {
+  const report = fixture();
+  report.vulnerabilities.deepmerge.severity = 'low';
+  report.vulnerabilities.expo.via.push('deepmerge');
+  report.metadata.vulnerabilities.high--;
+  report.metadata.vulnerabilities.low++;
+  assert.deepEqual(classifyAudit(report, verified).unmitigated, []);
+  assert.deepEqual(classifyAudit(report, verified.filter(value => value.name !== 'deepmerge')).unmitigated.map(value => value.name), ['expo', 'metro']);
+});

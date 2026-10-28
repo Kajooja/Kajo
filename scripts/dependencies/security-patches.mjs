@@ -77,6 +77,21 @@ export const corrections = [
     ],
   },
   zodSecurityCorrection,
+  {
+    name: 'deepmerge', version: '4.3.1',
+    advisory: 'https://github.com/advisories/GHSA-gcqx-w48m-w2h4',
+    integrity: 'sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==',
+    // Both source writes and the otherwise unguarded target-copy loop must
+    // reject __proto__, independently of the target object's shape.
+    files: [
+      { path: 'index.js', sha256: '12440c84957c1990ea2d5e33dc0091722dc1dc1585c6d20e0c780e568ffa9d30' },
+      { path: 'dist/cjs.js', sha256: '2e5160f84a1141bd927264afe4d15766f1e6cf07daef182b37ff53fea121de7d' },
+      { path: 'dist/umd.js', sha256: 'f33e6596482d1fb5c7c427f8ef92f2aa849eea9223acd974176b2fb27ddbf73a' },
+    ].map(file => ({ ...file, replacements: [
+      ['return propertyIsOnObject(target, key)', "return key === '__proto__' || propertyIsOnObject(target, key)", 1],
+      ['getKeys(target).forEach(function(key) {', "getKeys(target).forEach(function(key) {\n\t\t\tif (key === '__proto__') { return; }", 1],
+    ] })),
+  },
 ];
 
 function replaceExact(source, before, after, count) {
@@ -152,5 +167,5 @@ export async function securityPatches({ root = projectRoot, install = false } = 
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   await securityPatches({ install: true });
-  console.log('Verified braces, node-forge and Zod compatibility source corrections applied.');
+  console.log('Verified braces, node-forge, Zod and deepmerge compatibility source corrections applied.');
 }
