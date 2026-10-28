@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-28**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, fourteen accepted source packets; current accumulated skip-history comparison; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, accumulated skip-history comparison complete and NOT_ADMITTED; next bounded diagnosis; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,42 +11,70 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — accumulated skip-history comparison / Sprint 015
+## Current handoff — skip-history result and next diagnosis / Sprint 015
 
-[Issue #392](https://github.com/Kajooja/Kajo/issues/392), branch
-`test/native-skip-history-envelope`, starts from accepted main
-`2f6f3811e3489adca55d945481674a30a5064583` /
-[PR #391](https://github.com/Kajooja/Kajo/pull/391). This fifteenth bounded source
-packet measures the unchanged optimization with accumulated history; it adds
-no serving change, schema, migration or hosted operation.
+[PR #393](https://github.com/Kajooja/Kajo/pull/393), branch
+`test/native-skip-history-envelope`, completes [Issue #392](https://github.com/Kajooja/Kajo/issues/392)
+from accepted [PR #391](https://github.com/Kajooja/Kajo/pull/391) / main
+`2f6f3811e3489adca55d945481674a30a5064583`. It adds measurement and preservation
+checks only: no serving change, schema, migration or hosted operation.
 
-The source and protocol are in draft [PR #393](https://github.com/Kajooja/Kajo/pull/393).
-The initial executable head is `285e8ac77b4d55b279af889dc869247e835799c1`;
-[CI #807](https://github.com/Kajooja/Kajo/actions/runs/40682803256) covers that head.
-Required CI and independent artifact review must pass on the final PR head before
-acceptance. Focused parser/series tests (9/9) and real-SQL performance contracts
-(3/3) pass locally. The full local database run passed 404/405 tests; an unchanged
-atomic-pages PGlite test failed with a WASM memory error and its isolated retry
-was inconclusive. Local Deno registry networking also prevents a complete
-root-check pass; neither limitation counts as a passing gate.
+**Result: NOT_ADMITTED.** The [predeclared history protocol](sprints/SPRINT-015.md#accumulated-skip-history-comparison)
+completed all 2880 measurements, 288 excluded warmups and 72 separate function
+observations in six BC/CB/BC stacks. In CI #808 all latency/resource criteria and
+empty-history rules pass, but pair 1 Personal Discovery with catalogue history
+has 502 baseline versus 503 candidate skip-decision calls; equality was required.
+That rule is unchanged and the broader history scope is not accepted.
 
-The [predeclared history protocol](sprints/SPRINT-015.md#accumulated-skip-history-comparison)
-retains the original empty-history comparison and adds dense current-Item and
-10000-Item off-catalogue histories. Six fresh owned stacks run in BC/CB/BC order:
-2880 measurements, 288 excluded warmups and 72 separate function observations.
-Every history cohort/pair must stay within the existing fresh/retry regression
-allowances and preserve the predicted skip-call counts, source lineage and all
-canonical rows. A complete losing comparison remains NOT_ADMITTED; its failure
-must name a concrete successor before broader activation.
+**Next action:** finish #393's final source checks and integration, then continue
+[Issue #394](https://github.com/Kajooja/Kajo/issues/394). Use repeated no-forward
+controls and scoped native diagnostics to distinguish acquisition calls from
+downstream calls, with explicit input/clock witnesses. Investigate the earlier
+latency failures without assuming a cause. Preserve the v1 losing results and
+thresholds; any justified successor protocol must be versioned and predeclared.
+The next packet changes no serving SQL or hosted state.
 
-**Next action:** complete the exact-head source/CI validation, then independently
-verify both history inventories/decisions, raw quantiles, all paired criteria,
-source/installation identities and six cleanups. Expand the accepted synthetic
-scope only if every declared rule passes unchanged. This does not admit dense
-production traffic, a latency SLO, phone speed or recommendation quality. The
-#391 forward is not yet installed in the hosted application; any eventual rollout
-still needs its guarded preservation procedure. Hosted and physical-device
-observations and separately predeclared quality sampling remain open.
+The #391 forward remains uninstalled in the hosted application. Keep its earlier
+acceptance limited to the declared empty-skip synthetic scope. This work admits
+no production traffic envelope, latency SLO, phone speed or predictive quality;
+hosted/device observations and separately predeclared quality sampling remain open.
+
+### Completed history comparison evidence
+
+Measured executable head `6de8082877d1c3b8b83856455303cc177c499cc1`, tested merge
+`c403ccc9d84ac2f176c43c30b63aba84f774755f`, tree
+`c94bfef15e6afe7b5f5ff82fc2c8e7ef564aba9f`: all six required gates passed in
+[CI #808](https://github.com/Kajooja/Kajo/actions/runs/40683795720), including
+2259 tests and four configured iOS/Android exports. PR #393 owns final source-head
+acceptance after this documentation receipt; a documentation update is not a new
+measurement or a change to the predeclared rules. CI also passed the atomic-pages
+test that failed locally in PGlite; the earlier local run was not a passing gate.
+
+Performance artifact `12815439771`, JSON SHA-256
+`6c31128085e99ae274aeae05430a5b5d1a4cd3eb31b347d74713edd9172d9042`,
+was independently checked against raw quantiles, every paired criterion, fixture
+inventories/decisions, exact installation/source identities and all six cleanups.
+Its worker reports AMD EPYC 9V45, four logical CPUs, Node 22.23.4 and PostgreSQL
+17.6. All 91 canonical tables are restored. PR #393 retains every paired p50/p95;
+p95 remains exploratory. The call-count difference is an observation, not a proven
+semantic defect or a causal performance explanation.
+
+The earlier complete [CI #807](https://github.com/Kajooja/Kajo/actions/runs/40682803256)
+comparison also remains NOT_ADMITTED: artifact `12815597733`, JSON SHA-256
+`c556a7f4b2409bd0f9a18ccbef8ef70f87d2a98f42d8b4071b73c19c9edd70c9`.
+Personal catalogue-history calls were 501/501/502 versus 503/503/503. Four latency
+comparisons also failed: pair 2 empty-history fresh Taste; pair 1 off-catalogue
+Taste exact retry; pair 2 catalogue-history fresh Personal and Shared Discovery.
+The later passing latency observations do not erase these results or establish
+cross-worker equivalence.
+
+Native artifact `12815997380`, JSON SHA-256
+`fabc0ae341d1bc155d1e5cf6988337af5e386888a8a7ee8d444e4db17dd48690`,
+independently verifies all 54 installation sources, 126 populated acquisition
+cases, actual NEXT calls 39/39, 276 unchanged functions/all metadata, two invalid
+clocks and two exact retries. It retains 54 Discovery cases/810 exact candidate
+comparisons with zero score differences, seven Taste/evaluation captures, 21
+sources, seven Shared lock proofs, 16 reconciliations and canonical/stack cleanup.
 
 **Project authority — 2026-10-28:** follow Kajo's repository and this Kajo project's
 conversations. Unrelated files or projects do not introduce development or

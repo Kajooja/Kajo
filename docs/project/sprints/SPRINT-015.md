@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — fourteen accepted source packets; current accumulated skip-history comparison; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
+Status: **IN PROGRESS — accumulated skip-history comparison complete and NOT_ADMITTED; next bounded diagnosis; seven SQL forwards installed; native/hosted performance and quality acceptance remain separate gates**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -289,6 +289,25 @@ accepted scope. Record the failed cohort and a concrete successor before hosted
 activation; do not tune thresholds after seeing results. All six CI gates,
 source/fixture/protocol/worker identities, raw denominators and six stack cleanups
 remain required. STATUS owns the final source receipt and next action.
+
+### Recorded history outcome and successor
+
+[PR #393](https://github.com/Kajooja/Kajo/pull/393) completes the declared
+comparison as **NOT_ADMITTED**. CI #808 passes all six source gates and all
+latency/resource criteria, but pair 1 catalogue-history Personal Discovery has
+502 baseline versus 503 candidate skip-decision calls, violating equality. The
+earlier complete CI #807 result is also retained, including its four failed
+latency comparisons. No threshold or result was revised after measurement.
+[STATUS](../STATUS.md#completed-history-comparison-evidence) retains exact source,
+artifact hashes, denominators, preservation proofs and the earlier losing result;
+the PR retains all paired p50/p95 values.
+
+The next bounded packet is [Issue #394](https://github.com/Kajooja/Kajo/issues/394):
+attribute acquisition versus downstream calls with repeated no-forward controls
+and explicit input/clock witnesses, and investigate the earlier latency failures.
+Do not infer causality from total root-RPC calls, widen the accepted scope, install
+the forward or relax v1 criteria. Any justified successor protocol is versioned
+and predeclared before fresh evidence; this diagnosis changes no serving SQL.
 
 ## Evidence and completion rules
 
