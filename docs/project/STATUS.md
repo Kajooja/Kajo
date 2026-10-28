@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-28**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, #394 diagnostic source complete in PR #395; historical call drift and off-catalogue Taste retry latency remain unresolved; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, native expected-rating evaluation feasibility #396 in progress; optional skip-prefilter diagnosis #394 deferred; native, hosted/device and quality acceptance remain distinct gates.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,55 +11,61 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — native skip-call diagnosis #394 / Sprint 015
+## Current handoff — native evaluation feasibility #396 / Sprint 015
 
-[PR #393](https://github.com/Kajooja/Kajo/pull/393), accepted as main
-`0f04f5d954ba99992ff4e7291d53e1c14c5b3d28`, completes [Issue #392](https://github.com/Kajooja/Kajo/issues/392)
-from accepted [PR #391](https://github.com/Kajooja/Kajo/pull/391) / main
-`2f6f3811e3489adca55d945481674a30a5064583`. It adds measurement and preservation
-checks only: no serving change, schema, migration or hosted operation.
+[PR #395](https://github.com/Kajooja/Kajo/pull/395) is accepted as main
+`b7e38a6533eaa0771070b41d1fed1fe592e67927`, tree
+`9c80ef29e09e6d68c1b4e5b03ab2a2d79b31f12b`, after all six final
+[CI #812](https://github.com/Kajooja/Kajo/actions/runs/40726376980) gates,
+2263 tests and four configured iOS/Android exports. Its PR owns the complete
+#811/#812 paired timings and independently verified native preservation receipts.
 
-**Retained results: #807 and #808 NOT_ADMITTED; #809 individually admitted in
-the declared history envelope.** The [predeclared history protocol](sprints/SPRINT-015.md#accumulated-skip-history-comparison)
-completed all 2880 measurements, 288 excluded warmups and 72 separate function
-observations in six BC/CB/BC stacks. In CI #808 all latency/resource criteria and
-empty-history rules pass, but pair 1 Personal Discovery with catalogue history
-has 502 baseline versus 503 candidate skip-decision calls; equality was required.
-That rule is unchanged. The final #809 success does not resolve the preceding
-failures or establish repeatable broader activation.
+**Owner priority — 2026-10-28:** investigate performance deviations now only when
+material to development or MVP; otherwise continue required engine work. The
+#394 observations failed declared optimization rules but demonstrate neither a
+wrong result/data-preservation failure nor an end-user latency violation. Keep
+all failed results and thresholds; do not reinterpret them as accepted. Further
+investigation is **deferred**, with the optional #391 forward still uninstalled.
+Re-enter #394 before proposing its broader activation, or when baseline/runtime
+evidence links the issue to a correctness defect, required capacity or a declared
+user-facing performance budget. This does not close MVP-UX-008 or Sprint 015.
 
-**Active source packet:** [PR #395](https://github.com/Kajooja/Kajo/pull/395), branch
-`test/native-skip-call-diagnosis`, implements the [predeclared diagnostic protocol](sprints/SPRINT-015.md#native-skip-call-diagnostic-protocol)
-for [Issue #394](https://github.com/Kajooja/Kajo/issues/394). All six gates pass on
-executable head `1240b57d8a8fdd3706f26b6ff71bbc89efa13ef6` in CI #811. The PR owns
-final source-head acceptance after this documentation receipt; an unmerged PR
-is not accepted main. Inspect its final required checks before source integration.
+Continue on the current **pre-#391 hosted serving baseline**. Fresh source-test
+installations include the 54th candidate forward; their CI success does not
+activate or admit that forward in the hosted application. No migration is removed
+or rewritten, and no account, retained forecast or history is reset.
 
-**Diagnostic result:** all six original observations and 18 original-body controls
-report 503 calls; all 18 traces attribute **500 to acquisition and three to trailing
-availability**. Historical 501/502 totals did not reproduce and remain unresolved.
-Same-transaction acquisition inputs/full rows match, with exact native clock
-witnesses, retries and restored functions/data. Separate public requests have
-different clocks and slightly different scores; these traces do not prove exact
-full-RPC score equality. Candidate replay plans expose extra dense-history ledger
-work, not a demonstrated cause of public latency. No rollout admission is emitted.
+**One active packet:** [Issue #396](https://github.com/Kajooja/Kajo/issues/396),
+branch `feat/native-quality-feasibility`. Extend the existing Working cohort/report
+v2 workflow with an executable expected-rating feasibility boundary. Reuse its
+roster, inventory, native-source and outcome validation; preserve v1/v2 reports.
+Bind the declared target, controls, analysis unit, temporal roles/windows, source
+identity and numerical acceptance/resource requirements. Missing requirements,
+missing numeric forecasts and insufficient outcomes remain explicit blockers;
+fixtures, pair counts and rank scores cannot become native quality or grades.
+This packet adds no scorer, serving change or hosted write.
 
-**One next diagnostic packet after PR #395 source acceptance:** predeclare and
-observe the actual `OFF_CATALOGUE_HISTORY` Taste **exact-retry** path after the
-same physical prelude, with repeated same-variant controls, scoped call graphs,
-retained-response query plans and exact input/receipt witnesses. CI #811 pair 3
-has p50 **7.710 → 10.553 ms** (increase 2.843 ms, allowed 0.771 ms); p95 is
-7.862 → 10.826 ms. This measurement precedes the new observer. Existing function
-profiles cover fresh calls, so acquisition blame is unsupported. Keep #394 open;
-availability-order/plan controls for historical 501/502 remain a subsequent
-unresolved investigation, not a second implicit active packet. No serving SQL,
-schema or hosted change is justified by this evidence. Original v1 criteria and
-every losing result remain unchanged.
+A read-only hosted check on **2026-10-28T18:09:23Z** confirms acquisition body
+MD5 `6e0aba591a90c194c5bae49f0361084f` and no installed skip-prefilter forward.
+At **18:09:54Z**, aggregate feasibility counts are zero Personal Working
+enrollments/captures, zero Shared forecast consumptions/outcome captures, and
+47 valid retained Taste panels across two sessions. Counts do not establish
+eligible labels, independent support, a prospective sample or numeric forecasts.
+No individual identity/label rows were exported; no hosted state changed.
 
-The #391 forward remains uninstalled in the hosted application. Keep its earlier
-acceptance limited to the declared empty-skip synthetic scope. This work admits
-no production traffic envelope, latency SLO, phone speed or predictive quality;
-hosted/device observations and separately predeclared quality sampling remain open.
+After this bounded evaluation foundation, continue toward Sprint 016's numerical
+baseline using the existing research/temporal machinery. Preserve unresolved
+Sprint 015 quality/runtime observations as named acceptance obligations; do not
+wait for optional #391 tuning or claim the sprint/Engine V1 is already accepted.
+
+**Retained diagnostic conclusion:** both #811 and #812 observed 503 calls in every
+original target/control and 500 acquisition + three availability calls in every
+trace. Historical 501/502 totals remain unexplained. #811's OFF_CATALOGUE_HISTORY
+Taste exact-retry p50 rose 7.710 → 10.553 ms (2.843 ms versus a 0.771 ms allowance);
+#812 did not reproduce it. Separate private replays preserve exact acquisition
+inputs/rows, not fixed-clock equality across separate public RPCs. No causal
+public-latency explanation or rollout admission follows. #807/#808 remain
+NOT_ADMITTED; #809 retains its individual declared-history passing result.
 
 ### Completed diagnostic evidence
 
