@@ -32,10 +32,17 @@ supabase/functions/password-auth/
 synthetic PostgreSQL baseline and its PGlite contract-only tests. It reuses the
 existing candidate fixture and authenticated feed/Taste RPCs, validates exact
 retries and retained sources, reports execution/buffer/WAL distributions with
-failure denominators, and restores every canonical row. The fixed protocol and
+failure denominators, and restores every canonical row. Its separate diagnostic
+mode captures transaction-local function times before verification retries,
+without pooling them into baseline quantiles. The fixed protocol and
 unmeasured boundaries are in [Sprint 015](../project/sprints/SPRINT-015.md#native-database-performance-protocol).
-`run-ci-prediction-performance.mjs` composes the existing fresh installer and
-CI-only owned-stack lifecycle. The separate `database-prediction-performance`
+`native-performance-series.{mjs,test.mjs}` checks three complete comparable runs
+and reports the range of their individual quantiles. `run-ci-prediction-performance.mjs`
+composes the existing fresh installer and CI-only owned-stack lifecycle three
+times serially on one worker, with the function diagnostic after the last baseline.
+The series report retains each stack/source/host identity and cleanup result;
+its versioned format does not rewrite historical single-run artifacts.
+The separate `database-prediction-performance`
 job keeps collection outside the long historical migration probe. All original
 five gates plus this completeness/cleanup gate precede the Android artifact;
 there is no performance SLO, model admission or hosted load-test command.

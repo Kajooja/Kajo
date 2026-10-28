@@ -12,18 +12,30 @@ const id = n => 'ab157000-0000-4000-8000-' + String(n).padStart(12, '0');
 const actor = id(1), shared = id(900);
 const operations = ['discovery-personal-movie', 'discovery-shared-movie', 'taste-personal-next'];
 
-export function performanceProtocol(contractTest = false) {
+export function performanceProtocol({ contractTest = false, profileFunctions = false } = {}) {
   return {
-    version: 'native-prediction-performance-v1',
-    purpose: contractTest ? 'CONTRACT_TEST_ONLY' : 'EXPLORATORY_NATIVE_DATABASE_BASELINE',
+    version: 'native-prediction-performance-v2',
+    purpose: contractTest ? 'CONTRACT_TEST_ONLY' : profileFunctions
+      ? 'SINGLE_OBSERVATION_FUNCTION_DIAGNOSTIC' : 'EXPLORATORY_NATIVE_DATABASE_BASELINE',
     catalogSizes: contractTest ? [40, 60] : [40, 1000],
-    operations, requestKinds: ['fresh', 'exact-retry'],
-    warmupsPerCohort: contractTest ? 0 : 2, samplesPerCohort: contractTest ? 1 : 20,
-    quantile: 'NEAREST_RANK_CEILING_N_TIMES_P', tail: 'EXPLORATORY_NO_LATENCY_SLO',
+    operations, requestKinds: profileFunctions ? ['fresh'] : ['fresh', 'exact-retry'],
+    warmupsPerCohort: contractTest || profileFunctions ? 0 : 2,
+    samplesPerCohort: contractTest || profileFunctions ? 1 : 20,
+    quantile: profileFunctions ? 'NONE_SINGLE_DIAGNOSTIC_OBSERVATION' : 'NEAREST_RANK_CEILING_N_TIMES_P',
+    tail: 'EXPLORATORY_NO_LATENCY_SLO',
+    trackFunctions: profileFunctions ? 'all' : 'none',
+    functionTiming: profileFunctions ? {
+      source: 'PG_STAT_XACT_USER_FUNCTIONS_BEFORE_AUDITS_AND_VERIFICATION_RETRIES',
+      schemas: ['public', 'private'], topSelfTimeLimit: 25,
+      scope: 'TRACKED_NON_INLINED_FUNCTIONS_ONLY_ELAPSED_NOT_CPU_TIME',
+      totalTime: 'INCLUSIVE_DO_NOT_SUM_FUNCTION_TOTALS',
+      instrumentation: 'SEPARATE_FROM_BASELINE_OVERHEAD_NOT_SUBTRACTED',
+    } : null,
     boundary: 'POSTGRES_EXPLAIN_ANALYZE_EXECUTION_NO_RESULT_SERIALIZATION_OR_NETWORK',
     explain: 'ANALYZE, BUFFERS, WAL, TIMING OFF, SUMMARY ON, FORMAT JSON',
-    order: 'CATALOG_ASCENDING_THEN_OPERATION_THEN_FRESH_RETRY_SERIAL',
-    cache: 'WARMUP_NO_CACHE_FLUSH_EACH_TRIAL_NEW_CONNECTION_IN_NATIVE_RUNNER',
+    order: 'CATALOG_ASCENDING_THEN_OPERATION_THEN_REQUEST_KIND_SERIAL',
+    cache: profileFunctions ? 'NO_WARMUP_OR_CACHE_FLUSH_NEW_CONNECTION_SINGLE_OBSERVATION'
+      : 'WARMUP_NO_CACHE_FLUSH_EACH_TRIAL_NEW_CONNECTION_IN_NATIVE_RUNNER',
     analyzedTables: ['public.items', 'private.item_sources'],
     state: 'NEW_FIXTURE_PER_COHORT_COMMITTED_START_AND_RETRY_ORIGINAL_EACH_TRIAL_ROLLED_BACK',
     history: 'TWO_DISTINCT_PERSONAL_RATINGS_SHARED_TWO_MEMBERS_THREE_INTERACTIONS_EMPTY_TASTE_PREFIX',
@@ -31,7 +43,7 @@ export function performanceProtocol(contractTest = false) {
     exclusions: ['PHONE', 'NETWORK', 'RENDER', 'CONCURRENT_LOAD', 'COLD_CACHE', 'COMMIT_FSYNC',
       'RESULT_SERIALIZATION', 'EXPLICIT_EVALUATION', 'SHADOW_WORKER', 'PREDICTIVE_QUALITY', 'PEAK_PROCESS_MEMORY'],
     instrumentation: 'EXPLAIN_OVERHEAD_NOT_SUBTRACTED_NO_UNINSTRUMENTED_EQUIVALENCE_CLAIM',
-    retention: 'SYNTHETIC_AGGREGATES_AND_TIMINGS_ONLY_NO_QUERIES_PLANS_IDS_OR_RESPONSES',
+    retention: 'SYNTHETIC_AGGREGATES_TIMINGS_FUNCTION_IDENTITIES_NO_QUERIES_PLANS_USER_ITEM_IDS_OR_RESPONSES',
   };
 }
 
@@ -55,13 +67,15 @@ export function explainMetrics(explain) {
   return result; // Root counters already include children: never sum the plan tree.
 }
 
-export function summarizePerformance(samples, planned, attempted, failures) {
+export function summarizePerformance(samples, planned, attempted, failures, { quantiles = true } = {}) {
   assert.ok(Number.isInteger(planned) && planned > 0);
   assert.ok(Number.isInteger(attempted) && samples.length + failures.length === attempted && attempted <= planned);
   const summary = { planned, attempted, succeeded: samples.length,
     failed: failures.filter(value => value === 'ERROR').length,
-    cancelled: failures.filter(value => value === 'TIMEOUT').length, missing: planned - attempted, metrics: {} };
+    cancelled: failures.filter(value => value === 'TIMEOUT').length, missing: planned - attempted };
   assert.equal(summary.failed + summary.cancelled, failures.length);
+  if (!quantiles) return summary;
+  summary.metrics = {};
   for (const name of Object.keys(metrics)) {
     const values = samples.map(sample => sample[name]).sort((a, b) => a - b);
     assert.ok(values.every(value => typeof value === 'number' && Number.isFinite(value) && value >= 0));
@@ -73,6 +87,32 @@ export function summarizePerformance(samples, planned, attempted, failures) {
   return summary;
 }
 
+export function summarizeFunctionTiming(rows, rootName) {
+  assert.ok(Array.isArray(rows) && rows.length > 0, 'Missing transaction function timings');
+  const identities = new Set();
+  for (const row of rows) {
+    assert.ok(['public', 'private'].includes(row.schema));
+    assert.ok(typeof row.name === 'string' && row.name.length > 0 && typeof row.arguments === 'string');
+    const identity = JSON.stringify([row.schema, row.name, row.arguments]);
+    assert.ok(!identities.has(identity), 'Duplicate function identity'); identities.add(identity);
+    assert.ok(Number.isInteger(row.calls) && row.calls > 0);
+    for (const key of ['totalMs', 'selfMs']) assert.ok(Number.isFinite(row[key]) && row[key] >= 0);
+  }
+  const root = rows.find(row => row.schema === 'public' && row.name === rootName && row.arguments === 'jsonb');
+  assert.equal(root?.calls, 1, 'Diagnostic must contain exactly one measured root RPC call');
+  const sorted = [...rows].sort((a, b) => b.selfMs - a.selfMs
+    || JSON.stringify([a.schema, a.name, a.arguments]).localeCompare(JSON.stringify([b.schema, b.name, b.arguments])));
+  const limit = performanceProtocol({ profileFunctions: true }).functionTiming.topSelfTimeLimit;
+  return { trackedFunctions: rows.length, omittedFunctions: Math.max(0, rows.length - limit),
+    root, topSelfTime: sorted.slice(0, limit) };
+}
+
+const functionTimingSql = `select coalesce(jsonb_agg(jsonb_build_object(
+  'schema',s.schemaname,'name',s.funcname,'arguments',oidvectortypes(p.proargtypes),
+  'calls',s.calls,'totalMs',s.total_time,'selfMs',s.self_time)), '[]'::jsonb)
+  from pg_stat_xact_user_functions s join pg_proc p on p.oid=s.funcid
+  where s.calls>0 and s.schemaname in('public','private');`;
+
 const sourceAudit = `select jsonb_build_object(
   'runs',(select count(*) from private.prediction_runs),
   'finalRuns',(select count(*) from private.prediction_runs where state_snapshot#>>'{finalScoringInput,computation}'='FRESH_FINAL'),
@@ -83,8 +123,8 @@ const sourceAudit = `select jsonb_build_object(
     'sessions',(select jsonb_agg(to_jsonb(s) order by id) from private.sequential_taste_sessions s)
   )::text,'UTF8')),'hex')));`;
 
-export async function collectNativePredictionPerformance(execSql, { contractTest = false } = {}) {
-  const protocol = performanceProtocol(contractTest);
+export async function collectNativePredictionPerformance(execSql, { contractTest = false, profileFunctions = false } = {}) {
+  const protocol = performanceProtocol({ contractTest, profileFunctions });
   const exec = (sql, stage) => execSql(sql, { stage: 'native-perf-' + stage, timeoutMs: 120_000 });
   const one = async (sql, stage) => (await exec(sql, stage))[0];
   // This refusal is in addition to the runner's CI-only owned-stack boundary.
@@ -125,7 +165,8 @@ export async function collectNativePredictionPerformance(execSql, { contractTest
     report.environment = await one(`select jsonb_build_object('observedAt',clock_timestamp(),
       'serverVersion',current_setting('server_version'),'blockSize',current_setting('block_size'),
       'sharedBuffers',current_setting('shared_buffers'),'workMem',current_setting('work_mem'),
-      'jit',current_setting('jit'),'trackIoTiming',current_setting('track_io_timing'));`, 'environment');
+      'jit',current_setting('jit'),'trackIoTiming',current_setting('track_io_timing'),
+      'defaultTrackFunctions',current_setting('track_functions'));`, 'environment');
     outer: for (const cohort of report.cohorts) {
       fixture = true;
       report.cleanup = 'NOT_VERIFIED';
@@ -168,13 +209,16 @@ export async function collectNativePredictionPerformance(execSql, { contractTest
           // Raw EXPLAIN JSON is pretty-printed across lines. Keep its execution
           // boundary, but emit compact jsonb for the native psql line protocol.
           const output = await exec(`begin;set local extra_float_digits=3;set local request.jwt.claim.sub='${actor}';
+            set local track_functions='${protocol.trackFunctions}';
             create temp table perf_plan(value jsonb) on commit drop;
             grant insert,select on perf_plan to authenticated;set local role authenticated;
             do $measure$ declare plan jsonb;begin execute ` + literal('explain (' + protocol.explain + ') ' + call)
             + ` into plan;insert into pg_temp.perf_plan values(plan);end;$measure$;
-            reset role;select value from pg_temp.perf_plan;` + sourceAudit
+            reset role;select value from pg_temp.perf_plan;` + (profileFunctions ? functionTimingSql : '') + sourceAudit
             + 'set local role authenticated;' + call + call + 'reset role;' + sourceAudit + 'rollback;', 'sample');
-          assert.equal(output.length, 5);
+          assert.equal(output.length, profileFunctions ? 6 : 5);
+          const functionTiming = profileFunctions
+            ? summarizeFunctionTiming(output.splice(1, 1)[0], taste ? 'taste_session_v2' : 'rank_items_feed_v1') : null;
           const [plan, audit, response, second, afterRetry] = output;
           const sample = explainMetrics(plan);
           assert.deepEqual(afterRetry, audit, 'Exact retry changed its retained source');
@@ -191,6 +235,7 @@ export async function collectNativePredictionPerformance(execSql, { contractTest
           if (taste) assert.equal(response.status, 'QUESTION');
           else assert.equal(response.items.length, 5);
           sample.candidates = audit.candidates;
+          if (profileFunctions) sample.functionTiming = functionTiming;
           if (index < 0) cohort.warmupsCompleted++;
           else cohort.samples.push(sample);
         } catch (error) {
@@ -209,7 +254,8 @@ export async function collectNativePredictionPerformance(execSql, { contractTest
       await cleanup();
     }
     for (const cohort of report.cohorts) {
-      cohort.summary = summarizePerformance(cohort.samples, protocol.samplesPerCohort, cohort.attempted, cohort.failures);
+      cohort.summary = summarizePerformance(cohort.samples, protocol.samplesPerCohort, cohort.attempted, cohort.failures,
+        { quantiles: !profileFunctions });
     }
     if (report.status === 'COLLECTING') report.status = 'PASS';
     return report;

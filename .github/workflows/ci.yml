@@ -162,7 +162,7 @@ jobs:
           retention-days: 7
 
   database-prediction-performance:
-    name: Native prediction performance baseline
+    name: Native prediction performance repeatability
     needs: [validate, database-platform]
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -179,7 +179,7 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Measure authenticated RPCs in a disposable installation
+      - name: Repeat native baselines and collect separate function diagnostics
         run: node scripts/database/run-ci-prediction-performance.mjs "$RUNNER_TEMP/kajo-prediction-performance-report.json"
 
       - name: Upload bounded diagnostic report

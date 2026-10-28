@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-28**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, eleven accepted source packets; current native performance baseline packet; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
+Sprint: **015 — shared prediction inputs and trustworthy evaluation**, twelve accepted source packets; current same-worker performance repeatability packet; seven SQL forwards installed; native measurements, hosted/device performance and quality remain distinct gates.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,33 +11,73 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — native prediction performance baseline / Sprint 015
+## Current handoff — native performance repeatability / Sprint 015
 
-The twelfth bounded source packet is [PR #388](https://github.com/Kajooja/Kajo/pull/388),
-branch `test/native-prediction-performance`,
-based on accepted main `4891bfd235f10f3b28c66ef294694e6e01f710fb` /
-[PR #387](https://github.com/Kajooja/Kajo/pull/387). It adds a disposable native
-PostgreSQL measurement job through the existing installer and authenticated
-Discovery/Taste RPCs. It changes no migration, serving scorer or hosted state.
+The thirteenth bounded source packet is branch
+`test/native-performance-repeatability`, based on accepted main
+`4a1a3bec2a231f89c9764d8966216308d3410523` /
+[PR #388](https://github.com/Kajooja/Kajo/pull/388). It repeats the existing native
+baseline three times serially on one CI worker, recreating and cleaning the owned
+stack each time. A separate six-observation function-timing diagnostic follows
+the third baseline. It changes no migration, scorer, hosted state or product flow.
 
-The first CI attempt stopped at the fresh advisory audit: the newly reviewed
-deepmerge advisory reached Expo's high meta-findings. The bounded build repair
-uses the existing exact-archive/source correction owner for deepmerge 4.3.1,
-rejecting `__proto__` on both source and target copying. Pristine controls
-reproduce the defect; all 32 security/audit regressions pass locally. Package
-identity, raw findings and audit policy remain unchanged. Require a fresh
-successful audit and all six final-source jobs after this repair.
+The [Sprint 015 measurement protocol](sprints/SPRINT-015.md#native-database-performance-protocol)
+predeclares 720 measured baseline trials and 72 excluded warmups, plus six separate
+fresh-command diagnostics. Sources, migration manifest, image digest, database
+settings and worker inventory must match across runs. Reports retain each run's
+p50/p95 and their ranges, without pooling samples or inventing an admitted latency
+budget. Function timings are transaction-local, captured before verification
+retries, and include only tracked non-inlined functions. Their instrumentation
+cost is not subtracted; they cannot replace the baseline distribution.
 
-The predeclared [Sprint 015 measurement protocol](sprints/SPRINT-015.md#native-database-performance-protocol)
-has 12 cohorts: 40/1000 synthetic Items × Personal MOVIE Discovery / two-member
-Shared MOVIE Discovery / Personal Taste NEXT × fresh / exact retry. Each cohort
-has two warmups and 20 measured trials. Reports retain all success, failure,
-cancellation and missing denominators; p95 is exploratory, not an admitted SLO.
-PostgreSQL execution time and buffer/WAL counters exclude network, output
-serialization, commit acknowledgement and phone rendering. Instrumentation
-overhead is not subtracted. PGlite checks contracts only; its timings are not a
-native baseline. Complete canonical-row restoration and owned-stack cleanup
-are required even on failed collection.
+**Next action:** require all six final-source CI gates, independently inspect the
+complete series, source/runtime identity, diagnostic root-call counts and canonical/
+stack cleanup, then integrate the exact tested tree. If already accepted, use the
+same-worker variation and function owners to predeclare one bounded optimization
+and comparison budget before measuring its effect. Three repetitions characterize
+this worker only; they do not fix future CI hardware or establish a production SLO.
+Hosted current-path observations and phone action-to-visible/actionable/durable/
+server-ack timings remain open. Quality sampling remains a separate predeclared
+packet with a supported target; ordinal `final_score` is not a calibrated expected
+rating. Do not reuse #232E's exposed same-pool pair target for single-target
+EVALUATION captures.
+
+### Retained twelfth-packet native baseline acceptance
+
+[PR #388](https://github.com/Kajooja/Kajo/pull/388) was accepted as main
+`4a1a3bec2a231f89c9764d8966216308d3410523`. All six required jobs passed in
+[CI #800](https://github.com/Kajooja/Kajo/actions/runs/40605166832), head
+`15c939b3355333ae2b75e3ee417e99dfd88cf7e0`, tested merge
+`1c70f0c1912539c24488e3eb5711b69ac7945bd1`; accepted/tested tree is
+`8b8c5b32e3789380666e0981c0f84af5784503e0`. Native performance artifact
+`12779859681` has JSON SHA-256
+`8b25f348bb0253c5f4a0938b8b3026d9f2464407216331e1ffe5d98a33d0ff8f`.
+It contains all 240 successful measurements and 24 warmups, matching all 53
+installation sources and restoring all 91 canonical tables plus the owned stack.
+The independent native CLI/history artifact `12781677783` / JSON SHA-256
+`3338f106684e0fa1c63736dc7de5ffba6c18d84b4b153f2a822a706d63ba997c`
+retains 54 Discovery cases, 810 exact candidate comparisons, seven committed
+Taste/evaluation captures, seven Shared lock proofs and 16 reconciliation cases.
+
+The earlier successful [CI #799](https://github.com/Kajooja/Kajo/actions/runs/40604350344)
+measured the same protocol/source/fixture/migrations; the final source difference
+was STATUS only. Its performance artifact `12780263634` has JSON SHA-256
+`77657d4229e3a25edbf66863e459e7adee5f01c988cf8f3b0bf36a90df3dbf7d`.
+Both used PostgreSQL image digest
+`sha256:66089200353d90686fe9b252a47d17d078364bf47c50190852c33dc850a0191f`,
+CLI 2.117.0 and four logical CPUs, but #799 used AMD EPYC 9V74 and #800 Intel Xeon
+Platinum 8370C. Their 1000-Item fresh-command p50 values were respectively
+160.247/187.239 ms (Personal Discovery), 168.793/198.660 ms (Shared Discovery),
+and 140.850/169.526 ms (Taste NEXT). These are different hardware environments,
+not same-worker repeatability. The PR receipt retains every cohort's p50/p95;
+no pooled tail, latency regression, quality or phone claim is accepted.
+
+The initial fresh advisory audit required a bounded deepmerge 4.3.1 source repair
+through the existing exact-archive/security owner. All 32 security/audit regressions
+and 52 dependency tests pass. Final CI verifies the five expected installed source
+corrections and preserves the nine raw findings (five low, four high meta-findings)
+without an unmitigated high finding. This is not a zero-vulnerability claim.
+No package identity, audit classifier, migration or hosted data was changed.
 
 **Read-only hosted observation — 2026-10-27 23:51 UTC:** endpoint matching in
 authenticated top-level `pg_stat_statements` includes quoted PostgREST identifiers.
@@ -50,16 +90,6 @@ they are neither a Taste NEXT cohort nor per-request p50/p95. The separate
 inventory still had 49 historical PredictionRuns and zero marked FINAL/V4-receipt
 runs. Missing retained statements are not proof that no user ever called an
 endpoint. No statistics were reset and no hosted fixture/load was created.
-
-**Next action:** require the original five final-source CI gates plus the new
-native performance job, inspect its complete 240-trial report and source/runtime
-identity, then integrate the exact tested tree. If already accepted, repeat the
-declared baseline independently before fixing a comparison budget or choosing
-an optimization from measured evidence. Hosted current-path observations and
-phone action-to-visible/actionable/durable/server-ack timings remain open.
-Quality sampling is a separate predeclared packet with a supported target; the
-ordinal `final_score` is not a calibrated expected rating. Do not reuse #232E's
-exposed same-pool pair target for single-target EVALUATION captures.
 
 ### Retained eleventh-packet parity acceptance
 
