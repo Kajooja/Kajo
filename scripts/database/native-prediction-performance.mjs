@@ -136,7 +136,10 @@ const sourceAudit = (skipHistory = false) => `select jsonb_build_object(
     ${skipHistory ? ",'skipSources',(select jsonb_agg(to_jsonb(s) order by prediction_id,action_id) from private.prediction_contextual_skip_sources s)" : ''}
   )::text,'UTF8')),'hex')));`;
 
-export async function collectNativePredictionPerformance(execSql, { contractTest = false, profileFunctions = false, skipHistory = false } = {}) {
+export async function collectNativePredictionPerformance(execSql, { contractTest = false, profileFunctions = false,
+  skipHistory = false, observeHistoryCohort } = {}) {
+  assert.ok(observeHistoryCohort === undefined || (typeof observeHistoryCohort === 'function'
+    && profileFunctions && skipHistory), 'History observer requires the separate function-diagnostic collection');
   const protocol = performanceProtocol({ contractTest, profileFunctions, skipHistory });
   const auditSql = sourceAudit(skipHistory);
   const exec = (sql, stage) => execSql(sql, { stage: 'native-perf-' + stage, timeoutMs: 120_000 });
@@ -279,6 +282,23 @@ export async function collectNativePredictionPerformance(execSql, { contractTest
         assert.equal(await one(skipLedgerHashSql, 'history-after'), ledgerHash, 'Measured RPC changed skip history');
         cohort.historyPreserved = true;
       }
+      // Optional successor diagnostics begin only after the original target
+      // observation. They may change physical heap/cache state despite rollback;
+      // the caller must version that protocol and must not claim v1 admission.
+      if (observeHistoryCohort && cohort.skipHistory === 'CATALOGUE_HISTORY'
+        && cohort.operation === 'discovery-personal-movie' && cohort.requestKind === 'fresh') {
+        const request = makeRequest();
+        try {
+          await observeHistoryCohort({ actor, profileId, request, call: rpc(request), auditSql,
+            catalogSize: cohort.catalogSize, originalSample: cohort.samples[0] });
+        } catch (error) {
+          report.failure = { skipHistory: cohort.skipHistory, catalogSize: cohort.catalogSize,
+            operation: cohort.operation, requestKind: cohort.requestKind, phase: 'OBSERVER', kind: 'ERROR' };
+          throw error;
+        }
+        assert.equal(await one(skipLedgerHashSql, 'history-after-observer'), ledgerHash,
+          'History diagnostic changed skip history');
+      }
       await cleanup();
     }
     for (const cohort of report.cohorts) {
@@ -287,12 +307,24 @@ export async function collectNativePredictionPerformance(execSql, { contractTest
     }
     if (report.status === 'COLLECTING') report.status = 'PASS';
     return report;
-  } catch (error) { primaryError = error; throw error; }
+  } catch (error) {
+    primaryError = error;
+    report.status = 'FAIL';
+    for (const cohort of report.cohorts) cohort.summary ??= summarizePerformance(cohort.samples,
+      protocol.samplesPerCohort, cohort.attempted, cohort.failures, { quantiles: !profileFunctions });
+    error.performanceReport = report;
+    throw error;
+  }
   finally {
     if (fixture) {
       try {
         await cleanup();
-      } catch (error) { throw new AggregateError(primaryError ? [primaryError, error] : [error], 'Performance collection/cleanup failed'); }
+      } catch (error) {
+        report.status = 'FAIL';
+        const failure = new AggregateError(primaryError ? [primaryError, error] : [error], 'Performance collection/cleanup failed');
+        failure.performanceReport = report;
+        throw failure;
+      }
     }
   }
 }

@@ -165,7 +165,7 @@ jobs:
     name: Native prediction performance comparison
     needs: [validate, database-platform]
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -180,7 +180,7 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Repeat native baselines and collect separate function diagnostics
-        run: node scripts/database/run-ci-prediction-performance.mjs "$RUNNER_TEMP/kajo-prediction-performance-report.json" --compare-skip-history
+        run: node scripts/database/run-ci-prediction-performance.mjs "$RUNNER_TEMP/kajo-prediction-performance-report.json" --diagnose-skip-history
 
       - name: Upload bounded diagnostic report
         if: always()

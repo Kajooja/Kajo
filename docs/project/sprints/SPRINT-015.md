@@ -341,7 +341,12 @@ rollout admission**, not a revised interpretation of any v1 comparison.
   Retain invalid-clock controls and exact public response/frozen-source retries.
 - Capture relevant acquisition/availability query plans through closed diagnostic
   copies with explicit inputs. Label separate query replays as replays, not
-  original nested cached plans. Do not subtract instrumentation overhead from
+  original nested cached plans. PostgreSQL requires the acquisition EXPLAIN
+  copies to be VOLATILE; only those closed `pg_temp` copies use that metadata.
+  Their query bodies/inputs remain exact, the fixture has no concurrent writer,
+  and original/parity functions retain STABLE. This diagnostic plan difference
+  prevents claims of identical original snapshot/planning behavior.
+  Do not subtract instrumentation overhead from
   timings or treat instrumented times as uninstrumented performance evidence.
   Snapshot function definitions/metadata and verify their restoration after
   rollback; retain full canonical-row and skip-ledger cleanup checks.

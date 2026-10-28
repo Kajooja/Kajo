@@ -77,6 +77,12 @@ the old comparison rules/results. [Sprint 015](../project/sprints/SPRINT-015.md#
 owns its predeclared order, controls, physical-state limits and synthetic witness
 retention.
 
+`native-skip-call-series.{mjs,test.mjs}` validates the six diagnostic packets,
+same-variant control/trace denominators and exact source/protocol identities,
+then reports per-stack counts and timing ranges without pooled quantiles or
+rollout admission. The runner retains an incomplete stack's completed collections
+and phase if observation or cleanup fails; missing evidence is never a fast sample.
+
 `20261028081350_native_skip_acquisition_prefilter.sql` changes only
 `acquire_native_candidates_v1`: its materialized potential-skip superset now also
 avoids redundant empty-history reads for Discovery. Actual skip decisions,
