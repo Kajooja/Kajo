@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **PLANNED**
+Status: **IN PROGRESS — first native Personal numeric baseline #398; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -104,10 +104,45 @@ methods retain a working baseline and a written decision; an unmet mandatory
 quality gate stays open. A missing physical-device observation is recorded and
 does not become an invented pass.
 
+## First source packet — #398
+
+[Issue #398](https://github.com/Kajooja/Kajo/issues/398) follows accepted #397.
+It implements the Personal/domain mean control and the first shrunk domain-prior
+location baseline, with raw canonical resolved native labels and a same-cutoff
+candidate pool. This bounded source test does not implement content fit,
+identified response spread, model selection, final evaluation or serving.
+All Items in this location-only model retain equal forecasts; no jitter creates
+pretend differentiation. No permitted prior means Personal-mean fallback;
+no labels/prior means unavailable. No external prior is admitted by this packet.
+
+The native bridge joins `NATIVE_RATING.source_event_id` to the original Event
+rating and exercises correction, clear, Undo, withdrawal, domain/Profile isolation,
+native microsecond cutoffs and pre-action input/oracle capture. The pure core
+test calls TypeScript before later answers; the native fixture replays TypeScript
+after the SQL batch against its retained inputs and independent numeric oracle.
+The fixture answer updates history for another candidate, rather than establishing
+a prospective forecast/outcome pair. Actual before-answer forecast persistence
+remains the successor obligation. Event weights and old
+rank scores are never inverted into grades. Snapshot observation is not a
+certificate that a past transaction saw the same prefix. Existing feasibility
+reports retain their ordinal-only capability contract.
+
+After source acceptance, [#400](https://github.com/Kajooja/Kajo/issues/400) adds
+durable prospective numeric capture and later-label reconciliation using the same
+computation, followed by
+Profile-macro mean-loss comparison under development-selected requirements and
+an untouched final window. Existing Sprints 014/015 acceptance remains open;
+#398 does not make the whole Sprint 016 or Engine V1 complete.
+
 ## Delivery record
 
 - Design: planned by the owner's 2026-10-25 engine-first decision.
-- Source / CI: not delivered by this plan.
+- Source / CI: #398 implements the bounded computation on
+  `feat/native-personal-rating-baseline`. All 350 engine tests, built exports and
+  the 15-case full-schema PGlite bridge pass locally; core coverage includes all
+  eleven integer grades **0–10**. Full local root check stopped at the inherited
+  catalogue process-cleanup assertion. Required native PostgreSQL and final CI
+  acceptance belong to the PR; STATUS owns continuation to #400 after integration.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.

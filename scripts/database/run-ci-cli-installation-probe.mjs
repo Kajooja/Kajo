@@ -51,6 +51,7 @@ import { verifyNativeV4ReceiptUpgrade, verifyNativeV4Receipt, verifyNativeV4Rece
 import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption, verifySharedPreparedHostedVariant } from './shared-prepared-consumption.mjs';
 import { verifySharedPreparedConcurrency } from './shared-prepared-consumption-concurrency.mjs';
 import { verifySharedForecastOutcomes } from './shared-forecast-outcomes.mjs';
+import { verifyPersonalRatingBaseline } from './personal-rating-baseline.mjs';
 import { verifyNativeSkipPrefilter } from './native-skip-prefilter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
@@ -94,6 +95,8 @@ try {
     assert.equal(deadlineRollback.absent, true, 'Timed-out server statement left partial DDL');
     const sqlStatementDeadline = { status: 'PASS', serverTimeoutMs: 5000, dockerTimeoutMs: 10_000,
       rollback: 'owned test table absent after server statement cancellation' };
+    const nativePersonalRatingBaseline = await verifyPersonalRatingBaseline(exec);
+    assert.equal(nativePersonalRatingBaseline.status, 'PASS');
     const nativeDiscoveryParity = await verifyNativeDiscoveryParity(exec);
     assert.equal(nativeDiscoveryParity.status, 'PASS');
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), expected,
@@ -499,7 +502,7 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
-      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativeSkipPrefilter,
+      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativePersonalRatingBaseline, nativeSkipPrefilter,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,

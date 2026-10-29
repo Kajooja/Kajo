@@ -1,4 +1,5 @@
 import type { ArtifactVersion, Observation, PredictionScope, TargetDefinition } from './contracts.js';
+import { shrunkRatingResidual } from './rating-location.js';
 
 /** Bounded offline estimators. This separate export is never imported by serving. */
 export const ratingVariants = ['global-mean', 'item-mean', 'state-static', 'state-recent',
@@ -282,7 +283,7 @@ export function forecastRatingBatch(a: RatingArtifact, query: RatingQuery): Reco
     seen.add(row.objectId); previous = row.occurredAt;
   }
   const c = a.config, prefix = query.prefix, residuals = new Map(prefix.map(row => [row.objectId, observed(row) - (a.items[row.objectId]?.mean ?? a.globalMean)]));
-  const durable = [...residuals.values()].reduce((x, y) => x + y, 0) / (prefix.length + c.subjectShrinkage);
+  const durable = shrunkRatingResidual([...residuals.values()], c.subjectShrinkage);
   const groups = groupHistory(prefix), lastGroups = groups.slice(-c.recentGroups);
   const recentResidual = lastGroups.length ? mean(lastGroups.map(g => mean(g.map(row => residuals.get(row.objectId)!)))) : 0;
   const recentCorrection = lastGroups.length / (lastGroups.length + 1) * recentResidual;

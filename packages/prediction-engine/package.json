@@ -82,6 +82,14 @@
     "./adapters/kajo-taste-selection": {
       "types": "./dist/adapters/kajo-taste-selection.d.ts",
       "import": "./dist/adapters/kajo-taste-selection.js"
+    },
+    "./personal-rating": {
+      "types": "./dist/personal-rating.d.ts",
+      "import": "./dist/personal-rating.js"
+    },
+    "./adapters/kajo-personal-rating": {
+      "types": "./dist/adapters/kajo-personal-rating.d.ts",
+      "import": "./dist/adapters/kajo-personal-rating.js"
     }
   },
   "scripts": {

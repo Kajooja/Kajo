@@ -26,6 +26,21 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Native Personal numeric baseline — Sprint 016 / #398
+
+| Boundary | Source and scope |
+| --- | --- |
+| Pure own-scale point baseline | `packages/prediction-engine/src/personal-rating.ts`, separate `./personal-rating` export; complete resolved numeric prefix, distinct Item mean control and permitted domain prior with shrunk residual; no serving activation |
+| Shared residual arithmetic | `packages/prediction-engine/src/rating-location.ts`; reused by existing D2 `research.ts` without broadening external evidence admission or changing experiment semantics |
+| Native fixture adapter | `packages/prediction-engine/src/adapters/kajo-personal-rating.ts`; original Event/raw rating joins, canonical resolver identity, Personal/domain isolation and same-cutoff declared pool; isolated fixtures only |
+| Verification | `packages/prediction-engine/test/personal-rating.test.ts`, adapter tests and `scripts/database/personal-rating-baseline*`; reusable rollback fixture runs in PGlite and the native CLI gate |
+
+STATUS and the PR own exact source/CI acceptance. Numeric capability belongs only
+to these new immutable point forecasts. Existing feasibility/ranking reports keep
+their original capabilities. No migrations, hosted writes, fitted prior, content
+ranking, calibrated response spread or quality admission follow. Durable numeric
+capture/evaluation remains separate from this fixture computation.
+
 ## Native prediction performance — Sprint 015
 
 `scripts/database/native-prediction-performance.{mjs,test.mjs}` owns the bounded
