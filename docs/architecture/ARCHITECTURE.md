@@ -1759,6 +1759,19 @@ The independent engine's full cycle and modules are in [PREDICTIVE_MEMORY_ENGINE
 
 Current V0/V1 SQL boundaries remain valid while appropriate. Only the accepted public serving boundary is exposed to clients; private baselines/workers remain private. A future service or package may replace a component only after behavior/parity and admission tests, not by duplicating the whole scorer independently. No transport/language choice is made mandatory by portability.
 
+The #400 private numeric evaluation source exercises a bounded trusted worker
+boundary without replacing serving. One dedicated native transaction holds the
+lifecycle, raw-Event and Profile locks while preparing complete input, invoking
+the existing compiled TypeScript location baseline and finalizing immutable
+output. The closed first-answer wrapper runs only after that transaction commits
+and delegates the canonical action write to the existing command owner. Native
+SQL validates ownership and exact input/output bindings; only the trusted worker
+supplies the numerical computation. API roles have no direct access to these
+helpers or artifacts. Pending captures are invalidated by outside-path reports;
+source erasure removes dependent copies. Current-state reconciliation never
+rewrites the original first measurement. The persistent psql session is isolated
+CI transport, not an exposed production service. See [the numeric contract](../domain/PREDICTION_MODEL.md#durable-prospective-numeric-source--sprint-016--400).
+
 ### Online state
 
 Existing Kajo layers remain:

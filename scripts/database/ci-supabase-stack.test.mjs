@@ -12,7 +12,7 @@ async function mockedStackLifecycle(fixture) {
   try {
     const bin = join(directory, 'bin');
     await mkdir(bin);
-    for (const name of ['ci-supabase-stack.mjs', 'buffered-sql-command.mjs']) {
+    for (const name of ['ci-supabase-stack.mjs', 'buffered-sql-command.mjs', 'isolated-sql-session.mjs']) {
       await copyFile(new URL(name, import.meta.url), join(directory, name));
     }
     const configuration = join(directory, 'fixture.json');
@@ -301,7 +301,7 @@ test('local installation requires a new absolute workspace and the reviewed arch
 test('platform-only stack lifecycle loads without application source modules or npm dependencies', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'kajo-platform-module-'));
   try {
-    for (const name of ['ci-supabase-stack.mjs', 'buffered-sql-command.mjs']) {
+    for (const name of ['ci-supabase-stack.mjs', 'buffered-sql-command.mjs', 'isolated-sql-session.mjs']) {
       await copyFile(new URL(name, import.meta.url), join(directory, name));
     }
     execFileSync(process.execPath, ['--input-type=module', '-e', "await import('./ci-supabase-stack.mjs')"],

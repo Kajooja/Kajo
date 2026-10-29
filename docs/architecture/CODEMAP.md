@@ -26,6 +26,15 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Prospective Personal numeric capture — Sprint 016 / #400
+
+| Responsibility | Implementation |
+| --- | --- |
+| Private immutable capture and first-answer lifecycle | `supabase/migrations/20261029095452_personal_rating_prospective.sql`; dedicated native preparation/finalization, original first response, current-state inspection and source erasure; no public grants or serving activation |
+| Trusted native adapter | `packages/prediction-engine/src/adapters/kajo-personal-rating-prospective.ts`, optional `./adapters/kajo-personal-rating-prospective`; validates owner, raw Event joins, selected target, delivered pool, exact cutoff and explicit evidence origin; native-only baseline |
+| TypeScript/native integration and regression | `scripts/database/personal-rating-prospective.mjs`, `.test.mjs`, `personal-rating-prospective-concurrency.mjs`; actual compiled computation between native prepare/finalize and separate later answer; PGlite and independent PostgreSQL sessions |
+| Native persistent SQL test session | `scripts/database/isolated-sql-session.mjs`, `ci-supabase-stack.mjs`; bounded owned psql connection allows TypeScript computation while native transaction locks remain held; CI-only transport |
+
 ## Native Personal numeric baseline — Sprint 016 / #398
 
 | Boundary | Source and scope |

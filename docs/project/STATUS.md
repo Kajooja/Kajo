@@ -2,7 +2,7 @@
 
 Last updated: **2026-10-29**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, first native Personal numeric baseline #398 source packet; #400 follows its CI-gated acceptance. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, durable prospective Personal numeric capture #400 source packet; the #398 baseline is accepted through #401. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,18 +11,23 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — numeric baseline #398, then prospective capture #400
+## Current handoff — prospective numeric capture #400
 
-[PR #397](https://github.com/Kajooja/Kajo/pull/397) is accepted as main
-`b3fad53d7a811e82807e48ab77b7817a465b3061`, with tested tree
-`08743a875ea102d56c4c1ce94c671071e1a45942`. All six required
-[CI #814, attempt 2](https://github.com/Kajooja/Kajo/actions/runs/40744973376)
-gates passed: **2,275 tests and four configured iOS/Android exports**.
-The feasibility boundary is complete as source; it does not supply numeric
-forecasts, admit quality or close Sprint 015. Its legacy capability labels remain
-unchanged. The cancelled first attempt and single owner-authorized rerun remain
-recorded in the PR; [#399](https://github.com/Kajooja/Kajo/issues/399) tracks the
-separate bounded validation-diagnostics follow-up.
+[PR #401](https://github.com/Kajooja/Kajo/pull/401) is accepted as main
+`2d09d87bb8a4274deff0fd0aa099fdc82b462037`, with source/tested/accepted tree
+`03ba583afbc26bbabd2ed548c4fb0b98a5912036`. All six required
+[CI #816](https://github.com/Kajooja/Kajo/actions/runs/40841255469) gates passed:
+**2,294 tests and four configured iOS/Android exports**. The native artifact
+independently reproduces all 15 numerical fixture cases and preserves source,
+retry, correction, Undo, withdrawal and exact microsecond boundaries. #398 is
+closed; do not repeat the baseline implementation. The full **0–10** integer
+scale remains supported. Fixture success supplies source conformance, not
+measured usefulness or serving admission.
+
+The prior [#397](https://github.com/Kajooja/Kajo/pull/397) feasibility source is
+also accepted. Its ordinal-only capability labels remain unchanged. The
+separate [#399](https://github.com/Kajooja/Kajo/issues/399) CI diagnostics follow-up
+is not an implicit competing engine task.
 
 **Owner priority — 2026-10-28:** investigate performance deviations now only when
 material to development or MVP; otherwise continue required engine work. The
@@ -39,41 +44,40 @@ installations include the 54th candidate forward; their CI success does not
 activate or admit that forward in the hosted application. No migration is removed
 or rewritten, and no account, retained forecast or history is reset.
 
-**Source packet pending acceptance:** [Issue #398](https://github.com/Kajooja/Kajo/issues/398),
-branch `feat/native-personal-rating-baseline`, based on accepted #397. This packet implements one
-pure own-scale numeric baseline and a rollback-only native fixture bridge:
-Personal/domain mean control and a permitted versioned domain prior with a
-shrunk Personal residual. Without a permitted prior use the Personal mean;
-without supported labels/prior report unavailable. Resolve canonical native
-ratings through `private.personal_source_evidence_v1` and the original Event
-rating, preserving zero, correction, clear, Undo and withdrawal lineage.
+**Active source packet:** [Issue #400](https://github.com/Kajooja/Kajo/issues/400),
+branch `feat/prospective-personal-rating`, starts from accepted #401. It adds a
+private, dedicated native transaction that captures the complete canonical raw
+rating prefix and actual delivered Personal candidate pool, runs the existing
+TypeScript mean baseline, and durably finalizes the selected target forecast
+before a later answer transaction. The native-only fallback is explicit; no
+external prior, content differentiation or calibrated uncertainty is introduced.
 
-This is a complete resolved-label-prefix input, separate from bounded Working
-history and frozen ordinal features. The label prefix and candidate pool share
-one native cutoff. Distinct Items supply support; tags/actions/retries do not
-multiply it. Constant candidates remain genuine ties. Location is supported
-without claiming learned content differentiation, response spread, calibrated
-uncertainty or predictive usefulness. No scorer activation, migration, hosted
-write or historical source rewrite is included.
+The bounded first-answer path is a private trusted wrapper around the existing
+canonical rating command. It retains the original numeric answer and comparison;
+ordinary later correction, Undo and clear change current/future evidence without
+rewriting that measurement. Outside-path answers are not silently promoted to
+prospective first answers by sorting stored timestamps. Input or answer source
+erasure withdraws dependent copied data and retains the source-owned consumed-ID
+boundary. Synthetic test provenance remains synthetic.
 
-The local core/adapter tests pass, including every integer rating from **0 to 10**,
-and the 15-case full-schema PGlite bridge preserves canonical rows/functions.
-All 350 engine tests and built exports pass. Local root `npm run check` stopped
-on the existing catalogue operator's descendant-process cleanup test; this is
-not a full local pass. The required final-source CI and native PostgreSQL receipt
-belong to the implementation PR; never merge with a failed required gate.
-The SQL fixture freezes inputs and an independent oracle before later history
-changes, then TypeScript replays those inputs after the batch. This is conformance,
-not an actual persisted prospective numeric forecast/outcome pair.
+This is source-only evaluation infrastructure. It does not route mobile answers,
+collect an owner cohort, activate a scorer or install any hosted forward. Native
+independent-session checks must prove both capture/answer orders, raw Event
+writers and withdrawal; a single-session fixture is not concurrency evidence.
+Local checks pass: all 426 database tests and 353 engine tests, including
+24 committed numeric lifecycle cases,
+five populated-upgrade checks and nine persistent-session protocol tests. The
+full local root check encounters inherited CLI stderr assertions because this
+workspace injects an experimental HTTP-proxy warning; it is not a full pass.
+Final required CI, source identities and native acceptance belong to the
+implementation PR. Never merge with a failed required gate.
 
-**Continuation rule:** until this source packet passes CI and is integrated,
-finish its named branch/PR. After integration, do not repeat #398: the sole next
-source packet is
-[#400](https://github.com/Kajooja/Kajo/issues/400): durable prospective numeric
-forecast capture and later-label reconciliation under the
-existing declared evaluation protocol, before any quality admission or serving
-change. Do not substitute fixtures or the pooled research RMSE for Profile-macro
-MSE evaluation. #394 and #399 are not competing implicit active packets.
+**Continuation rule:** finish #400 on its named branch and required CI. After integration, the sole next source packet is
+[#402](https://github.com/Kajooja/Kajo/issues/402): declared numeric evaluation
+coverage and the Profile-macro report. Do not repeat #400. Profile-macro mean-loss evaluation,
+coverage, genuine later labels and independently selected quality requirements
+remain open. Do not substitute pooled research RMSE or synthetic fixture results.
+#394 and #399 remain separate follow-ups.
 
 A read-only hosted check on **2026-10-28T18:09:23Z** confirms acquisition body
 MD5 `6e0aba591a90c194c5bae49f0361084f` and no installed skip-prefilter forward.

@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — first native Personal numeric baseline #398; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398 accepted; prospective numeric capture #400 in progress; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -129,20 +129,29 @@ reports retain their ordinal-only capability contract.
 
 After source acceptance, [#400](https://github.com/Kajooja/Kajo/issues/400) adds
 durable prospective numeric capture and later-label reconciliation using the same
-computation, followed by
-Profile-macro mean-loss comparison under development-selected requirements and
+computation. Its successor [#402](https://github.com/Kajooja/Kajo/issues/402)
+adds declared numeric evaluation coverage and the Profile-macro report, before
+mean-loss comparison under development-selected requirements and
 an untouched final window. Existing Sprints 014/015 acceptance remains open;
 #398 does not make the whole Sprint 016 or Engine V1 complete.
 
 ## Delivery record
 
 - Design: planned by the owner's 2026-10-25 engine-first decision.
-- Source / CI: #398 implements the bounded computation on
-  `feat/native-personal-rating-baseline`. All 350 engine tests, built exports and
-  the 15-case full-schema PGlite bridge pass locally; core coverage includes all
-  eleven integer grades **0–10**. Full local root check stopped at the inherited
-  catalogue process-cleanup assertion. Required native PostgreSQL and final CI
-  acceptance belong to the PR; STATUS owns continuation to #400 after integration.
+- Source / CI: #398 is accepted through [#401](https://github.com/Kajooja/Kajo/pull/401),
+  main `2d09d87bb8a4274deff0fd0aa099fdc82b462037`, tested tree
+  `03ba583afbc26bbabd2ed548c4fb0b98a5912036`. All six CI #816 gates pass,
+  including 2,294 tests and four exports. Its independently checked native
+  artifact reproduces the 15 numeric cases; all integer grades **0–10** are covered.
+- Source successor: #400 adds private durable numeric forecasts and a closed
+  first-answer measurement boundary using the same TypeScript computation.
+  The shared 24-case fixture runs actual compiled TypeScript before the
+  committed first answer, with all grades 0–10, correction/Undo/clear, missing
+  support, expiry, outside-path retirement and physical withdrawal. Five
+  populated-upgrade and nine persistent-session protocol tests pass; the complete
+  local database suite passes all 426 tests. Independent
+  native lock proofs and final CI acceptance are recorded in its PR; STATUS
+  owns the active handoff.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.
