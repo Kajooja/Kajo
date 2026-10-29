@@ -130,9 +130,10 @@ reconciliation must precede the predeclared Profile-macro MSE/coverage experimen
 
 ### Durable prospective numeric source — Sprint 016 / #400
 
-The private native evaluation path freezes a selected never-answered Personal
-Item from an actual delivered source pool. A dedicated READ COMMITTED transaction
-locks the lifecycle boundary, raw Event writes and Profile, captures the complete
+The private native evaluation path freezes a selected Personal Item with no prior
+report in retained source history, from an actual delivered source pool. A
+dedicated READ COMMITTED transaction locks the lifecycle boundary, raw Event
+writes and Profile, captures the complete
 canonical raw-label prefix, invokes the same `forecastPersonalRatingBaseline`
 TypeScript computation, and finalizes its immutable output before COMMIT. A
 deferred guard requires finalization and rejects target answers in that same
@@ -158,8 +159,11 @@ explicit coverage states. Source withdrawal and outside-path retirement share a
 truthful grouped exclusion; this packet cannot recover their individual causes
 from removed payloads. Later corrections change future
 prefixes, never the original forecast or measured answer. Source erasure removes
-dependent copied inputs, forecasts and measurements; a consumed allocation
-prevents the withdrawn ID from being silently reused.
+dependent copied inputs, forecasts and measurements. Event withdrawal retains
+the consumed capture allocation while its prediction source exists, preventing
+reuse of that ID. Erasing the prediction source also removes the allocation.
+Retained-history and target checks cannot certify that an Item was never answered
+in erased history or reserve its evaluation opportunity permanently.
 
 Delivery is not proof of an impression or a new experience. This source supports
 forecast-before-report measurement with unknown experience time; newly experienced

@@ -41,9 +41,11 @@ An answer arriving outside the closed boundary is not recovered as a first
 measurement by timestamp sorting. Earlier evaluation-only Taste answers also
 exclude a supposedly never-answered target, even when they wrote no native Event.
 
-Physical source withdrawal removes dependent copied numeric evidence and prevents
-reuse of its consumed capture identity. An ordinary correction is not physical
-withdrawal. The synthetic/native origin declaration is retained, and delivery
+Physical Event withdrawal removes dependent copied numeric evidence and retains
+the consumed capture allocation while its prediction source exists. Erasing that
+prediction source also removes the allocation. These checks cannot certify prior
+answers in erased history. An ordinary correction is not physical withdrawal.
+The synthetic/native origin declaration is retained, and delivery
 alone does not establish exposure, consumption time or recommendation benefit.
 This is private source infrastructure; no new public action or mobile route is
 activated. [Prediction model](PREDICTION_MODEL.md#durable-prospective-numeric-source--sprint-016--400)

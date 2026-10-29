@@ -80,7 +80,9 @@ try {
           }
           assert.ok(baselineDefinition, 'First diagnostic stack must provide the actual predecessor');
           skipCallDiagnostics = await collectSkipCallDiagnostics(exec, { ...context, baselineDefinition,
-            migration: installation.files.at(-1) });
+            // This diagnostic belongs to the frozen comparison's candidate,
+            // even after unrelated forwards extend the current installation.
+            migration: variants.CANDIDATE.files.at(-1) });
           pending.skipCallDiagnostics = skipCallDiagnostics;
           pending.phase = 'historyDiagnostics';
         } : undefined;
