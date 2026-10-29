@@ -23,6 +23,59 @@ estimates are 7 (rating) and 50 (energy); after a known continuation, recalled
 estimates are 9 and 45. This demonstrates execution and portability, not learned
 quality, causal effects, calibrated confidence or real non-media competence.
 
+## Personal numeric location baseline — #398
+
+The separate `./personal-rating` export consumes an already authorized, complete,
+canonically resolved raw-label prefix. It does not read a database, resolve native
+Event receipt revisions, fit a prior or activate a serving policy. The Kajo
+fixture adapter is explicitly limited to `ISOLATED_NATIVE_FIXTURE`; arbitrary
+JSON, hashes and timestamp fields do not authorize native data access or certify
+historical completeness.
+
+For one declared Subject/domain and cutoff, the control is the arithmetic mean
+of distinct eligible Item ratings. The first candidate uses one permitted,
+versioned domain prior `p` and an explicit positive shrinkage `s`:
+
+```text
+control = sum(rating) / support
+candidate = p + sum(rating - p) / (support + s)
+```
+
+The residual arithmetic is shared with D2's existing state-static implementation;
+its research admission, source validator and experiment remain unchanged. With no
+permitted prior, the candidate falls back to the Personal mean. With no labels,
+only a permitted prior supplies a value; with neither, the result is unavailable.
+No default shrinkage, numeric acceptance threshold or admitted real prior is
+invented. Raw labels include zero and remain on 0–10; a missing rating is not zero.
+
+This location-only model gives every candidate the same forecast. It identifies
+neither content preference nor response spread, and a person's average is not a
+psychological generosity parameter. Corrected labels require a fresh canonical
+resolved snapshot; identical duplicate records do not add support and conflicting
+Item/source contributions fail. Future and foreign scope records cannot contribute.
+Cutoffs are exact decimal Unix microseconds, with occurrence and availability
+at or before the common cutoff. Returned forecasts, labels, versions and candidate
+pools are immutable copies; later answers do not change them.
+
+The reusable rollback-only database fixture resolves
+`private.personal_source_evidence_v1`, selects `NATIVE_RATING` and joins its
+`source_event_id` to the original `ITEM_RATED` value. It freezes inputs and an
+independent numeric oracle before subsequent answers, then replays the pure
+computation after the SQL batch. The later answer updates the history for another
+candidate; this is not a persisted prospective forecast/outcome pair. It does not invert `event_weight`, read bounded Working history as
+complete numeric history, or turn existing rank scores into grades. Native
+PostgreSQL and PGlite run the same verifier; the exact native receipt belongs to
+STATUS/the PR. The declared fixture Item pool is not a claim of serving-policy
+eligibility or historical catalogue availability.
+
+New forecasts with a numeric value carry `NUMERIC_POINT_BASELINE_V1`; absent
+values carry `NUMERIC_POINT_UNAVAILABLE_V1`. Both are `UNCALIBRATED`, retain
+synthetic fixture provenance where applicable, and have no quality or serving
+admission. Existing Working feasibility reports retain their older
+ordinal-only capabilities. Durable prospective numeric capture, source-withdrawal
+lifecycle, Profile-macro MSE evaluation and demonstrated usefulness remain separate
+successors; passing synthetic fixtures does not supply those outcomes.
+
 ## Executable boundaries
 
 | Export / function | Contract |
@@ -36,6 +89,8 @@ quality, causal effects, calibrated confidence or real non-media competence.
 | `./adapters/kajo` | Structural Profile/User/Item/rating snapshots; Shared is its own Subject; acting User remains separate; no app imports |
 | `./ranking-conformance` | Compare complete frozen ranking snapshots with exact scope, policy, candidate identity and eligibility, and an explicit scalar tolerance; no scoring or outcome evaluation |
 | `./adapters/kajo-native-prediction` | Normalize actual private native run/candidate snapshots through the existing Kajo scope adapter; preserve declared candidate acquisition and input clocks; ranking scores remain uncalibrated |
+| `./personal-rating` | Pure `forecastPersonalRatingBaseline`: complete resolved raw-label prefix, Personal/domain mean control, permitted domain prior plus shrunk residual, immutable numeric point forecasts; source-only and uncalibrated |
+| `./adapters/kajo-personal-rating` | Strict `normalizeKajoPersonalRatingPrefix` for isolated native fixture snapshots; original numeric Event join, canonical source identity, exact microsecond cutoff and declared same-snapshot candidate pool |
 | `./working-state` | Pure `deriveWorkingState` and default-OFF `scoreWorkingAdjustment`; bounded independent current-session Item support, correction closure and explicit STATIC/ORDERED controls |
 | `./adapters/kajo-working-state` | Strict `normalizeKajoWorkingSession` for authorized Personal canonical Event/session snapshots; no database reader, writer, app import or authorization replacement |
 | `./working-evaluation` | Pure `summarizeWorkingSupport`, `freezeWorkingEvaluationPlan`, `evaluateWorkingPlan` and `evaluateWorkingBatch`; conditional OFF-exposed pairwise comparison, planned coverage and Item weight concentration; no capture writer or admission |

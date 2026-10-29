@@ -1,6 +1,6 @@
 # Sprint 015 — Shared prediction inputs and trustworthy evaluation
 
-Status: **IN PROGRESS — expected-rating evaluation feasibility #396; optional skip-prefilter diagnosis #394 deferred under the October 28 priority decision; native/hosted performance and quality acceptance remain separate gates**
+Status: **IN PROGRESS — expected-rating evaluation feasibility #396 accepted through #397; numeric source successor #398 in Sprint 016; optional skip-prefilter diagnosis #394 deferred under the October 28 priority decision; native/hosted performance and quality acceptance remain separate gates**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: active Sprint 014 source stack and explicit disposition of remaining
 acceptance; [ROADMAP](../ROADMAP.md) owns order. Sprint IDs are distinct from the
@@ -112,7 +112,8 @@ Keep the predecessor serving baseline. Re-enter before broader #391 activation
 or on relevant baseline/runtime correctness, capacity or declared latency evidence.
 This does not close this sprint, MVP-UX-008 or the engine quality gate.
 
-[Issue #396](https://github.com/Kajooja/Kajo/issues/396) extends the existing Working
+[Issue #396](https://github.com/Kajooja/Kajo/issues/396), accepted through
+[PR #397](https://github.com/Kajooja/Kajo/pull/397), extends the existing Working
 cohort/report v2 validation with an executable feasibility boundary. It binds a
 Personal own-scale expected-rating target, source identities, Profile analysis,
 fixed controls and TRAIN/DEVELOPMENT/FINAL windows with outcome-horizon separation.
@@ -130,8 +131,15 @@ captures. The 47 valid retained Taste panels across two sessions are not an
 untouched prospective cohort or certified own-scale numeric forecasts. No
 identity/label rows were exported. STATUS owns the baseline identity and the
 single active packet; the implementation PR owns final source/CI acceptance.
-This makes the next Sprint 016 numerical-baseline and evidence task explicit
-without repeating the accepted enrollment/parity machinery.
+All six CI #814 attempt-2 gates passed on the final source: 2,275 tests and
+four configured exports. Accepted main is `b3fad53d7a811e82807e48ab77b7817a465b3061`;
+its tree equals tested `08743a875ea102d56c4c1ce94c671071e1a45942`. The PR retains
+the cancelled initial attempt and single owner-authorized rerun; #399 separately
+tracks bounded validation diagnostics. This completes the feasibility source
+boundary, while this sprint's runtime/quality acceptance remains open.
+The one successor is [#398](https://github.com/Kajooja/Kajo/issues/398), Sprint 016's
+native Personal numeric baseline, without repeating accepted enrollment/parity
+machinery or activating the optional #391 migration.
 
 ## Native database performance protocol
 

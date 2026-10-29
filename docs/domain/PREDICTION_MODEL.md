@@ -101,6 +101,33 @@ Raw scores or inferred latent utility are not comparable cardinal happiness
 across people. Cross-Profile retrieval and Shared aggregation need supported
 response-aware comparisons, uncertainty and their own declared target semantics.
 
+### First numerical source baseline — Sprint 016 / #398
+
+The bounded first implementation is the separate portable `./personal-rating`
+computation and isolated native fixture adapter. It predicts one domain-level
+location for a PersonalProfile: the mean of eligible distinct resolved numeric
+Item labels, compared with a permitted versioned domain prior plus
+`sum(rating - prior) / (support + shrinkage)`. The prior and positive shrinkage
+are explicit inputs. Without a permitted prior use the Personal mean; without
+labels or prior return unavailable. This is not yet an Item/content model:
+candidate values tie, and response spread remains unidentified.
+
+The native fixture uses `private.personal_source_evidence_v1` and the selected
+`NATIVE_RATING.source_event_id` to read the original Event rating, including zero.
+It captures the complete resolved label prefix and a declared canonical Item pool
+at one exact native cutoff; future answers affect only subsequent snapshots.
+Correction, clear, Undo and withdrawal are resolved by the existing native owner,
+not by treating distinct Event receipts as revisions of one portable record.
+The fixture's current snapshot and created-at witnesses do not establish the
+commit visibility of an arbitrary historical prediction.
+
+This source-only numeric capability is separately versioned and uncalibrated.
+No old ranking score, bounded Working prefix or feasibility-report capability is
+relabelled. No serving change, fitted/admitted prior or measured recommendation
+benefit follows. Durable prospective numeric forecasts and later-label
+reconciliation must precede the predeclared Profile-macro MSE/coverage experiment.
+[STATUS](../project/STATUS.md) owns source/native acceptance and the next packet.
+
 ### Three-action learning boundary
 
 Current Taste/Discovery feed actions are **List saving, numeric rating and Ohita**.

@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-10-28**
+Last updated: **2026-10-29**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **015 — shared prediction inputs and trustworthy evaluation**, native expected-rating evaluation feasibility #396 in progress; optional skip-prefilter diagnosis #394 deferred; native, hosted/device and quality acceptance remain distinct gates.
+Sprint: **016 — expected ratings and each user's rating style**, first native Personal numeric baseline #398 source packet; #400 follows its CI-gated acceptance. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,14 +11,18 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — native evaluation feasibility #396 / Sprint 015
+## Current handoff — numeric baseline #398, then prospective capture #400
 
-[PR #395](https://github.com/Kajooja/Kajo/pull/395) is accepted as main
-`b7e38a6533eaa0771070b41d1fed1fe592e67927`, tree
-`9c80ef29e09e6d68c1b4e5b03ab2a2d79b31f12b`, after all six final
-[CI #812](https://github.com/Kajooja/Kajo/actions/runs/40726376980) gates,
-2263 tests and four configured iOS/Android exports. Its PR owns the complete
-#811/#812 paired timings and independently verified native preservation receipts.
+[PR #397](https://github.com/Kajooja/Kajo/pull/397) is accepted as main
+`b3fad53d7a811e82807e48ab77b7817a465b3061`, with tested tree
+`08743a875ea102d56c4c1ce94c671071e1a45942`. All six required
+[CI #814, attempt 2](https://github.com/Kajooja/Kajo/actions/runs/40744973376)
+gates passed: **2,275 tests and four configured iOS/Android exports**.
+The feasibility boundary is complete as source; it does not supply numeric
+forecasts, admit quality or close Sprint 015. Its legacy capability labels remain
+unchanged. The cancelled first attempt and single owner-authorized rerun remain
+recorded in the PR; [#399](https://github.com/Kajooja/Kajo/issues/399) tracks the
+separate bounded validation-diagnostics follow-up.
 
 **Owner priority — 2026-10-28:** investigate performance deviations now only when
 material to development or MVP; otherwise continue required engine work. The
@@ -35,15 +39,41 @@ installations include the 54th candidate forward; their CI success does not
 activate or admit that forward in the hosted application. No migration is removed
 or rewritten, and no account, retained forecast or history is reset.
 
-**One active packet:** [Issue #396](https://github.com/Kajooja/Kajo/issues/396),
-branch `feat/native-quality-feasibility`. Extend the existing Working cohort/report
-v2 workflow with an executable expected-rating feasibility boundary. Reuse its
-roster, inventory, native-source and outcome validation; preserve v1/v2 reports.
-Bind the declared target, controls, analysis unit, temporal roles/windows, source
-identity and numerical acceptance/resource requirements. Missing requirements,
-missing numeric forecasts and insufficient outcomes remain explicit blockers;
-fixtures, pair counts and rank scores cannot become native quality or grades.
-This packet adds no scorer, serving change or hosted write.
+**Source packet pending acceptance:** [Issue #398](https://github.com/Kajooja/Kajo/issues/398),
+branch `feat/native-personal-rating-baseline`, based on accepted #397. This packet implements one
+pure own-scale numeric baseline and a rollback-only native fixture bridge:
+Personal/domain mean control and a permitted versioned domain prior with a
+shrunk Personal residual. Without a permitted prior use the Personal mean;
+without supported labels/prior report unavailable. Resolve canonical native
+ratings through `private.personal_source_evidence_v1` and the original Event
+rating, preserving zero, correction, clear, Undo and withdrawal lineage.
+
+This is a complete resolved-label-prefix input, separate from bounded Working
+history and frozen ordinal features. The label prefix and candidate pool share
+one native cutoff. Distinct Items supply support; tags/actions/retries do not
+multiply it. Constant candidates remain genuine ties. Location is supported
+without claiming learned content differentiation, response spread, calibrated
+uncertainty or predictive usefulness. No scorer activation, migration, hosted
+write or historical source rewrite is included.
+
+The local core/adapter tests pass, including every integer rating from **0 to 10**,
+and the 15-case full-schema PGlite bridge preserves canonical rows/functions.
+All 350 engine tests and built exports pass. Local root `npm run check` stopped
+on the existing catalogue operator's descendant-process cleanup test; this is
+not a full local pass. The required final-source CI and native PostgreSQL receipt
+belong to the implementation PR; never merge with a failed required gate.
+The SQL fixture freezes inputs and an independent oracle before later history
+changes, then TypeScript replays those inputs after the batch. This is conformance,
+not an actual persisted prospective numeric forecast/outcome pair.
+
+**Continuation rule:** until this source packet passes CI and is integrated,
+finish its named branch/PR. After integration, do not repeat #398: the sole next
+source packet is
+[#400](https://github.com/Kajooja/Kajo/issues/400): durable prospective numeric
+forecast capture and later-label reconciliation under the
+existing declared evaluation protocol, before any quality admission or serving
+change. Do not substitute fixtures or the pooled research RMSE for Profile-macro
+MSE evaluation. #394 and #399 are not competing implicit active packets.
 
 A read-only hosted check on **2026-10-28T18:09:23Z** confirms acquisition body
 MD5 `6e0aba591a90c194c5bae49f0361084f` and no installed skip-prefilter forward.
@@ -53,8 +83,8 @@ enrollments/captures, zero Shared forecast consumptions/outcome captures, and
 eligible labels, independent support, a prospective sample or numeric forecasts.
 No individual identity/label rows were exported; no hosted state changed.
 
-After this bounded evaluation foundation, continue toward Sprint 016's numerical
-baseline using the existing research/temporal machinery. Preserve unresolved
+Continue Sprint 016 from the accepted feasibility foundation using the existing
+research mathematics and canonical native evidence machinery. Preserve unresolved
 Sprint 015 quality/runtime observations as named acceptance obligations; do not
 wait for optional #391 tuning or claim the sprint/Engine V1 is already accepted.
 
