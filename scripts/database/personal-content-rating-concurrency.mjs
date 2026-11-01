@@ -9,6 +9,21 @@ import { literal, json, inspect } from './personal-rating-prospective.mjs';
 export const executePersonalContentRatingProbe = (execSql, sql, stage) =>
   execSql(sql, { stage: stage.replaceAll('_', '-'), timeoutMs: 45_000 });
 
+/** These Items are created after source-page capture and never discoverable.
+ * Provider-row removal alone cannot free a delivered Item's retained FK refs. */
+export async function withPersonalContentRatingDeletionItems(execSql, run) {
+  const ids = [randomUUID(), randomUUID()];
+  const exec = (sql, stage) => executePersonalContentRatingProbe(execSql, sql, stage);
+  await exec(`begin;insert into public.items(id,item_type,title,tags,discoverable) values
+    ${ids.map(id => `(${literal(id)},'MOVIE','Synthetic content deletion proof','{}',false)`).join(',')};commit;`,
+  'content-item-deletion-setup');
+  try { return await run(ids); }
+  finally {
+    await exec(`begin;delete from public.items where id in(${ids.map(literal).join(',')});commit;`,
+      'content-item-deletion-cleanup');
+  }
+}
+
 /** Native PostgreSQL only. Each witness identifies two different backends and
  * the actual conflicting relation lock; computation remains inside the capture
  * transaction. Timing alone is never accepted as a serialization proof. */
@@ -196,21 +211,18 @@ export async function verifyPersonalContentRatingConcurrency(execSql, withSqlSes
 
       // Item DELETE takes its relation write lock before its lifecycle trigger.
       // Reproduce that exact dangerous interval, then execute a real deletion.
-      // The source-free MOVIE Items are outside every BOOK feature prefix here.
-      const erasedItems = [f.items[28], f.items[29]];
-      await run(`begin;set local role service_role;
-        delete from private.item_external_ids where item_id in(${erasedItems.map(literal).join(',')});
-        delete from private.item_sources where item_id in(${erasedItems.map(literal).join(',')});commit;`,
-      'content-item-erasure-source-setup');
-      const beforeDelete = await writerFirst('kajo_content_item_delete_holder', f.targets[16],
-        'lock table public.items in row exclusive mode;',
-        `delete from public.items where id=${literal(erasedItems[0])};`, 'public.items', 'postgres');
-      assert.equal(object(beforeDelete).status, 'UNAVAILABLE');
-      const afterDelete = await captureFirst('kajo_content_item_delete_waiter', f.targets[17],
-        `delete from public.items where id=${literal(erasedItems[1])};`, 'public.items', 'postgres');
-      assert.equal(object(afterDelete).status, 'UNAVAILABLE');
-      assert.equal(await one(`select to_jsonb(count(*)) from public.items where id in(${erasedItems.map(literal).join(',')});`,
-        'content-item-deletions-complete'), 0);
+      // Fresh non-discoverable MOVIE Items have no retained source-page FKs.
+      await withPersonalContentRatingDeletionItems(execSql, async erasedItems => {
+        const beforeDelete = await writerFirst('kajo_content_item_delete_holder', f.targets[16],
+          'lock table public.items in row exclusive mode;',
+          `delete from public.items where id=${literal(erasedItems[0])};`, 'public.items', 'postgres');
+        assert.equal(object(beforeDelete).status, 'UNAVAILABLE');
+        const afterDelete = await captureFirst('kajo_content_item_delete_waiter', f.targets[17],
+          `delete from public.items where id=${literal(erasedItems[1])};`, 'public.items', 'postgres');
+        assert.equal(object(afterDelete).status, 'UNAVAILABLE');
+        assert.equal(await one(`select to_jsonb(count(*)) from public.items where id in(${erasedItems.map(literal).join(',')});`,
+          'content-item-deletions-complete'), 0);
+      });
 
       assert.equal(proofs.length, 6);assert.equal(contention.length, 5);
       return { status: 'PASS', version: 'native-personal-content-rating-concurrency-v1',

@@ -87,8 +87,14 @@ platform/foundation jobs. Its native CLI job passed the new conformance cases,
 then rejected an underscore in a concurrency probe's diagnostic stage label.
 The corrected probe normalizes only the diagnostic label, preserving SQL backend
 identities and both strict runner validators; two actual-validator regressions
-pass. Required CI on the corrected head and native contention evidence remain
-pending; the earlier failed run is not an acceptance receipt.
+pass. CI #826 then passed 2,415 tests/four exports and the three foundation jobs;
+native concurrency reached the final Item-deletion scenario before a valid
+foreign-key restriction rejected the reused MOVIE fixture Items. The probe now
+creates two fresh non-discoverable, unreferenced Items with scoped cleanup.
+A third full-schema regression verifies both real deletions and canonical
+cleanup on success and failure. Production constraints, model and SQL source
+are unchanged. Required CI on this corrected head and complete native contention
+evidence remain pending; neither failed run is an acceptance receipt.
 
 Local lint/typecheck, research and acceptance tests and four explicit-demo
 iOS/Android exports pass. The full local database regression passed 441 tests
