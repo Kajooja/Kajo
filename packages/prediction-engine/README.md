@@ -23,6 +23,77 @@ estimates are 7 (rating) and 50 (energy); after a known continuation, recalled
 estimates are 9 and 45. This demonstrates execution and portability, not learned
 quality, causal effects, calibrated confidence or real non-media competence.
 
+## Declared numeric evaluation — #402
+
+`./personal-rating-evaluation` exposes
+`validatePersonalRatingEvaluationDeclaration` and
+`buildPersonalRatingEvaluationReport`. It computes per-Subject MSE, MAE and bias
+from frozen first answers, then weights scored Subjects equally. Macro RMSE is
+`sqrt(macro MSE)`; paired delta MSE uses identical targets with both point
+forecasts. Zero-opportunity/zero-scored roster members remain visible. Domain,
+prefix-support and current-correction diagnostics do not redefine the target.
+The full integer 0–10 rating scale is preserved.
+
+The declaration names the retrospective first-report target with unknown
+experience time, scale, roster, domains, versions, deterministic
+`FIRST_DELIVERED_ITEM` selection, independent cohort cap, capture window,
+chronological DEVELOPMENT/SELECTION/FINAL windows and fixed microsecond
+checkpoints. Role windows have a full label-horizon embargo between them.
+FINAL requires explicit development-selected acceptance, coverage, precision,
+domain guardrail, dependence, search-budget and resource requirements before
+its window begins. No default accuracy/sample threshold is supplied. Precision
+and resource assessment are **not implemented by this descriptive report**;
+complete declarations never imply model admission.
+
+`./adapters/kajo-personal-rating-evaluation` normalizes a supplied attempt ledger
+and complete retained-allocation census. It verifies owner/source/target/pool,
+stored forecast and immutable measurement bindings without rescoring history.
+The native-only model is `personal-domain-mean-v1`, config
+`personal-native-location-v1`, control identity
+`personal-domain-mean-v1:PERSONAL_MEAN`, and source identity
+`personal-source-evidence-v1:<resolver MD5>`. Every owner, including one with
+zero allocations, needs a census. Missing expected captures, missing owners or
+undeclared allocations make reconciliation unresolved. A supplied unavailable
+attempt is not proof of a native failure. Withdrawal/outside-path retirement
+invalidates primary metrics for the entire cohort; counts remain diagnostic.
+
+Classification uses the frozen horizon and first-answer acceptance time.
+`observedThroughMicros` is the earliest supplied owner observation, distinct from
+the aggregate export's `observedAtMicros`; every present owner must cover the
+requested checkpoint. Later answers never improve an earlier cut. The declared
+cohort cap (maximum 4,096 opportunities across 128 Subjects) is independent of
+the native limit of 128 currently retained source-owned allocations per owner.
+Source erasure cannot authorize refilling the declared cohort.
+
+The private Node wrapper uses shared bounded POSIX file protections:
+
+```sh
+npm run engine:rating:evaluation -- declare /private/request.json /private/declaration.json
+npm run engine:rating:evaluation -- report /private/declaration.json /private/inventory.json CHECKPOINT_MICROS /private/report.json
+```
+
+The request has `version: "kajo-personal-rating-evaluation-request-v1"`,
+`declaration` (the portable declaration without `createdAtMicros`) and `roster`
+entries `{actorUserId, profileId, subjectId}`. The process injects its observed
+creation clock before the active role's window. The inventory has
+`version: "kajo-personal-rating-evaluation-inventory-v1"`, `declarationDigest`,
+`opportunities` (the native binding's attempt ledger) and `census` (the native
+adapter's owner census envelope). Typed contracts own the exact remaining fields.
+
+Inputs are bounded to 16 MiB and output to 32 MiB. Outputs are exclusive 0600
+files outside Git; reports contain aliases, not native UUIDs or raw prefixes.
+Reporting expires seven days after the last declared checkpoint. Delete inputs
+and prior reports when their sources/authorization are withdrawn; files cannot
+verify current authorization, withdrawal, authentic preregistration or historical
+inventory completeness. Hashes establish consistency only. The command has no
+database credentials or executor. `scripts/database/personal-rating-evaluation.mjs`
+supplies the separately tested trusted census seam using existing private locks
+and inspection, including empty owned Profiles. It adds no migration/public grant.
+
+`qualityAdmission: NONE` and `servingActivation: NONE` remain explicit. Synthetic
+fixtures remain synthetic; even an observed report cannot establish new
+experience, causal recommendation uplift or statistical readiness.
+
 ## Prospective native numeric adapter — #400
 
 `./adapters/kajo-personal-rating-prospective` exposes
@@ -112,6 +183,8 @@ successors; passing synthetic fixtures does not supply those outcomes.
 | `./ranking-conformance` | Compare complete frozen ranking snapshots with exact scope, policy, candidate identity and eligibility, and an explicit scalar tolerance; no scoring or outcome evaluation |
 | `./adapters/kajo-native-prediction` | Normalize actual private native run/candidate snapshots through the existing Kajo scope adapter; preserve declared candidate acquisition and input clocks; ranking scores remain uncalibrated |
 | `./personal-rating` | Pure `forecastPersonalRatingBaseline`: complete resolved raw-label prefix, Personal/domain mean control, permitted domain prior plus shrunk residual, immutable numeric point forecasts; source-only and uncalibrated |
+| `./personal-rating-evaluation` | Versioned declaration and pure equal-Subject first-rating error/coverage report; fixed cuts, chronological windows and explicit incomplete/withdrawn disposition |
+| `./adapters/kajo-personal-rating-evaluation` | Retained allocation/inspection census and declared attempt-ledger reconciliation, immutable numeric bindings and alias-only portable rows |
 | `./adapters/kajo-personal-rating` | Strict `normalizeKajoPersonalRatingPrefix` for isolated native fixture snapshots; original numeric Event join, canonical source identity, exact microsecond cutoff and declared same-snapshot candidate pool |
 | `./adapters/kajo-personal-rating-prospective` | Trusted private native preparation mapping with exact selected-target/delivered-pool bindings and explicit observed/synthetic origin; fixed native-only baseline, no permission or commit certificate from the adapter alone |
 | `./working-state` | Pure `deriveWorkingState` and default-OFF `scoreWorkingAdjustment`; bounded independent current-session Item support, correction closure and explicit STATIC/ORDERED controls |

@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398 accepted; prospective numeric capture #400 in progress; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398 and prospective numeric capture #400 accepted; declared numeric evaluation #402 in progress; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -121,19 +121,61 @@ native microsecond cutoffs and pre-action input/oracle capture. The pure core
 test calls TypeScript before later answers; the native fixture replays TypeScript
 after the SQL batch against its retained inputs and independent numeric oracle.
 The fixture answer updates history for another candidate, rather than establishing
-a prospective forecast/outcome pair. Actual before-answer forecast persistence
-remains the successor obligation. Event weights and old
+a prospective forecast/outcome pair. This packet alone does not establish
+before-answer forecast persistence; accepted #400 supplies that later boundary.
+Event weights and old
 rank scores are never inverted into grades. Snapshot observation is not a
 certificate that a past transaction saw the same prefix. Existing feasibility
 reports retain their ordinal-only capability contract.
 
-After source acceptance, [#400](https://github.com/Kajooja/Kajo/issues/400) adds
-durable prospective numeric capture and later-label reconciliation using the same
-computation. Its successor [#402](https://github.com/Kajooja/Kajo/issues/402)
+Accepted [#400](https://github.com/Kajooja/Kajo/issues/400) supplies durable
+prospective numeric capture and later-label reconciliation using the same
+computation. Active [#402](https://github.com/Kajooja/Kajo/issues/402)
 adds declared numeric evaluation coverage and the Profile-macro report, before
 mean-loss comparison under development-selected requirements and
 an untouched final window. Existing Sprints 014/015 acceptance remains open;
-#398 does not make the whole Sprint 016 or Engine V1 complete.
+neither source packet makes the whole Sprint 016 or Engine V1 complete.
+
+## Active source packet — #402
+
+The bounded source implementation on `feat/personal-rating-evaluation` adds a
+versioned declaration, complete declared-opportunity inventory adapter and pure
+Profile-macro report. Pin roster, retrospective first-report target, BOOK/MOVIE
+scope, deterministic delivered-target selection, source/model/control versions,
+capture windows/checkpoints and chronological development/selection/final split.
+Retain the full integer **0–10** scale. Experience time remains unknown; this is
+not a new-experience cohort or an exposure/uplift claim.
+
+Every declared opportunity and zero-opportunity/zero-scored Profile remains
+visible. Distinguish unavailable capture/forecast, pending/expired follow-up,
+first answer and grouped source-withdrawal/outside-path retirement. Missing
+expected identities leave completeness unresolved, and withdrawal must not select
+a favorable survivor cohort. Source-owned allocation capacity is separate from
+the declared cohort cap: #400's 128 retained allocations are not a lifetime
+budget, and source erasure does not permit refilling the evaluation cohort.
+
+Use frozen horizon/first-answer microseconds for historical checkpoints; later
+correction, Undo and clear do not rewrite the measurement. Report per-Profile
+MSE, MAE and bias, equal-Profile macro summaries, sqrt(macro MSE) and same-target
+paired Profile-level deltas with explicit coverage/null denominators. Native-only
+candidate and Personal-mean control currently coincide; zero delta is not useful
+improvement. File hashes establish consistency, not trusted preregistration or
+native census completeness. Final evaluation requires complete numerical
+requirements selected from development evidence before the untouched final
+window; descriptive source fixtures retain `qualityAdmission: NONE`.
+
+The source includes the private declaration/report CLI and logically read-only
+owner census. Forty focused core, adapter, private-file and actual database-path
+tests pass; required full CI and source acceptance remain pending. No quality,
+mobile-route, hosted-installation or serving acceptance follows; STATUS and the
+implementation PR own the exact source/check receipt.
+
+The owner approved publication and merge after all six required CI gates on
+2026-11-01. STATUS records local verification and environment limits; the PR
+must retain the exact source/CI receipt. After source acceptance, select
+one bounded item-differentiating content-preference challenger with frozen
+permitted feature inputs and the Personal-mean control. Observed development
+cohort collection and quality admission remain explicit separate dependencies.
 
 ## Delivery record
 
@@ -143,15 +185,22 @@ an untouched final window. Existing Sprints 014/015 acceptance remains open;
   `03ba583afbc26bbabd2ed548c4fb0b98a5912036`. All six CI #816 gates pass,
   including 2,294 tests and four exports. Its independently checked native
   artifact reproduces the 15 numeric cases; all integer grades **0–10** are covered.
-- Source successor: #400 adds private durable numeric forecasts and a closed
-  first-answer measurement boundary using the same TypeScript computation.
-  The shared 24-case fixture runs actual compiled TypeScript before the
-  committed first answer, with all grades 0–10, correction/Undo/clear, missing
-  support, expiry, outside-path retirement and physical withdrawal. Five
-  populated-upgrade and nine persistent-session protocol tests pass; the complete
-  local database suite passes all 426 tests. Independent
-  native lock proofs and final CI acceptance are recorded in its PR; STATUS
-  owns the active handoff.
+- Durable capture source / CI: #400 is accepted through
+  [#403](https://github.com/Kajooja/Kajo/pull/403), main
+  `23e7d8ee2bb3be02be6d93b33fd1d71eb5697244`, with source/tested/accepted tree
+  `42f2c01d844a5eb4004c1318ca4c90e27d8a25cd`. All six required
+  [CI #821](https://github.com/Kajooja/Kajo/actions/runs/41316036602) gates pass,
+  including **2,332 tests and four configured iOS/Android exports**. The native
+  artifact independently verifies 24 prospective cases and all eleven grades
+  0–10, actual compiled TypeScript before the committed first answer, five
+  independent-session lock proofs, populated-upgrade preservation, closed new
+  ACLs and canonical cleanup. Correction/Undo/clear, unavailable support, expiry,
+  outside-path retirement and physical withdrawal retain their distinct effects.
+  All 2,880 performance measurements and original rules independently match with
+  no rule failures in this run; `admission` remains `NONE`. The PR records exact
+  artifact identities and limits, including no hosted or mobile-route activation.
+- Declared evaluation source: #402 is under implementation; required checks and
+  source acceptance remain pending. STATUS owns the one active handoff.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.

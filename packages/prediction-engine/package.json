@@ -94,6 +94,14 @@
     "./adapters/kajo-personal-rating-prospective": {
       "types": "./dist/adapters/kajo-personal-rating-prospective.d.ts",
       "import": "./dist/adapters/kajo-personal-rating-prospective.js"
+    },
+    "./personal-rating-evaluation": {
+      "types": "./dist/personal-rating-evaluation.d.ts",
+      "import": "./dist/personal-rating-evaluation.js"
+    },
+    "./adapters/kajo-personal-rating-evaluation": {
+      "types": "./dist/adapters/kajo-personal-rating-evaluation.d.ts",
+      "import": "./dist/adapters/kajo-personal-rating-evaluation.js"
     }
   },
   "scripts": {

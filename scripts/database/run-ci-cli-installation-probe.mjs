@@ -55,6 +55,7 @@ import { verifyPersonalRatingBaseline } from './personal-rating-baseline.mjs';
 import { verifyPersonalRatingProspective } from './personal-rating-prospective.mjs';
 import { verifyPersonalRatingProspectiveConcurrency } from './personal-rating-prospective-concurrency.mjs';
 import { verifyPersonalRatingProspectiveUpgrade } from './personal-rating-prospective-upgrade.mjs';
+import { verifyPersonalRatingEvaluation } from './personal-rating-evaluation.mjs';
 import { verifyNativeSkipPrefilter } from './native-skip-prefilter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
@@ -104,6 +105,8 @@ try {
     const nativePersonalRatingProspectiveConcurrency = await verifyPersonalRatingProspectiveConcurrency(execConcurrentSql, withSqlSession);
     assert.equal(nativePersonalRatingProspective.status, 'PASS');
     assert.equal(nativePersonalRatingProspectiveConcurrency.status, 'PASS');
+    const nativePersonalRatingEvaluation = await verifyPersonalRatingEvaluation(execConcurrentSql, withSqlSession);
+    assert.equal(nativePersonalRatingEvaluation.status, 'PASS');
     const nativeDiscoveryParity = await verifyNativeDiscoveryParity(exec);
     assert.equal(nativeDiscoveryParity.status, 'PASS');
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), expected,
@@ -515,7 +518,7 @@ try {
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativePersonalRatingBaseline, nativePersonalRatingProspective,
-      nativePersonalRatingProspectiveConcurrency, nativePersonalRatingProspectiveUpgrade, nativeSkipPrefilter,
+      nativePersonalRatingProspectiveConcurrency, nativePersonalRatingProspectiveUpgrade, nativePersonalRatingEvaluation, nativeSkipPrefilter,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,

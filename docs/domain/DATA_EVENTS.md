@@ -51,6 +51,14 @@ This is private source infrastructure; no new public action or mobile route is
 activated. [Prediction model](PREDICTION_MODEL.md#durable-prospective-numeric-source--sprint-016--400)
 owns the numeric calculation and transaction boundary.
 
+The #402 descriptive report reuses those frozen first answers without writing
+new Events or rescoring historical predictions. Current correction/Undo/clear
+state stays diagnostic. Missing expected source identities leave inventory
+incomplete; grouped withdrawal/outside-path retirement invalidates cohort metrics
+instead of removing an unfavorable observation from the denominator. Each fixed
+checkpoint uses immutable answer/horizon microseconds and a sufficiently recent
+owner census. A supplied failed-attempt ledger is not a native failure receipt.
+
 The Personal source-fusion correction now resolves available same-owner native
 rating authority before assigning weights. Exact scoped canonical command
 receipt lineage governs revisions, including backdated/equal occurrence clocks;
