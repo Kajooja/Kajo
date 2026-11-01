@@ -1772,6 +1772,43 @@ source erasure removes dependent copies. Current-state reconciliation never
 rewrites the original first measurement. The persistent psql session is isolated
 CI transport, not an exposed production service. See [the numeric contract](../domain/PREDICTION_MODEL.md#durable-prospective-numeric-source--sprint-016--400).
 
+The active #405 successor adds a separately exported fixed-mean content ridge
+model, a Kajo feature adapter and private v2 prepare/finalize functions. The
+existing allocation, first-answer and complete-census/report lifecycle remains
+the owner; old model/preparation generations and frozen payloads remain valid.
+The worker fits only the eligible frozen training prefix around the all-label
+Personal/domain mean. Candidate metadata never fits parameters or reconstructs
+an old prefix. After numeric lifecycle/Event/Profile locks, capture takes all
+three catalogue relation fences with `SHARE NOWAIT` in Item → source → alias
+order before the cutoff and allocation. An already active writer causes
+SQLSTATE `55P03` and whole-worker transaction rollback without an allocation;
+only an explicit retry after writer commit takes a new cutoff. If capture acquires
+the fences first, later writers wait until TypeScript finalization and transaction commit. This
+nonwaiting acquisition also covers multi-Item catalogue batches and raw Item
+deletion without waiting into their different lock orders. All owned Profile
+Events, including future-dated dependencies, count toward the 8,192-Event budget
+checked before fences/cutoff; only cutoff-eligible labels train the model. SQL
+validates bindings and the output contract; the TypeScript core owns fitting.
+
+Feature use requires an explicit trusted operator manifest covering capture,
+answer horizon and source-bound retention until withdrawal; shape validation
+does not certify rights. Missing permission/content chooses the mean fallback.
+The copied source/alias dependency edges retire snapshots on source deletion or
+identity reassignment; review revocation retires the owner's matching inputs
+and prevents new use of the same review reference. Normal metadata refreshes
+leave old snapshots unchanged. Three private tables hold source dependencies,
+alias dependencies and review revocations. Retirement locks input/forecast
+parents before counting the complete dependent-copy closure, capped at 250,000
+rows. Of ten new private functions, only the source/alias retirement trigger
+uses `SECURITY DEFINER`, with an empty fixed search path, closed execute access
+and strict relation/operation guard. It preserves existing `service_role`
+catalogue deletion/identity-update authority without evaluation-data grants;
+the other nine functions use invoker security. The six-feature assertion-presence
+transform does not replace the catalogue audit's positive-or-unknown semantics. No public
+grant, hosted install, mobile routing, WorkingState change or serving activation
+follows. The [content contract](../domain/PREDICTION_MODEL.md#frozen-content-numeric-challenger--sprint-016--405)
+owns numerical/resource details; STATUS owns implementation acceptance.
+
 ### Online state
 
 Existing Kajo layers remain:

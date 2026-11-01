@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { normalizeKajoPersonalRatingEvaluationInventory as normalize } from '../src/adapters/kajo-personal-rating-evaluation.js';
 import { normalizeKajoPersonalRatingProspectivePrefix } from '../src/adapters/kajo-personal-rating-prospective.js';
 import { forecastPersonalRatingBaseline } from '../src/personal-rating.js';
+import { normalizeKajoPersonalContentRatingPrefix, personalContentFeatureContract } from '../src/adapters/kajo-personal-content-rating.js';
+import type { KajoPersonalContentRatingPrefix } from '../src/adapters/kajo-personal-content-rating.js';
+import { forecastPersonalContentRating } from '../src/personal-content-rating.js';
 
 const id = (n: number) => `a4020000-0000-4000-8000-${String(n).padStart(12, '0')}`;
-type Mutable<T> = { -readonly [K in keyof T]: T[K] extends object ? Mutable<T[K]> : T[K] };
+type Mutable<T> = T extends object ? { -readonly [K in keyof T]: Mutable<T[K]> } : T;
 function fixture(rating = 0) {
   const snapshotId = `native-prospective:${'a'.repeat(32)}`, cutoff = '1793275200000000';
   const input = {
@@ -41,6 +44,54 @@ function fixture(rating = 0) {
     version: 'kajo-personal-rating-owner-census-v1' as const, actorUserId: id(1), profileId: id(2), observedAtMicros: '1793280000000000',
     allocations: [{ id: id(6), sourcePredictionId: id(7), actorUserId: id(1), profileId: id(2), requestHash: 'c'.repeat(32), inspection }] }] };
   return { binding, census, input, forecast, preparation, inspection };
+}
+function contentFixture(rating = 0) {
+  const old = fixture(rating), cutoff = old.input.cutoffMicros;
+  old.input.snapshotId = old.input.snapshotId.replace('native-prospective:', 'native-content-prospective:');
+  old.input.candidatePool.snapshotId = old.input.snapshotId;
+  const label = structuredClone(old.input.labels[0]!);
+  Object.assign(label, { itemId: id(33), sourceEventId: id(34) });
+  Object.assign(label.event, { id: id(34), itemId: id(33), rating: 2 });
+  const input: Mutable<KajoPersonalContentRatingPrefix> = { ...old.input, version: 'kajo-personal-content-rating-prefix-v1',
+    labels: [{ ...old.input.labels[0]!, event: { ...old.input.labels[0]!.event, rating: 8 } }, label],
+    contentFeatures: { version: 'kajo-personal-content-features-v1', snapshotId: old.input.snapshotId, cutoffMicros: cutoff,
+      mappingVersion: personalContentFeatureContract.mappingVersion, mappingHash: personalContentFeatureContract.mappingHash,
+      transformVersion: personalContentFeatureContract.transformVersion, semantics: 'ASSERTION_PRESENCE',
+      featureUse: { version: 'personal-content-feature-use-v1', purpose: 'PRIVATE_NATIVE_EVALUATION', origin: 'synthetic',
+        reviewRef: 'fixture:content-evaluation', validFromMicros: cutoff, validUntilMicros: old.preparation.horizonEndMicros,
+        retention: 'SOURCE_BOUND_UNTIL_WITHDRAWAL', sources: [{ providerKey: 'open_library', evidenceKind: 'provider-subject', disposition: 'PERMITTED' }] },
+      featureIds: personalContentFeatureContract.concepts.map(concept => `provider-subject:${concept}`),
+      objects: [id(3), id(33), id(5)].map((objectId, index) => {
+        const concept = index === 1 ? 'horror' : 'fantasy';
+        return { objectId, domainId: 'BOOK', sourceId: id(100 + index), availableAtMicros: cutoff, status: 'AVAILABLE',
+          assertions: personalContentFeatureContract.concepts.map(c => c === concept ? 1 : null),
+          values: personalContentFeatureContract.concepts.map(c => c === concept ? 1 : 0),
+          provenance: { providerKey: 'open_library', providerItemId: `OL${100 + index}W`, sourceUrl: null, sourceHash: null,
+            sourceUpdatedAtMicros: null, rowUpdatedAtMicros: cutoff, syncedAtMicros: cutoff,
+            alias: { namespace: 'open_library_work', externalId: `OL${100 + index}W` }, evidenceKind: 'provider-subject',
+            projectionHash: 'd'.repeat(32), featurePayload: { subject: [concept] } } };
+      }) },
+  };
+  const forecast = structuredClone(forecastPersonalContentRating(normalizeKajoPersonalContentRatingPrefix(input))) as
+    Mutable<ReturnType<typeof forecastPersonalContentRating>>;
+  const preparation = { ...old.preparation, version: 'kajo-personal-content-rating-preparation-v1', input, forecast,
+    contentConfig: { version: 'personal-native-content-ridge-v1', ridge: 2 } };
+  const inspection = { ...old.inspection, preparation };
+  const binding = { ...old.binding, sourceVersions: { ...old.binding.sourceVersions,
+    source: forecast.prefix.sourceVersion, model: forecast.version } };
+  const census = { ...old.census, owners: [{ ...old.census.owners[0]!, allocations: [{ ...old.census.owners[0]!.allocations[0]!, inspection }] }] };
+  const measure = () => {
+    const point = preparation.forecast.forecasts[0]!, answer = inspection.firstAnswer;
+    Object.assign(answer.measurement, {
+      controlSquaredError: point.control.value === null ? null : (point.control.value - answer.rating) ** 2,
+      candidateSquaredError: point.candidate.value === null ? null : (point.candidate.value - answer.rating) ** 2,
+      controlAbsoluteError: point.control.value === null ? null : Math.abs(point.control.value - answer.rating),
+      candidateAbsoluteError: point.candidate.value === null ? null : Math.abs(point.candidate.value - answer.rating),
+    });
+    inspection.coverage = answer.coverage = point.control.value === null ? 'NO_NUMERIC_FORECAST' : 'MEASURED_FIRST_RATING';
+  };
+  measure();
+  return { binding, census, input, forecast, preparation, inspection, measure };
 }
 describe('Declared native numeric inventory', () => {
   it('retains all eleven immutable first grades and keeps current correction diagnostic separate', () => {
@@ -164,5 +215,78 @@ describe('Declared native numeric inventory', () => {
       (f: ReturnType<typeof fixture>) => { f.census.owners[0]!.observedAtMicros = f.preparation.cutoffMicros; },
       (f: ReturnType<typeof fixture>) => { f.inspection.firstAnswer.targetItemId = id(99); },
     ]) { const f = fixture(); change(f); expect(() => normalize(f.binding, f.census)).toThrow(); }
+  });
+});
+
+describe('Retained content challenger evaluation compatibility', () => {
+  it('passes different frozen candidate/control values through the same first-answer measurement for every grade', () => {
+    for (let rating = 0; rating <= 10; rating++) {
+      const f = contentFixture(rating), result = normalize(f.binding, f.census);
+      expect(result.complete).toBe(true);
+      expect(result.opportunities[0]).toMatchObject({ firstAnswer: { rating }, currentRating: 9, prefixSupport: 2,
+        forecasts: { candidate: f.forecast.forecasts[0]!.candidate.value, control: 5 } });
+      expect(result.opportunities[0]!.forecasts!.candidate).toBeGreaterThan(5);
+      expect(JSON.stringify(result)).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-/u);
+    }
+  });
+  it('validates retained point consistency without fitting or rescoring historical points', () => {
+    const f = contentFixture(3), row = f.forecast.forecasts[0]!;
+    row.candidate.value = 6.25; row.contentDiagnostic.rawValue = 6.25; f.measure();
+    expect(normalize(f.binding, f.census).opportunities[0]!.forecasts).toEqual({ candidate: 6.25, control: 5 });
+    f.inspection.firstAnswer.measurement.candidateSquaredError += 1;
+    expect(() => normalize(f.binding, f.census)).toThrow('frozen measurement');
+  });
+  it('preserves mean fallback and no-numeric support in the unchanged report inventory schema', () => {
+    const fallback = contentFixture(); fallback.input.contentFeatures.featureUse = null;
+    fallback.input.contentFeatures.objects.forEach(row => Object.assign(row, { sourceId: `unavailable:${row.objectId}`,
+      status: 'UNAVAILABLE', assertions: null, values: null, provenance: null }));
+    fallback.preparation.forecast = structuredClone(forecastPersonalContentRating(normalizeKajoPersonalContentRatingPrefix(fallback.input))) as
+      Mutable<ReturnType<typeof forecastPersonalContentRating>>;
+    fallback.measure();
+    expect(normalize(fallback.binding, fallback.census).opportunities[0]!.forecasts).toEqual({ candidate: 5, control: 5 });
+    fallback.input.labels = [];
+    fallback.input.contentFeatures.objects = fallback.input.contentFeatures.objects.filter(row => row.objectId === fallback.input.targetItemId);
+    fallback.preparation.forecast = structuredClone(forecastPersonalContentRating(normalizeKajoPersonalContentRatingPrefix(fallback.input))) as
+      Mutable<ReturnType<typeof forecastPersonalContentRating>>;
+    fallback.measure();
+    expect(normalize(fallback.binding, fallback.census).opportunities[0]).toMatchObject({ prefixSupport: 0,
+      forecasts: { candidate: null, control: null }, firstAnswer: { rating: 0 } });
+  });
+  it('rejects version mixing and changed feature/config/support/fit/point bindings', () => {
+    const mutations: ((f: ReturnType<typeof contentFixture>) => void)[] = [
+      f => { f.binding.sourceVersions.source = fixture().binding.sourceVersions.source; },
+      f => { f.binding.sourceVersions.source = f.binding.sourceVersions.source.replace(personalContentFeatureContract.mappingHash, 'f'.repeat(64)); },
+      f => { f.binding.sourceVersions.model = 'personal-domain-mean-v1' as typeof f.binding.sourceVersions.model; },
+      f => { f.preparation.version = 'kajo-personal-rating-preparation-v1'; },
+      f => { f.preparation.contentConfig.ridge = 4; },
+      f => { f.forecast.contentConfig.ridge = 4; },
+      f => { f.forecast.content.featureIds.reverse(); },
+      f => { f.forecast.content.objects[0]!.sourceId = id(99); },
+      f => { f.forecast.content.objects[0]!.values![0] = 0; },
+      f => { delete f.forecast.content.objects[0]; },
+      f => { delete f.forecast.contentFit.featureMeans[0]; },
+      f => { f.forecast.contentFit.featureSupport = 1; },
+      f => { f.forecast.contentFit.variedFeatureCount = 1; },
+      f => { f.forecast.contentFit.coefficients[0] = NaN; },
+      f => { f.forecast.contentFit.coefficients.pop(); },
+      f => { Object.assign(f.forecast.contentFit, { version: 'changed-fit-v2' }); },
+      f => { f.forecast.forecasts[0]!.candidate.prefixSupport = 1; },
+      f => { f.forecast.forecasts[0]!.contentDiagnostic.supportedFeatureCount = 0; },
+      f => { f.forecast.forecasts[0]!.contentDiagnostic.rawValue = 0; },
+      f => { f.forecast.forecasts[0]!.candidate.mode = 'PERSONAL_MEAN_FALLBACK'; },
+      f => { f.input.contentFeatures.featureUse!.validUntilMicros = '1793278799999999'; },
+    ];
+    for (const mutate of mutations) { const f = contentFixture(); mutate(f); expect(() => normalize(f.binding, f.census)).toThrow(); }
+    const old = fixture(); old.binding.sourceVersions.model = 'personal-content-rating-v1';
+    old.binding.sourceVersions.source = contentFixture().binding.sourceVersions.source;
+    expect(() => normalize(old.binding, old.census)).toThrow('preparation binding');
+  });
+  it('does not silently filter older retained allocations from a new-model census', () => {
+    const f = contentFixture(), old = fixture().census.owners[0]!.allocations[0]!;
+    Object.assign(old, { id: id(70), sourcePredictionId: id(71) });
+    // The undeclared row is counted before interpreting any old payload/version.
+    f.census.owners[0]!.allocations.push(old as unknown as typeof f.census.owners[0]['allocations'][number]);
+    const result = normalize(f.binding, f.census);
+    expect(result.complete).toBe(false); expect(result.reconciliation.undeclaredAllocations).toBe(1);
   });
 });

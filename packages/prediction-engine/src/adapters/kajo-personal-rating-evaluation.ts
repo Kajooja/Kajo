@@ -2,6 +2,9 @@ import type { PersonalRatingBaselineForecast, PersonalRatingPoint } from '../per
 import type { PersonalRatingEvaluationInventory, PersonalRatingEvaluationOpportunity } from '../personal-rating-evaluation.js';
 import { normalizeKajoPersonalRatingProspectivePrefix, personalRatingProspectiveConfig } from './kajo-personal-rating-prospective.js';
 import type { KajoPersonalRatingProspectivePrefix } from './kajo-personal-rating-prospective.js';
+import type { PersonalContentRatingForecast } from '../personal-content-rating.js';
+import { normalizeKajoPersonalContentRatingPrefix, personalContentFeatureContract, personalContentRatingProspectiveConfig } from './kajo-personal-content-rating.js';
+import type { KajoPersonalContentRatingPrefix } from './kajo-personal-content-rating.js';
 
 /** Private native identities stay in the supplied binding, never in the report.
  * A failed attempt is a supplied ledger claim, not inferred from a missing row.
@@ -139,6 +142,100 @@ function retainedForecast(raw: unknown, prefix: KajoPersonalRatingProspectivePre
   return f;
 }
 
+/** Validate a retained content forecast's bindings and diagnostic structure.
+ * No coefficient fit or historical point forecast is recomputed here. Native
+ * finalization is the producer boundary; a file remains a consistency claim. */
+function retainedContentForecast(raw: unknown, prefix: KajoPersonalContentRatingPrefix,
+  binding: KajoPersonalRatingEvaluationBinding): PersonalContentRatingForecast {
+  const input = normalizeKajoPersonalContentRatingPrefix(prefix);
+  const dense = (value: unknown): boolean => {
+    if (Array.isArray(value)) return Array.from(value).every((row, index) => Object.hasOwn(value, index) && dense(row));
+    return value === null || typeof value !== 'object' || Object.values(value).every(dense);
+  };
+  shape(raw, ['version', 'targetVersion', 'capability', 'calibration', 'qualityAdmission', 'servingActivation',
+    'subjectId', 'domainId', 'cutoffMicros', 'prefix', 'candidatePool', 'config', 'prior', 'priorDisposition',
+    'location', 'identified', 'forecasts', 'content', 'contentConfig', 'contentFit'], 'content forecast shape');
+  check(dense(raw), 'dense retained content arrays');
+  const f = record(raw, 'retained content forecast') as unknown as PersonalContentRatingForecast;
+  const support = input.prefix.ratings.length, dimensions = input.content.featureIds.length;
+  check(f.version === 'personal-content-rating-v1' && f.targetVersion === 'personal-own-scale-post-experience-rating-v1'
+    && f.subjectId === input.subjectId && f.domainId === input.domainId && f.cutoffMicros === input.cutoffMicros
+    && f.calibration === 'UNCALIBRATED' && f.qualityAdmission === 'NONE' && f.servingActivation === 'NONE'
+    && f.capability === (support ? 'NUMERIC_CONTENT_POINT_V1' : 'NUMERIC_POINT_UNAVAILABLE_V1'), 'content forecast scope/version');
+  check(equal(f.config, personalRatingProspectiveConfig) && equal(f.contentConfig, personalContentRatingProspectiveConfig)
+    && f.prior === null && f.priorDisposition === 'ABSENT'
+    && equal(f.identified, { personalLocation: support > 0, responseSpread: false }), 'native-only content model');
+  const expectedRatings = [...input.prefix.ratings].sort((a, b) => a.objectId < b.objectId ? -1 : a.objectId > b.objectId ? 1 : 0);
+  const expectedObjects = [...input.content.objects].sort((a, b) => a.objectId < b.objectId ? -1 : a.objectId > b.objectId ? 1 : 0);
+  shape(f.prefix, ['version', 'sourceId', 'sourceVersion', 'snapshotId', 'support', 'ratings', 'excluded', 'provenance'], 'content forecast prefix shape');
+  check(f.prefix?.version === 'canonical-resolved-rating-prefix-v1' && f.prefix.sourceId === input.prefix.sourceId
+    && f.prefix.sourceVersion === binding.sourceVersions.source && f.prefix.sourceVersion === input.prefix.sourceVersion
+    && f.prefix.snapshotId === input.prefix.snapshotId && f.prefix.support === support
+    && equal(f.prefix.provenance, input.prefix.provenance) && equal(f.prefix.ratings, expectedRatings)
+    && equal(f.prefix.excluded, { foreignSubject: 0, foreignDomain: 0, future: 0, duplicate: 0 })
+    && equal(f.candidatePool, input.candidatePool)
+    && equal(f.content, { ...input.content, objects: expectedObjects }), 'content prefix/feature/pool binding');
+  const objects = new Map(input.content.objects.map(row => [row.objectId, row]));
+  const training = expectedRatings.filter(row => objects.get(row.objectId)!.status === 'AVAILABLE');
+  const featureSupport = training.length;
+  const varied = Array.from({ length: dimensions }, (_, index) => featureSupport > 1
+    && training.some(row => objects.get(row.objectId)!.values![index] !== objects.get(training[0]!.objectId)!.values![index]));
+  const variedCount = varied.filter(Boolean).length;
+  const fitStatus = !support ? 'NO_NUMERIC_SUPPORT' : featureSupport < 2 ? 'INSUFFICIENT_FEATURE_SUPPORT'
+    : training.every(row => row.value === training[0]!.value) ? 'CONSTANT_FEATURED_RATINGS'
+      : variedCount === 0 ? 'NO_TRAINING_FEATURE_VARIATION' : 'FITTED';
+  const fit = f.contentFit;
+  shape(fit, ['version', 'status', 'numericSupport', 'featureSupport', 'featureCoverage', 'featureDimensions',
+    'variedFeatureCount', 'featureMeans', 'coefficients', 'excluded', 'replayPolicy', 'parameterInterpretation', 'cost'], 'content fit shape');
+  check(fit.version === 'centered-fixed-mean-ridge-v1' && fit.status === fitStatus
+    && fit.numericSupport === support && fit.featureSupport === featureSupport
+    && fit.featureCoverage === (support ? featureSupport / support : null)
+    && fit.featureDimensions === dimensions && fit.variedFeatureCount === variedCount
+    && fit.replayPolicy === 'REBUILD_FROM_COMPLETE_RESOLVED_PREFIX'
+    && fit.parameterInterpretation === 'REGULARIZED_ASSOCIATION_NOT_LATENT_TASTE'
+    && equal(fit.excluded, { unavailable: support - featureSupport, withdrawn: 0, future: 0 })
+    && equal(fit.cost, { trainingRows: featureSupport, featureDimensions: dimensions, variedDimensions: variedCount,
+      centeredScalarProducts: fitStatus === 'FITTED' ? featureSupport * variedCount * (variedCount + 1) / 2 : 0 }), 'content fit support/version');
+  check(Array.isArray(fit.featureMeans) && fit.featureMeans.length === dimensions
+    && fit.featureMeans.every(value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1
+      && (featureSupport > 0 || value === 0))
+    && Array.isArray(fit.coefficients) && fit.coefficients.length === dimensions
+    && fit.coefficients.every((value, index) => typeof value === 'number' && Number.isFinite(value)
+      && Math.abs(value) <= 81920
+      && (fitStatus === 'FITTED' && varied[index] || value === 0)), 'retained fit dimensions/parameters');
+  check(Array.isArray(f.forecasts) && f.forecasts.length === input.candidatePool.candidateIds.length, 'content forecast pool cardinality');
+  for (const [index, row] of f.forecasts.entries()) {
+    shape(row, ['objectId', 'control', 'candidate', 'contentDiagnostic'], 'content forecast entry');
+    check(row.objectId === input.candidatePool.candidateIds[index], 'content forecast target/order');
+    for (const point of [row.control, row.candidate]) {
+      shape(point, ['value', 'status', 'mode', 'prefixSupport'], 'content forecast point shape'); numeric(point.value);
+      check(point.prefixSupport === support && point.status === (support ? 'AVAILABLE' : 'UNAVAILABLE')
+        && (support ? point.value !== null : point.value === null), 'content forecast point support');
+    }
+    check(row.control.mode === (support ? 'PERSONAL_MEAN' : 'NO_NUMERIC_SUPPORT')
+      && row.control.value === f.forecasts[0]!.control.value, 'content control binding');
+    const feature = objects.get(row.objectId)!;
+    const supported = feature.status === 'AVAILABLE' ? feature.values!.filter((value, j) => value !== 0 && varied[j]).length : 0;
+    const fallback = fitStatus !== 'FITTED' ? fitStatus : feature.status !== 'AVAILABLE' ? 'FEATURE_UNAVAILABLE'
+      : supported === 0 ? 'NO_SUPPORTED_CONTENT_FEATURE' : 'NONE';
+    const diagnostic = row.contentDiagnostic;
+    shape(diagnostic, ['fallback', 'rawValue', 'clipped', 'supportedFeatureCount'], 'content diagnostic shape');
+    check(diagnostic.fallback === fallback && diagnostic.supportedFeatureCount === supported, 'content fallback/support binding');
+    if (fallback === 'NONE') {
+      check(row.candidate.mode === 'CONTENT_RIDGE' && typeof diagnostic.rawValue === 'number' && Number.isFinite(diagnostic.rawValue)
+        && Math.abs(diagnostic.rawValue) <= 1000000
+        && row.candidate.value === Math.max(0, Math.min(10, diagnostic.rawValue))
+        && diagnostic.clipped === (row.candidate.value !== diagnostic.rawValue), 'retained content point clipping');
+    } else {
+      check(row.candidate.mode === (support ? 'PERSONAL_MEAN_FALLBACK' : 'NO_NUMERIC_SUPPORT')
+        && row.candidate.value === row.control.value && diagnostic.rawValue === row.control.value
+        && diagnostic.clipped === false, 'retained content fallback');
+    }
+  }
+  check(equal(f.location, { personalMean: f.forecasts[0]!.control.value, residual: null }), 'retained content location');
+  return f;
+}
+
 /** Complete means every supplied declared identity was reconciled. It never
  * certifies completeness of historical/native opportunities or authorization.
  * Undeclared retained allocations invalidate completeness, including tombstones
@@ -147,8 +244,13 @@ export function normalizeKajoPersonalRatingEvaluationInventory(binding: KajoPers
   census: KajoPersonalRatingEvaluationCensus): KajoPersonalRatingEvaluationInventory {
   check(binding && ['observed', 'synthetic'].includes(binding.origin) && Number.isInteger(binding.horizonSeconds)
     && binding.horizonSeconds >= 1 && binding.horizonSeconds <= 7776000, 'declaration');
-  check(binding.sourceVersions?.model === versions.model && binding.sourceVersions.control === versions.control
-    && /^personal-source-evidence-v1:[0-9a-f]{32}$/u.test(binding.sourceVersions.source), 'source versions');
+  const contentModel = binding.sourceVersions?.model === 'personal-content-rating-v1';
+  const contentSourceSuffix = `:${personalContentFeatureContract.mappingVersion}:${personalContentFeatureContract.mappingHash}:${personalContentFeatureContract.transformVersion}`;
+  check(binding.sourceVersions?.control === versions.control && (contentModel
+    ? /^personal-content-source-v1:[0-9a-f]{32}:/u.test(binding.sourceVersions.source)
+      && binding.sourceVersions.source.length === 'personal-content-source-v1:'.length + 32 + contentSourceSuffix.length
+      && binding.sourceVersions.source.endsWith(contentSourceSuffix)
+    : binding.sourceVersions.model === versions.model && /^personal-source-evidence-v1:[0-9a-f]{32}$/u.test(binding.sourceVersions.source)), 'source versions');
   check(Array.isArray(binding.roster) && binding.roster.length >= 1 && binding.roster.length <= 128
     && Array.isArray(binding.opportunities) && binding.opportunities.length <= 4096, 'declared budgets');
   check(census?.version === 'kajo-personal-rating-census-v1' && Array.isArray(census.owners)
@@ -220,23 +322,29 @@ export function normalizeKajoPersonalRatingEvaluationInventory(binding: KajoPers
     }
     check(inspection.status === 'AVAILABLE', 'inspection status');
     const prep = record(inspection.preparation, 'preparation');
-    check(prep.version === 'kajo-personal-rating-preparation-v1' && prep.forecastId === allocation.id
+    check(prep.version === (contentModel ? 'kajo-personal-content-rating-preparation-v1' : 'kajo-personal-rating-preparation-v1') && prep.forecastId === allocation.id
       && prep.sourcePredictionId === opportunity.sourcePredictionId && prep.targetItemId === opportunity.targetItemId
       && prep.itemType === opportunity.domainId && prep.requestHash === allocation.requestHash
       && prep.cohort === 'FIRST_REPORTED_RATING_EXPERIENCE_TIME_UNKNOWN'
       && prep.selection === 'ONE_PREDECLARED_TARGET_FROM_COMPLETE_DELIVERED_POOL'
       && prep.qualityAdmission === 'NONE' && prep.servingActivation === 'NONE'
-      && equal(prep.config, personalRatingProspectiveConfig), 'preparation binding');
-    const prefix = record(prep.input, 'input') as unknown as KajoPersonalRatingProspectivePrefix;
+      && equal(prep.config, personalRatingProspectiveConfig)
+      && (!contentModel || equal(prep.contentConfig, personalContentRatingProspectiveConfig)), 'preparation binding');
+    const prefix = record(prep.input, 'input') as unknown as KajoPersonalRatingProspectivePrefix | KajoPersonalContentRatingPrefix;
     check(prefix.actorUserId === opportunity.actorUserId && prefix.profile?.id === opportunity.profileId
       && prefix.evidenceOrigin === binding.origin && prefix.forecastId === allocation.id
       && prefix.sourcePredictionId === opportunity.sourcePredictionId && prefix.targetItemId === opportunity.targetItemId
       && prefix.itemType === opportunity.domainId && prefix.cutoffMicros === prep.cutoffMicros, 'native input binding');
-    const forecast = retainedForecast(prep.forecast, prefix, binding);
+    const forecast = contentModel ? retainedContentForecast(prep.forecast, prefix as KajoPersonalContentRatingPrefix, binding)
+      : retainedForecast(prep.forecast, prefix as KajoPersonalRatingProspectivePrefix, binding);
     check(prefix.candidatePool.items[0]?.id === opportunity.targetItemId, 'first delivered target selection');
     const cutoff = micros(prep.cutoffMicros), horizon = micros(prep.horizonEndMicros), ownerClock = ownerClocks.get(opportunity.profileId)!;
     check(cutoff >= micros(opportunity.attemptedAtMicros) && cutoff <= ownerClock
       && horizon === cutoff + BigInt(binding.horizonSeconds) * 1000000n, 'frozen horizon/capture clock');
+    if (contentModel) {
+      const manifest = (prefix as KajoPersonalContentRatingPrefix).contentFeatures.featureUse;
+      check(manifest === null || micros(manifest.validUntilMicros) >= horizon, 'feature-use horizon');
+    }
     const point = forecast.forecasts[0]!;
     let firstAnswer: PersonalRatingEvaluationOpportunity['firstAnswer'] = null;
     if (inspection.firstAnswer !== null) {

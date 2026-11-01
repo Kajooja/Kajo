@@ -194,6 +194,32 @@ ModelArtifact manifests inherit every training/preprocessing/prototype/distillat
 
 The requested documentation change does not approve any license interpretation, production publication, commercial use or artifact deployment.
 
+### Private frozen catalogue features — Sprint 016 / #405
+
+The active Personal content-rating implementation reuses only the existing six
+`catalog-concepts-v1` structured concepts, with TMDB genre IDs for MOVIE and
+allowlisted Open Library subject labels for BOOK. An explicit
+`personal-content-feature-use-v1` trusted operator manifest names the private
+native evaluation purpose, observed/synthetic origin, review reference, allowed
+provider/evidence-kind pairs, validity interval and source-bound retention until
+withdrawal. The interval covers capture and the whole answer horizon. This is
+an operator assertion to validate and retain, not a license decision or rights
+certificate. A null manifest or unlisted source copies no feature payload and
+leaves the model on its native Personal-mean fallback.
+
+The capture freezes bounded sanitized source assertions, exact Item/source/alias
+identity and provenance for both numeric training Items and delivered candidates.
+It copies no description, popularity or external preference prior. The original
+catalogue audit keeps positive `1` versus unknown `null`. The separately
+versioned assertion-presence transform uses `1/0` only inside a valid permitted
+source with at least one mapped assertion; it does not claim factual absence.
+Missing/malformed/unmapped whole sources remain unavailable. Source/alias
+deletion or identity reassignment and explicit review withdrawal retire dependent
+copies; ordinary source refresh cannot rewrite an older prediction snapshot.
+The [numeric contract](../domain/PREDICTION_MODEL.md#frozen-content-numeric-challenger--sprint-016--405)
+owns bounds and fallback. No hosted install, quality/serving admission or new
+external dataset authorization follows from this source implementation.
+
 ## 5. Isolated research storage and execution
 
 Do not load tens of millions of external ratings into the production transactional database. Use a developer-controlled offline workspace or separately governed research storage with bounded batch jobs and no production write credentials. Choose the actual local analytical format during implementation; portable normalized contracts matter more than a particular dataframe/database package.
