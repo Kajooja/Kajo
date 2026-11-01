@@ -582,9 +582,16 @@ bounded hostile-input parsing through all four actual minimatch consumer paths.
 The compatible 1.1.21/5.0.12 lock refresh and current advisory result are recorded
 in `dependency-audit-2026-09-30.json`; the older receipt remains dated evidence.
 
-`scripts/dependencies/security-patches.mjs` installs/verifies the exact October
-braces depth and node-forge DigestAlgorithm corrections. `security-patches.test.mjs`
-reproduces unpatched defects and tests corrected installed consumers.
+`scripts/dependencies/security-patches.mjs` installs/verifies exact compatibility
+source corrections. `security-patches.test.mjs` reproduces unpatched defects and
+tests corrected installed consumers. Published node-forge 1.4.2 replaces its old
+DigestAlgorithm backport, retaining archive/RSA/browser/PEM Buffer regressions;
+published decode-uri-component 0.5.1 adds bounded actual routing-decoder coverage.
+`glob-minimatch-security-corrections.mjs` / `glob-minimatch-security.test.mjs`
+cover every CJS/ESM minimatch 10.2.6 copy, glob 13.0.6 default/raw exports and its
+bundled optimizer with upstream growth/abort fixes and pristine negative controls.
+Exact unchanged minimatch 3.1.5 gets separately labelled optimizer-absence
+verification, not a patch claim or a generic old-version exception.
 The October 27 performance CI repair extends the same owner to deepmerge 4.3.1's
 `__proto__` source/target-copy guards in the exact source and CJS/UMD bundles,
 with pristine negative controls and normal merge-option coverage. The low
@@ -594,7 +601,7 @@ meta-findings; the audit classification policy is unchanged.
 and fail on unmitigated advisories or unverifiable patches. The correction contract
 is in ARCHITECTURE; `dependency-audit-native-2026-10-05.json` records the actual
 native graph. CI's same-repository `build-android-apk` PR label opts into an APK
-behind the unchanged five mandatory jobs.
+behind all six mandatory jobs.
 The October 24 build gate also uses `zod-security-correction.mjs` and
 `zod-security.test.mjs` for the exact Zod archive variants: the compatible v4 lock update,
 v3 upper-bound backports and the older bundled v4 leading-size guard. Real

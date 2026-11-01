@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { generateKeyPairSync, verify as verifyNative } from 'node:crypto';
+import { createHash, generateKeyPairSync, verify as verifyNative } from 'node:crypto';
 import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
@@ -13,6 +13,17 @@ const require = createRequire(import.meta.url);
 const braces = require('braces');
 const forge = require('node-forge');
 const lock = JSON.parse(await readFile(resolve(projectRoot, 'package-lock.json'), 'utf8'));
+// Published 1.4.2 includes the upstream security fixes and restores PEM Buffer
+// compatibility. These bytes replace the superseded 1.4.0 source backport.
+const forgeRelease = {
+  version: '1.4.2',
+  integrity: 'sha512-rRtAR5XLJ8gCKd9du4qrKAsgCG1ObGP4gLeNJMa4vYSeq4bmBMOJk5IHkrviBV0q7uoAJlVd8HEQYQSVUb4FGQ==',
+  files: {
+    'lib/rsa.js': '6632e195295ce76f6bb9131ee770dcd6cc1ee4ffac7906302208b00faf95a87f',
+    'dist/forge.min.js': '52b553e747df79daa5056ff5e4dff37094c7d8a71194efe2b153d7c3f12763ff',
+    'dist/forge.all.min.js': 'aae8c5722eff3d82f5162413c8a4eb104984ab09730169729a7166e21f2580cf',
+  },
+};
 const installedCorrections = corrections.flatMap(correction => Object.entries(lock.packages)
   .filter(([path]) => path === `node_modules/${correction.name}` || path.endsWith(`/node_modules/${correction.name}`))
   .map(([path, entry]) => ({ ...correction,
@@ -33,7 +44,26 @@ test('dependency containment accepts Windows/POSIX installs and rejects escapes'
 
 test('all locked instances contain the exact security corrections', async () => {
   const receipt = await securityPatches();
-  assert.deepEqual(new Set(receipt.map(value => value.name)), new Set(['braces', 'node-forge', 'zod', 'deepmerge']));
+  assert.deepEqual(new Set(receipt.map(value => value.name)), new Set(['glob', 'minimatch', 'braces', 'zod', 'deepmerge']));
+});
+
+test('all forge instances use the reviewed fixed release without a local correction', async () => {
+  assert.equal(corrections.some(value => value.name === 'node-forge'), false);
+  const instances = Object.entries(lock.packages).filter(([path]) =>
+    path === 'node_modules/node-forge' || path.endsWith('/node_modules/node-forge'));
+  assert.ok(instances.length > 0);
+  for (const [path, entry] of instances) {
+    assert.equal(entry.version, forgeRelease.version);
+    assert.equal(entry.integrity, forgeRelease.integrity);
+    assert.equal(entry.resolved, 'https://registry.npmjs.org/node-forge/-/node-forge-1.4.2.tgz');
+    const directory = resolveDependencyDirectory(projectRoot, path);
+    const pkg = JSON.parse(await readFile(resolve(directory, 'package.json'), 'utf8'));
+    assert.equal(pkg.name, 'node-forge');
+    assert.equal(pkg.version, forgeRelease.version);
+    for (const [file, expected] of Object.entries(forgeRelease.files)) {
+      assert.equal(createHash('sha256').update(await readFile(resolve(directory, file))).digest('hex'), expected);
+    }
+  }
 });
 
 test('source corrections are idempotent and reject unrelated edits or partial patches', async () => {
@@ -118,6 +148,13 @@ function signature(children, extra = []) {
   return privateKey.sign(asn1.toDer(info).getBytes(), 'NONE');
 }
 
+test('fixed forge preserves PEM string and Buffer consumers', () => {
+  const pem = nativeKeys.publicKey.export({ type: 'spki', format: 'pem' });
+  assert.deepEqual(forge.pem.decode(Buffer.from(pem)), forge.pem.decode(pem));
+  const decoded = forge.pki.publicKeyFromPem(Buffer.from(pem));
+  assert.equal(decoded.verify(digest, signature([oid(), nullValue()])), true);
+});
+
 test('valid PKCS#1 signatures, optional NULL, wrong-message rejection and PSS remain compatible', () => {
   for (const children of [[oid()], [oid(), nullValue()]]) {
     assert.equal(publicKey.verify(digest, signature(children)), true);
@@ -153,23 +190,22 @@ test('outer DigestInfo count check remains enforced', () => {
 });
 
 test('both distributed browser bundles reject the same malformed signatures', async () => {
-  for (const file of corrections.find(value => value.name === 'node-forge').files.filter(value => value.path.startsWith('dist/'))) {
-    const source = await readFile(resolve(projectRoot, 'node_modules/node-forge', file.path), 'utf8');
+  for (const file of ['dist/forge.min.js', 'dist/forge.all.min.js']) {
+    const source = await readFile(resolve(projectRoot, 'node_modules/node-forge', file), 'utf8');
     const load = code => {
       // forge.all also loads optional form/XHR helpers; RSA does not use jQuery.
       const sandbox = { window: {}, module: { exports: {} }, exports: {}, jQuery: null };
       runInNewContext(code, sandbox, { timeout: 1000 });
       return sandbox.module.exports.pki.publicKeyFromPem(nativeKeys.publicKey.export({ type: 'spki', format: 'pem' }));
     };
-    const patched = load(source);
-    const original = load(originalSource(source, file));
-    assert.equal(patched.verify(digest, signature([oid(), nullValue()])), true);
-    assert.equal(patched.verify(digest, signature([oid()])), true);
-    for (const [, children] of malformed.slice(0, 4)) {
+    const released = load(source);
+    assert.equal(released.verify(digest, signature([oid(), nullValue()])), true);
+    assert.equal(released.verify(digest, signature([oid()])), true);
+    for (const [, children] of malformed) {
       const signed = signature(children());
-      assert.equal(original.verify(digest, signed), true);
-      assert.throws(() => patched.verify(digest, signed), /DigestInfo/);
+      assert.throws(() => released.verify(digest, signed), /DigestInfo/);
     }
+    assert.throws(() => released.verify(digest, signature([oid(), nullValue()], [garbage()])), /DigestInfo/);
   }
 });
 
@@ -219,10 +255,10 @@ test('deepmerge rejects prototype injection in both bundles and preserves normal
   }
 });
 
-test('negative controls reproduce braces and RSA defects in pristine upstream source', async () => {
+test('negative control reproduces the braces defect in pristine upstream source', async () => {
   const temporary = await mkdtemp(join(tmpdir(), 'kajo-security-controls-'));
   try {
-    for (const correction of corrections.filter(value => ['braces', 'node-forge'].includes(value.name))) {
+    for (const correction of corrections.filter(value => value.name === 'braces')) {
       const directory = join(temporary, correction.name);
       await cp(resolve(projectRoot, 'node_modules', correction.name), directory, { recursive: true });
       for (const file of correction.files) {
@@ -238,11 +274,6 @@ test('negative controls reproduce braces and RSA defects in pristine upstream so
     `], { encoding: 'utf8', timeout: 5000, maxBuffer: 8192, env: { ...process.env, NODE_PATH: resolve(projectRoot, 'node_modules') } });
     assert.ifError(child.error);
     assert.equal(child.status, 0, child.stderr);
-    const originalForge = require(join(temporary, 'node-forge'));
-    const originalPublicKey = originalForge.pki.publicKeyFromPem(nativeKeys.publicKey.export({ type: 'spki', format: 'pem' }));
-    for (const [, children] of malformed.slice(0, 4)) {
-      assert.equal(originalPublicKey.verify(digest, signature(children())), true, 'Control must prove upstream accepts the malformed structure');
-    }
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }

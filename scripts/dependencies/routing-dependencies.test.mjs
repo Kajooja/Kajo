@@ -56,12 +56,52 @@ test('malformed percent input completes in a bounded separate process through th
   assert.equal(child.status, 0, child.stderr);
 });
 
+test('distinct malformed runs have bounded replacement work and decode exactly once through the routing query parser', () => {
+  // GHSA-qr28-fpjm-wq7f: each distinct run formerly rescanned the whole input.
+  // Count replacement input lengths instead of depending on a timing threshold;
+  // fail early on the old quadratic algorithm in an isolated child process.
+  const child = spawnSync(process.execPath, ['--input-type=module', '-e', `
+    import { createRequire } from 'node:module';
+    import assert from 'node:assert/strict';
+    const require = createRequire(${JSON.stringify(import.meta.url)});
+    const router = createRequire(require.resolve('expo-router/package.json'));
+    const query = router('query-string');
+    let hostile = '', expected = '';
+    for (let index = 0; index < 32000; index++) {
+      const highByte = Math.floor(index / 256), lowByte = index % 256;
+      const high = highByte.toString(16).padStart(2, '0'), low = lowByte.toString(16).padStart(2, '0');
+      hostile += '%' + high + '%' + low + 'x';
+      expected += String.fromCharCode(highByte) + (lowByte < 128 ? String.fromCharCode(lowByte) : '%' + low) + 'x';
+    }
+    hostile += '%zz'; expected += '%zz';
+    const originalReplace = String.prototype.replace;
+    let replacementWork = 0, decoded;
+    try {
+      String.prototype.replace = function (...args) {
+        replacementWork += this.length;
+        if (replacementWork > hostile.length * 8) throw new Error('Repeated full-input replacement scans');
+        return Reflect.apply(originalReplace, this, args);
+      };
+      decoded = query.parse('value=' + hostile).value;
+    } finally {
+      String.prototype.replace = originalReplace;
+    }
+    assert.equal(decoded, expected);
+    assert.ok(replacementWork > hostile.length);
+    assert.equal(query.parse('value=%25C2%zz').value, '%C2%zz');
+    assert.equal(query.parse('value=%25%41%zz').value, '%A%zz');
+    assert.equal(query.parse('value=%41%FE%FF').value, 'A\\uFFFD\\uFFFD');
+  `], { timeout: 10000, encoding: 'utf8', maxBuffer: 4096 });
+  assert.ifError(child.error);
+  assert.equal(child.status, 0, child.stderr);
+});
+
 test('reviewed install patch is idempotent and rejects unexpected parent changes', () => {
   const installed = readFileSync(queryPath, 'utf8');
   assert.ok(routingDecoderInterop(installed) === installed, 'npm install must apply the reviewed decoder interop');
   assert.throws(() => routingDecoderInterop(installed + '\n// changed dependency\n'), /Unexpected patched query-string/);
   const decoderPath = createRequire(queryPath).resolve('decode-uri-component');
-  assert.equal(JSON.parse(readFileSync(join(dirname(decoderPath), 'package.json'), 'utf8')).version, '0.5.0');
+  assert.equal(JSON.parse(readFileSync(join(dirname(decoderPath), 'package.json'), 'utf8')).version, '0.5.1');
 });
 
 test('xcode uses the patched CommonJS UUID API to generate valid unique project identifiers', () => {

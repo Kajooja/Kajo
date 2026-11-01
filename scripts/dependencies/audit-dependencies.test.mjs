@@ -39,7 +39,7 @@ function fixture() {
     name: value.name, severity: 'high', nodes: [`node_modules/${value.name}`],
     via: [{ name: value.name, url: value.advisory }],
   }]));
-  vulnerabilities.expo = { name: 'expo', severity: 'high', nodes: ['node_modules/expo'], via: ['braces', 'node-forge', 'zod', 'metro'] };
+  vulnerabilities.expo = { name: 'expo', severity: 'high', nodes: ['node_modules/expo'], via: [...corrections.map(value => value.name), 'metro'] };
   vulnerabilities.metro = { name: 'metro', severity: 'high', nodes: ['node_modules/metro'], via: ['expo'] };
   return { auditReportVersion: 2, vulnerabilities, metadata: { vulnerabilities: { info: 0, low: 0, moderate: 0, high: findingCount, critical: 0, total: findingCount } } };
 }
@@ -107,4 +107,22 @@ test('a low deepmerge leaf still requires its exact correction for a high Expo p
   report.metadata.vulnerabilities.low++;
   assert.deepEqual(classifyAudit(report, verified).unmitigated, []);
   assert.deepEqual(classifyAudit(report, verified.filter(value => value.name !== 'deepmerge')).unmitigated.map(value => value.name), ['expo', 'metro']);
+});
+
+
+test('optimizer audit preserves explicitly verified legacy non-applicability without borrowing another version', () => {
+  const report = fixture();
+  report.vulnerabilities.minimatch.nodes = ['node_modules/minimatch', 'node_modules/glob/node_modules/minimatch'];
+  const correction = corrections.find(value => value.name === 'minimatch');
+  const entries = verified.filter(value => value.name !== 'minimatch').concat([
+    { name: 'minimatch', version: '3.1.5', advisory: correction.advisory, path: 'node_modules/minimatch',
+      evidenceKind: 'NOT_AFFECTED_VULNERABLE_OPTIMIZER_ABSENT' },
+    { name: 'minimatch', version: '10.2.6', advisory: correction.advisory, path: 'node_modules/glob/node_modules/minimatch' },
+  ]);
+  assert.deepEqual(classifyAudit(report, entries).unmitigated, []);
+  for (const change of [entry => { delete entry.evidenceKind; }, entry => { entry.version = '11.0.1'; },
+    entry => { entry.path = 'node_modules/another/minimatch'; }]) {
+    const changed = structuredClone(entries);change(changed.find(value => value.version === '3.1.5'));
+    assert.deepEqual(classifyAudit(report, changed).unmitigated.map(value => value.name), ['minimatch', 'expo', 'metro']);
+  }
 });

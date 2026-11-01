@@ -83,6 +83,15 @@ all SQL/process deadlines and the exact reviewed image guard. Required CI for
 this final source remains pending; the PR owns the receipt. No new image or
 hosted version is admitted by these orchestration corrections.
 
+CI #820 confirms the restored database platform but its fresh dependency audit
+finds newly published advisories. The same packet updates compatible node-forge
+to 1.4.2 and decode-uri-component to 0.5.1, retires the superseded forge backport,
+and adds exact upstream minimatch/glob compatibility corrections, including glob's
+bundled optimizer. Legacy minimatch 3.1.5 is explicitly verified to lack the
+reported optimizer; raw audit findings remain visible and unknown findings fail.
+ARCHITECTURE owns these source dispositions. Final dependency/runtime checks and
+all six final-source CI jobs must pass before #403 integrates.
+
 **Continuation rule:** finish #400 on its named branch and required CI. After integration, the sole next source packet is
 [#402](https://github.com/Kajooja/Kajo/issues/402): declared numeric evaluation
 coverage and the Profile-macro report. Do not repeat #400. Profile-macro mean-loss evaluation,

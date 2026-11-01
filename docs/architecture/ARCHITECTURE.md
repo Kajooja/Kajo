@@ -2073,12 +2073,12 @@ blur, backgrounding and unmount invalidate prior work before it can publish.
 
 ## Verified local dependency security corrections — #238
 
-When a published dependency has no fixed release, a local source correction must
+When a required dependency API has no compatible fixed release, a local source correction must
 retain its real npm identity and the raw advisory result. It is not an upstream
 version upgrade or permission to suppress unrelated scanner findings.
 
-`scripts/dependencies/security-patches.mjs` binds the braces 3.0.3 and node-forge
-1.4.0 archives to their exact lockfile identities/integrities and original source
+`scripts/dependencies/security-patches.mjs` binds the reviewed compatibility
+archives to their exact lockfile identities/integrities and original source
 SHA-256 hashes. Installation is idempotent and refuses unknown or partially
 patched source. Verification is read-only and checks every locked installed copy.
 Installed-directory containment uses native path-relative rules on Windows and
@@ -2092,15 +2092,41 @@ cannot be directly spawned as native executables.
   SyntaxError, analogous to the existing maximum input length. Escaped, quoted
   and character-class braces remain literal. The upstream diagnosis is
   [micromatch/braces#70](https://github.com/micromatch/braces/issues/70).
-- [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv):
-  require exactly the validated OID plus an optional, empty primitive NULL in
-  DigestAlgorithm, retaining the outer DigestInfo count check. Counting children
-  alone is insufficient: an unexpected second element or nonempty NULL must also
-  be rejected. The correction covers `lib/rsa.js` and both distributed browser
-  bundles; the same malformed-signature controls execute against all three.
-  The upstream diagnosis/proposal is
-  [digitalbazaar/forge#1149](https://github.com/digitalbazaar/forge/issues/1149)
-  / [#1152](https://github.com/digitalbazaar/forge/pull/1152).
+- The October node-forge 1.4.0 DigestAlgorithm backport for
+  [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv)
+  was retired on November 1 in favor of published **1.4.2**. That compatible
+  release includes upstream security corrections and the PEM Buffer repair.
+  Tests pin its archive and actual RSA/browser-bundle source identities, retain
+  valid signatures, reject malformed DigestAlgorithm/outer structures and verify
+  string/Buffer consumers; no forge advisory is locally suppressed.
+
+The November 1 CI findings also require published **decode-uri-component 0.5.1**
+for [GHSA-qr28-fpjm-wq7f](https://github.com/SamVerschueren/decode-uri-component/security/advisories/GHSA-qr28-fpjm-wq7f).
+The query-string 7.1.3 hash-pinned default-export interop remains; the routing
+suite verifies actual Expo consumers and limits replacement work on the reported
+many-distinct-percent-run input, with exact decoded output and a pristine negative
+control. This is a published decoder upgrade, not a package identity alias.
+
+`glob-minimatch-security-corrections.mjs` retains minimatch 10.2.6/glob 13.0.6 APIs
+with exact-archive backports of the upstream
+[minimatch optimizer bound](https://github.com/isaacs/minimatch/commit/77a0f5c4b80bdc641c3c930a1d9edf5ad2db57f8)
+and [glob abort fix](https://github.com/isaacs/node-glob/commit/4682e8c9babee1b385202ede36389634e12076d7).
+It covers every locked minimatch CJS/ESM copy and all glob default/raw runtime
+exports, including the optimizer embedded in glob's two minified bundles.
+The optimizer caps first-phase growth and skips quadratic second-phase work above
+the upstream bound; aborted walkers return before further traversal while normal
+resume behavior remains. Pristine controls reproduce growth and post-abort I/O;
+installed tests verify bounds, zero subsequent I/O and ordinary sync/async/stream
+matching.
+
+The broad minimatch advisory range also includes **3.1.5**, whose exact reviewed
+source predates and lacks the affected optimizer. Its archive and unchanged
+`minimatch.js` hash are verified and tested separately, with explicit
+`NOT_AFFECTED_VULNERABLE_OPTIMIZER_ABSENT` evidence. This record is not called a
+patch or generalized to other versions. Audit qualification requires each
+reported installed path, the explicitly reviewed version and that evidence kind;
+missing/tampered source, missing evidence and unknown versions still fail.
+
 
 `audit-dependencies.mjs` first verifies those exact corrections and runs the
 installed security regressions (including pristine-upstream negative controls),

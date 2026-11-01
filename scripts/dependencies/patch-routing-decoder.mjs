@@ -31,7 +31,7 @@ export async function installRoutingDecoderInterop() {
   assert.equal(queryPackage.version, '7.1.3', 'Review/remove decoder interop when upgrading the routing parent');
   const decoder = createRequire(path).resolve('decode-uri-component');
   const decoderPackage = JSON.parse(await readFile(join(dirname(decoder), 'package.json'), 'utf8'));
-  assert.equal(decoderPackage.version, '0.5.0', 'The patched, reviewed decoder is required');
+  assert.equal(decoderPackage.version, '0.5.1', 'The patched, reviewed decoder is required');
   const source = await readFile(path, 'utf8');
   const patched = routingDecoderInterop(source);
   if (patched !== source) await writeFile(path, patched);
