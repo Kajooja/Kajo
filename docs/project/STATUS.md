@@ -73,7 +73,7 @@ activate or admit that forward in the hosted application. No migration is remove
 or rewritten, and no account, retained forecast or history is reset.
 
 **Active source packet:** [Issue #405](https://github.com/Kajooja/Kajo/issues/405),
-branch `feat/personal-content-rating`, starts from accepted #404. The owner
+branch `feat/personal-content-rating`, [PR #406](https://github.com/Kajooja/Kajo/pull/406), starts from accepted #404. The owner
 approved publication of this successor task and uninterrupted continuation on
 **2026-11-02**. The implementation is ready for required source CI. Local engine
 tests pass (410), as do 39 native-fixture cases, populated V1 upgrade and eight
@@ -82,8 +82,17 @@ inputs, forecasts, census and report evidence for independent reconstruction.
 Actual PostgreSQL contention proofs and required CI/source acceptance remain
 pending; no observed-quality, hosted or serving acceptance is claimed.
 
+CI #825 passed validation (2,413 tests/four configured exports) and all three
+platform/foundation jobs. Its native CLI job passed the new conformance cases,
+then rejected an underscore in a concurrency probe's diagnostic stage label.
+The corrected probe normalizes only the diagnostic label, preserving SQL backend
+identities and both strict runner validators; two actual-validator regressions
+pass. Required CI on the corrected head and native contention evidence remain
+pending; the earlier failed run is not an acceptance receipt.
+
 Local lint/typecheck, research and acceptance tests and four explicit-demo
-iOS/Android exports pass. The full database regression is running. Local catalogue
+iOS/Android exports pass. The full local database regression passed 441 tests
+before the two new runner-contract tests. Local catalogue
 checks retain four inherited child-process stderr failures from this environment's
 injected `UNDICI-EHPA` proxy warning; Deno dependency retrieval is refused by the
 local network. Assertions and source checks are unchanged. Required CI must pass

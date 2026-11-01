@@ -4,6 +4,11 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { withPersonalContentRatingFixture } from './personal-content-rating.mjs';
 import { literal, json, inspect } from './personal-rating-prospective.mjs';
 
+// Native one-shot executors use stricter diagnostic labels than PostgreSQL
+// application_name or persistent-session stages. Keep SQL identities intact.
+export const executePersonalContentRatingProbe = (execSql, sql, stage) =>
+  execSql(sql, { stage: stage.replaceAll('_', '-'), timeoutMs: 45_000 });
+
 /** Native PostgreSQL only. Each witness identifies two different backends and
  * the actual conflicting relation lock; computation remains inside the capture
  * transaction. Timing alone is never accepted as a serialization proof. */
@@ -15,7 +20,7 @@ export async function verifyPersonalContentRatingConcurrency(execSql, withSqlSes
     const aliasSource = contentSources.find(row => row.itemId === f.items[1]);
     const lateAlias = contentSources.find(row => row.itemId === f.targets[12]);
     assert.ok(source && aliasSource && lateAlias);
-    const run = (sql, stage) => execSql(sql, { stage, timeoutMs: 45_000 });
+    const run = (sql, stage) => executePersonalContentRatingProbe(execSql, sql, stage);
     const track = promise => {
       const task = promise.then(value => ({ value }), error => ({ error }));
       pending.push(task);return task;
