@@ -172,6 +172,46 @@ cohort, aggregate quality comparison, calibration, model promotion or serving
 activation follows. Source/CI and guarded hosted acceptance remain separate;
 STATUS and the implementation PR retain their exact receipts.
 
+### Declared numeric evaluation — Sprint 016 / #402
+
+The separate `./personal-rating-evaluation` computation summarizes immutable
+first-report forecasts on the full integer 0–10 scale. A versioned declaration
+pins the Profile roster, domains, source/model/control versions, first-delivered
+target rule, capture window, chronological development/selection/final windows,
+label horizon, fixed checkpoints and independent cohort cap. The split windows
+include a label-horizon embargo. A final-role declaration requires explicit
+development-selected loss, coverage, precision, domain guardrail and resource
+requirements; file hashes do not authenticate preregistration or untouched data.
+
+The private Kajo adapter reconciles every supplied opportunity with a complete
+retained-allocation census for each declared owner. An explicit attempt ledger
+distinguishes capture unavailable/not attempted from a missing expected capture;
+the ledger is supplied evidence, not a native failure receipt. Missing owners,
+missing captures or undeclared allocations make reconciliation incomplete.
+Withdrawal/outside-path retirement invalidates primary metrics for the entire
+declared cohort. Coverage counts and zero-opportunity/zero-scored Profiles remain
+visible. The storage guard of 128 currently retained allocations per owner is
+not the cohort cap, and erasure is never permission to refill a declared cohort.
+
+Use frozen native microseconds for the evaluation cut. Each included owner's
+census must cover the checkpoint; a later aggregate export time cannot make a
+stale owner snapshot current. Later first answers do not retroactively answer an
+earlier checkpoint. Corrections/Undo/clear are current-state diagnostics only.
+Mean squared error, absolute error and bias (forecast minus first rating) are
+computed per Profile and then averaged equally across scored Profiles. Macro
+RMSE is the square root of macro MSE. Paired delta MSE uses identical targets
+with both forecasts available; absent denominators remain null. Domain and
+prefix-support slices are descriptive; rating-style parameters stay unidentified.
+
+This source packet supplies descriptive arithmetic and explicit coverage checks.
+It does not estimate the declared uncertainty method, evaluate resource budgets,
+admit a model, establish new experience or causal recommendation benefit, or
+activate collection/serving. The current native-only candidate and Personal-mean
+control are equal. Native identities remain in private input bindings; alias-only
+reports are bounded, exclusive mode-0600 files outside Git, with a seven-day
+post-checkpoint retention limit. Files cannot prove current authorization or
+withdrawal status; callers must invalidate/delete stale exports with their sources.
+
 ### Three-action learning boundary
 
 Current Taste/Discovery feed actions are **List saving, numeric rating and Ohita**.

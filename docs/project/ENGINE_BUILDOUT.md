@@ -359,6 +359,16 @@ Compare single-scale, short/long and context-gated alternatives on declared targ
 
 **Next bounded slice:** run one bounded, retry-safe evaluation job over frozen decisions and eligible matured outcomes, with deterministic identity/checkpoints and an explicit report.
 
+The Sprint 016 #402 source slice adds a versioned numeric declaration and
+descriptive Profile-macro first-report evaluation over #400's immutable captures.
+It retains missing/unavailable/withdrawn coverage, fixed microsecond cuts and
+chronological role windows; current corrections do not rewrite first measurements.
+Its private census/file bindings do not prove authentic preregistration or a
+complete historical cohort. Declared uncertainty/resource methods, observed
+quality, operating collection and model admission still need their own evidence.
+STATUS and the implementation PR own source/CI acceptance; this does not close
+EB-03 or substitute a synthetic cohort for eligible native outcomes.
+
 **Exit evidence:** horizon-specific label maturity, corrected outcomes, missing/censored results and exposure coverage are reported. Training/selection/final-test windows are separate. Replay uses only available-at-time inputs and compatible artifacts. Representative replay is the control for error-prioritized replay, with sampling treatment and diagnostic limits recorded. Unchosen actions receive no invented successes or failures. Report support, uncertainty method, latency/resource cost and rejected/insufficient results. Exercise manual canary and rollback without enabling automatic/global promotion.
 
 Diagnostics separate possible state/retrieval/world/calibration failures; they do not claim causal explanations from one surprising outcome. No worker creates its own evaluation truth.

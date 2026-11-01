@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-01**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, durable prospective Personal numeric capture #400 source packet; the #398 baseline is accepted through #401. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, declared numeric evaluation coverage and Profile-macro report #402 source packet; baseline #398 and durable capture #400 are accepted through #401/#403. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,18 +11,36 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — prospective numeric capture #400
+## Current handoff — declared numeric evaluation #402
 
-[PR #401](https://github.com/Kajooja/Kajo/pull/401) is accepted as main
-`2d09d87bb8a4274deff0fd0aa099fdc82b462037`, with source/tested/accepted tree
-`03ba583afbc26bbabd2ed548c4fb0b98a5912036`. All six required
-[CI #816](https://github.com/Kajooja/Kajo/actions/runs/40841255469) gates passed:
-**2,294 tests and four configured iOS/Android exports**. The native artifact
-independently reproduces all 15 numerical fixture cases and preserves source,
-retry, correction, Undo, withdrawal and exact microsecond boundaries. #398 is
-closed; do not repeat the baseline implementation. The full **0–10** integer
-scale remains supported. Fixture success supplies source conformance, not
-measured usefulness or serving admission.
+[PR #403](https://github.com/Kajooja/Kajo/pull/403) is accepted as main
+`23e7d8ee2bb3be02be6d93b33fd1d71eb5697244`, with source/tested/accepted tree
+`42f2c01d844a5eb4004c1318ca4c90e27d8a25cd`. All six required
+[CI #821](https://github.com/Kajooja/Kajo/actions/runs/41316036602) gates passed:
+**2,332 tests and four configured iOS/Android exports**. Independent native
+review reproduces 15 baseline numerical cases and 24 prospective lifecycle cases,
+all eleven integer grades **0–10**, five independent-session lock proofs,
+populated-upgrade preservation and canonical cleanup. Performance review
+recomputes the retained 2,880 measurements and original comparison rules with
+no rule failures in this run; `admission` remains `NONE`. This does not replace
+earlier failed diagnostic results or admit optional #391. The PR owns exact
+source/tested identities, artifact hashes and verification limits.
+
+#400 is closed. Its private trusted TypeScript/native path durably freezes the
+forecast before the separate first-answer command and preserves the first
+measurement through ordinary correction, Undo and clear. Outside-path reports
+and physical withdrawal retain their explicit exclusion/erasure boundaries.
+This remains forecast-before-first-report evidence with unknown experience time,
+not proof of exposure, a new experience or recommendation benefit. #398 was
+accepted through [#401](https://github.com/Kajooja/Kajo/pull/401); do not repeat
+either numerical baseline or capture implementation. No mobile answer route,
+actual owner cohort, hosted forward or serving model was activated by #403.
+
+The accepted packet also preserves the reviewed database image contract on
+Ubuntu 24.04 and resolves the recorded dependency findings with the verified
+[source corrections](../architecture/ARCHITECTURE.md#verified-local-dependency-security-corrections--238).
+Raw advisory findings remain visible and unknown/unverified findings fail.
+These source/CI corrections do not admit a new hosted image or version.
 
 The prior [#397](https://github.com/Kajooja/Kajo/pull/397) feasibility source is
 also accepted. Its ordinal-only capability labels remain unchanged. The
@@ -44,60 +62,69 @@ installations include the 54th candidate forward; their CI success does not
 activate or admit that forward in the hosted application. No migration is removed
 or rewritten, and no account, retained forecast or history is reset.
 
-**Active source packet:** [Issue #400](https://github.com/Kajooja/Kajo/issues/400),
-branch `feat/prospective-personal-rating`, starts from accepted #401. It adds a
-private, dedicated native transaction that captures the complete canonical raw
-rating prefix and actual delivered Personal candidate pool, runs the existing
-TypeScript mean baseline, and durably finalizes the selected target forecast
-before a later answer transaction. The native-only fallback is explicit; no
-external prior, content differentiation or calibrated uncertainty is introduced.
+**Active source packet:** [Issue #402](https://github.com/Kajooja/Kajo/issues/402),
+branch `feat/personal-rating-evaluation`, starts from accepted #403. It adds one
+versioned declaration, a complete declared-opportunity inventory adapter and a
+pure Profile-macro report over the existing immutable forecasts/first answers.
+The implementation includes the private declaration/report CLI and a logically
+read-only owner census exercised through actual native producers. Forty focused
+core, adapter, private-file and database tests pass. Required full CI and source
+acceptance remain pending; no quality or mobile/hosted collection is admitted.
 
-The bounded first-answer path is a private trusted wrapper around the existing
-canonical rating command. It retains the original numeric answer and comparison;
-ordinary later correction, Undo and clear change current/future evidence without
-rewriting that measurement. Outside-path answers are not silently promoted to
-prospective first answers by sorting stored timestamps. Input or answer source
-erasure withdraws dependent copied data and retains the source-owned consumed-ID
-boundary. Synthetic test provenance remains synthetic.
+**Local verification / publication boundary — 2026-11-01:** lint and typecheck,
+904 mobile tests, 430 database tests, 380 engine tests, 75 Node/19 Python research
+tests, and 11 acceptance tests pass. All four iOS/Android smoke exports pass in
+explicit demo mode; production environment variables are unavailable locally.
+The full `npm run check` stopped at 15
+unchanged catalogue CLI assertions because the work environment injects an
+`UNDICI-EHPA` warning into stderr (433/448 catalogue tests passed). Separate edge
+verification could not fetch locked npm dependencies: the registry connection
+was refused. No product assertions or network restrictions were weakened.
+The owner explicitly approved this prepared #402 packet's publication, PR and
+merge after all six required CI gates on **2026-11-01**, resolving the automatic
+publication-review hold. Publish the reviewed source on the named branch and
+record its PR/CI receipt; merge only after all six required gates pass.
 
-This is source-only evaluation infrastructure. It does not route mobile answers,
-collect an owner cohort, activate a scorer or install any hosted forward. Native
-independent-session checks must prove both capture/answer orders, raw Event
-writers and withdrawal; a single-session fixture is not concurrency evidence.
-Local checks pass: all 426 database tests and 353 engine tests, including
-24 committed numeric lifecycle cases,
-five populated-upgrade checks and nine persistent-session protocol tests. The
-full local root check encounters inherited CLI stderr assertions because this
-workspace injects an experimental HTTP-proxy warning; it is not a full pass.
-Final required CI, source identities and native acceptance belong to the
-implementation PR. Never merge with a failed required gate.
+Declare the Profile roster, BOOK/MOVIE scope, retrospective first-report target,
+deterministic delivered-target selection, source/model/control versions, capture
+windows, checkpoints and chronological development/selection/final split. Keep
+every declared opportunity, including capture unavailable, numeric forecast
+unavailable, pending, expired, answered and grouped withdrawal/outside-path
+retirement. Zero-opportunity and zero-scored Profiles remain visible. Missing
+expected identities leave completeness unresolved; withdrawal must not produce
+a favorable survivor cohort. File hashes establish consistency, not authentic
+preregistration, native inventory completeness or current source authorization.
 
-[PR #403](https://github.com/Kajooja/Kajo/pull/403) remains open. CI #819 passed
-2,314 tests, four exports and five required jobs. Its native CLI probe printed
-PASS after 24m45s, but the 25-minute job deadline cancelled artifact upload; that
-gate is not accepted. One exact-source retry then stopped before application SQL
-when `ubuntu-latest` moved from Ubuntu 24.04/Docker 28 to Ubuntu 26.04/Docker 29
-and reported a different image identity. The source now pins all five database
-jobs to Ubuntu 24.04 and gives only the CLI job a 30-minute outer budget, preserving
-all SQL/process deadlines and the exact reviewed image guard. Required CI for
-this final source remains pending; the PR owns the receipt. No new image or
-hosted version is admitted by these orchestration corrections.
+Use the frozen native `horizonEndMicros` and first-answer `acceptedAtMicros` for
+the declared evaluation cut, rather than the inspector's current-clock coverage.
+Current corrections/Undo/clear remain separate diagnostics. Compute per-Profile
+MSE, MAE and bias, weight scored Profiles equally, and define macro RMSE as the
+square root of macro MSE. Paired model deltas use identical targets; empty
+denominators remain null. The native-only candidate currently equals its
+Personal-mean control, so zero delta is expected rather than an improvement.
 
-CI #820 confirms the restored database platform but its fresh dependency audit
-finds newly published advisories. The same packet updates compatible node-forge
-to 1.4.2 and decode-uri-component to 0.5.1, retires the superseded forge backport,
-and adds exact upstream minimatch/glob compatibility corrections, including glob's
-bundled optimizer. Legacy minimatch 3.1.5 is explicitly verified to lack the
-reported optimizer; raw audit findings remain visible and unknown findings fail.
-ARCHITECTURE owns these source dispositions. Final dependency/runtime checks and
-all six final-source CI jobs must pass before #403 integrates.
+The declared cohort cap is separate from #400's 128 currently retained
+source-owned allocations. Event-withdrawal tombstones count while their source
+prediction exists; source erasure frees that storage capacity without granting
+permission to refill an evaluation cohort. Retained-source checks cannot certify
+already erased history. Synthetic/observed provenance stays explicit and this
+descriptive source packet keeps `qualityAdmission: NONE`.
 
-**Continuation rule:** finish #400 on its named branch and required CI. After integration, the sole next source packet is
-[#402](https://github.com/Kajooja/Kajo/issues/402): declared numeric evaluation
-coverage and the Profile-macro report. Do not repeat #400. Profile-macro mean-loss evaluation,
-coverage, genuine later labels and independently selected quality requirements
-remain open. Do not substitute pooled research RMSE or synthetic fixture results.
-#394 and #399 remain separate follow-ups.
+**Continuation rule:** finish #402 on its named branch, including required CI
+and the complete declaration/inventory/report checks. Mean-loss comparison on
+genuine eligible labels still requires development-selected numerical coverage,
+precision and quality requirements before an untouched final window. Do not
+substitute pooled research RMSE or synthetic fixture results. #394 and #399
+remain separate follow-ups; Sprint 016 and Engine V1 acceptance remain open.
+
+After #402 acceptance, the next bounded source issue under #302 should add one
+transparent, regularized content-preference challenger that can distinguish
+Items, with immutable permitted feature inputs and the Personal-mean control.
+The current location-only baseline gives every Item the same forecast. Reuse
+#400/#402 with explicit version compatibility, sparse/constant-support fallback
+and no serving admission. A genuine declared development cohort remains the
+separate experiment needed to select regularization and numerical quality/
+coverage/precision requirements before selection and untouched final windows.
 
 A read-only hosted check on **2026-10-28T18:09:23Z** confirms acquisition body
 MD5 `6e0aba591a90c194c5bae49f0361084f` and no installed skip-prefilter forward.

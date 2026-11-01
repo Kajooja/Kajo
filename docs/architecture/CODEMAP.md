@@ -26,6 +26,21 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Declared Personal numeric evaluation — Sprint 016 / #402
+
+| Responsibility | Implementation |
+| --- | --- |
+| Versioned declaration and equal-Profile arithmetic | `packages/prediction-engine/src/personal-rating-evaluation.ts`, optional `./personal-rating-evaluation`; fixed cuts, chronological split, missing/withdrawn coverage, per-Profile and paired MSE/MAE/bias; descriptive only |
+| Native inventory reconciliation | `packages/prediction-engine/src/adapters/kajo-personal-rating-evaluation.ts`; complete declared roster/attempt ledger versus retained allocation/inspection census, source and immutable first-answer binding, alias-only portable rows |
+| Private declaration/report command | `packages/prediction-engine/scripts/personal-rating-evaluation.mjs`, `npm run engine:rating:evaluation`; canonical digest, expiry and shared bounded POSIX file protections; no credentials or database executor |
+| Native census and verification | `scripts/database/personal-rating-evaluation.mjs` and its tests; existing private locks/inspector, owned-Personal census including empty owners, synthetic committed producer integration; no migration/public grants |
+
+Core/adapter tests live in `packages/prediction-engine/test/*personal-rating-evaluation.test.ts`;
+file/CLI regressions join `scripts/research/personal-rating-evaluation.test.mjs`.
+Stored forecasts are not rescored, missing labels are not zeros, and successful
+fixtures do not establish predictive quality, complete historical inventory or
+hosted activation. STATUS and the implementation PR own exact acceptance.
+
 ## Prospective Personal numeric capture — Sprint 016 / #400
 
 | Responsibility | Implementation |
