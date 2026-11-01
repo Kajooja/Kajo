@@ -128,6 +128,50 @@ benefit follows. Durable prospective numeric forecasts and later-label
 reconciliation must precede the predeclared Profile-macro MSE/coverage experiment.
 [STATUS](../project/STATUS.md) owns source/native acceptance and the next packet.
 
+### Durable prospective numeric source — Sprint 016 / #400
+
+The private native evaluation path freezes a selected Personal Item with no prior
+report in retained source history, from an actual delivered source pool. A
+dedicated READ COMMITTED transaction locks the lifecycle boundary, raw Event
+writes and Profile, captures the complete
+canonical raw-label prefix, invokes the same `forecastPersonalRatingBaseline`
+TypeScript computation, and finalizes its immutable output before COMMIT. A
+deferred guard requires finalization and rejects target answers in that same
+transaction, including savepoint writes. Native receipt microseconds remain exact;
+wall-clock ordering alone is not claimed as proof of commit visibility.
+
+The new `./adapters/kajo-personal-rating-prospective` contract is separate from
+the isolated #398 fixture adapter. It binds the canonical resolver, Personal
+owner, selected target, actual delivered pool and common snapshot/cutoff. Origin
+is explicit: synthetic integration fixtures stay synthetic. This first native
+consumer uses the pinned native-only mean fallback, with no admitted domain prior.
+All candidate values remain genuine ties. Unavailable numeric support remains
+unavailable rather than silently dropping the observation opportunity.
+
+A closed private first-answer writer invokes the existing canonical rating
+command after forecast commitment and retains the first raw 0–10 response and
+its comparison. This is a trusted evaluation boundary, not a public RPC or an
+installed mobile route. It refuses an already answered or otherwise changed
+target; passive timestamp sorting cannot manufacture an eligible first answer.
+The inspection path exposes the immutable first measurement separately from the
+current canonical rating/clear/Undo state. Pending and expired follow-up are
+explicit coverage states. Source withdrawal and outside-path retirement share a
+truthful grouped exclusion; this packet cannot recover their individual causes
+from removed payloads. Later corrections change future
+prefixes, never the original forecast or measured answer. Source erasure removes
+dependent copied inputs, forecasts and measurements. Event withdrawal retains
+the consumed capture allocation while its prediction source exists, preventing
+reuse of that ID. Erasing the prediction source also removes the allocation.
+Retained-history and target checks cannot certify that an Item was never answered
+in erased history or reserve its evaluation opportunity permanently.
+
+Delivery is not proof of an impression or a new experience. This source supports
+forecast-before-report measurement with unknown experience time; newly experienced
+recommendation value still requires its own exposure/cohort protocol. No actual
+cohort, aggregate quality comparison, calibration, model promotion or serving
+activation follows. Source/CI and guarded hosted acceptance remain separate;
+STATUS and the implementation PR retain their exact receipts.
+
 ### Three-action learning boundary
 
 Current Taste/Discovery feed actions are **List saving, numeric rating and Ohita**.

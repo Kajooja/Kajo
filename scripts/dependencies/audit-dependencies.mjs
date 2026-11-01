@@ -61,7 +61,13 @@ export function classifyAudit(report, verified) {
       const correction = corrections.find(entry => entry.name === advisory.name && entry.advisory === advisory.url);
       if (!correction) return false;
       const leaf = vulnerabilities[correction.name];
-      return leaf && leaf.nodes.every(path => verified.some(entry => entry.name === correction.name && entry.version === correction.version && entry.advisory === correction.advisory && entry.path === path));
+      return leaf && leaf.nodes.every(path => verified.some(entry => {
+        if (entry.name !== correction.name || entry.advisory !== correction.advisory || entry.path !== path
+          || !(correction.auditVersions ?? [correction.version]).includes(entry.version)) return false;
+        const variant = correction.variants?.find(value => value.version === entry.version);
+        // A reviewed absence of the affected mechanism is distinct from a patch.
+        return !variant?.evidenceKind || entry.evidenceKind === variant.evidenceKind;
+      }));
     });
     (corrected ? mitigated : unmitigated).push({ name, severity: finding.severity, advisories: sources.map(source => source.url) });
   }
@@ -75,7 +81,7 @@ export function classifyAudit(report, verified) {
 export async function auditDependencies() {
   const verified = await securityPatches();
   const regression = spawnSync(process.execPath, ['--test', 'scripts/dependencies/security-patches.test.mjs',
-    'scripts/dependencies/zod-security.test.mjs'], {
+    'scripts/dependencies/zod-security.test.mjs', 'scripts/dependencies/glob-minimatch-security.test.mjs'], {
     cwd: projectRoot, encoding: 'utf8', timeout: 30000, maxBuffer: 1024 * 1024,
   });
   assert.ifError(regression.error);

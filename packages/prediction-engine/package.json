@@ -90,6 +90,10 @@
     "./adapters/kajo-personal-rating": {
       "types": "./dist/adapters/kajo-personal-rating.d.ts",
       "import": "./dist/adapters/kajo-personal-rating.js"
+    },
+    "./adapters/kajo-personal-rating-prospective": {
+      "types": "./dist/adapters/kajo-personal-rating-prospective.d.ts",
+      "import": "./dist/adapters/kajo-personal-rating-prospective.js"
     }
   },
   "scripts": {

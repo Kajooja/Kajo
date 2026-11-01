@@ -23,6 +23,28 @@ estimates are 7 (rating) and 50 (energy); after a known continuation, recalled
 estimates are 9 and 45. This demonstrates execution and portability, not learned
 quality, causal effects, calibrated confidence or real non-media competence.
 
+## Prospective native numeric adapter — #400
+
+`./adapters/kajo-personal-rating-prospective` exposes
+`normalizeKajoPersonalRatingProspectivePrefix`. It accepts only the private native
+preparation contract: a complete canonical raw-label prefix, actual delivered
+Personal pool and never-answered selected target, with one exact microsecond
+cutoff and snapshot. It validates the original Event joins and preserves the
+declared observed/synthetic origin. This source uses pinned
+`personal-native-location-v1` configuration and no external prior; the numerical
+computation remains `forecastPersonalRatingBaseline`.
+
+The adapter does not authorize a caller or establish commit order. The trusted
+native driver must prepare, compute and finalize inside the same dedicated
+transaction, then commit before the closed first-answer writer runs. PostgreSQL
+owns lifecycle/row/raw-Event locks, deferred commit checks, immutable first
+measurements and dependent-source erasure. A pure adapter test is not a native
+prospectivity certificate. The existing fixture-only adapter remains restrictive.
+
+This packet does not route mobile answers, serve a model, collect a real cohort
+or prove recommendation usefulness. Missing support, unknown experience time and
+uncalibrated quality remain explicit. See [canonical semantics](../../docs/domain/PREDICTION_MODEL.md#durable-prospective-numeric-source--sprint-016--400).
+
 ## Personal numeric location baseline — #398
 
 The separate `./personal-rating` export consumes an already authorized, complete,
@@ -91,6 +113,7 @@ successors; passing synthetic fixtures does not supply those outcomes.
 | `./adapters/kajo-native-prediction` | Normalize actual private native run/candidate snapshots through the existing Kajo scope adapter; preserve declared candidate acquisition and input clocks; ranking scores remain uncalibrated |
 | `./personal-rating` | Pure `forecastPersonalRatingBaseline`: complete resolved raw-label prefix, Personal/domain mean control, permitted domain prior plus shrunk residual, immutable numeric point forecasts; source-only and uncalibrated |
 | `./adapters/kajo-personal-rating` | Strict `normalizeKajoPersonalRatingPrefix` for isolated native fixture snapshots; original numeric Event join, canonical source identity, exact microsecond cutoff and declared same-snapshot candidate pool |
+| `./adapters/kajo-personal-rating-prospective` | Trusted private native preparation mapping with exact selected-target/delivered-pool bindings and explicit observed/synthetic origin; fixed native-only baseline, no permission or commit certificate from the adapter alone |
 | `./working-state` | Pure `deriveWorkingState` and default-OFF `scoreWorkingAdjustment`; bounded independent current-session Item support, correction closure and explicit STATIC/ORDERED controls |
 | `./adapters/kajo-working-state` | Strict `normalizeKajoWorkingSession` for authorized Personal canonical Event/session snapshots; no database reader, writer, app import or authorization replacement |
 | `./working-evaluation` | Pure `summarizeWorkingSupport`, `freezeWorkingEvaluationPlan`, `evaluateWorkingPlan` and `evaluateWorkingBatch`; conditional OFF-exposed pairwise comparison, planned coverage and Item weight concentration; no capture writer or admission |

@@ -4,6 +4,7 @@ import { lstat, readFile, writeFile } from 'node:fs/promises';
 import path, { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { zodSecurityCorrection } from './zod-security-correction.mjs';
+import { globMinimatchSecurityCorrections } from './glob-minimatch-security-corrections.mjs';
 
 export const projectRoot = fileURLToPath(new URL('../../', import.meta.url));
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -13,6 +14,7 @@ const depthError = "throw new SyntaxError('Brace nesting exceeds the supported d
 // identities so the raw advisory report continues to show upstream findings.
 // Remove each correction only after reviewing a fixed upstream release.
 export const corrections = [
+  ...globMinimatchSecurityCorrections,
   {
     name: 'braces', version: '3.0.3',
     advisory: 'https://github.com/advisories/GHSA-vfj7-8cjw-p6xm',
@@ -45,34 +47,6 @@ export const corrections = [
           ['  const stringify = (node, parent = {}) => {', `  const stringify = (node, parent = {}, depth = 0) => {\n    if (depth > 128) { ${depthError} }`, 1],
           ['output += stringify(child);', 'output += stringify(child, {}, depth + 1);', 1],
         ],
-      },
-    ],
-  },
-  {
-    name: 'node-forge', version: '1.4.0',
-    advisory: 'https://github.com/advisories/GHSA-86w9-cpqp-85rv',
-    integrity: 'sha512-LarFH0+6VfriEhqMMcLX2F7SwSXeWwnEAJEsYm5QKWchiVYVvJyV9v7UDvUv+w5HO23ZpQTXDv/GxdDdMyOuoQ==',
-    files: [
-      {
-        path: 'lib/rsa.js', sha256: 'fd4740238145ec26470eb3f06a627c72039538ce1307dbdce40521f94dfd0a50',
-        replacements: [[
-          '            obj.value.length !== 2) {',
-          "            obj.value.length !== 2 ||\n            obj.value[0].value.length !== ('parameters' in capture ? 2 : 1) ||\n            ('parameters' in capture && capture.parameters !== '')) {", 1,
-        ]],
-      },
-      {
-        path: 'dist/forge.min.js', sha256: 'd9b9074e6861200d676e25dcfe97889db5e8f4150bb766d29c491ad709a51b58',
-        replacements: [[
-          'if(!s.validate(n,d,o,c)||2!==n.value.length)',
-          'if(!s.validate(n,d,o,c)||2!==n.value.length||n.value[0].value.length!==("parameters"in o?2:1)||("parameters"in o&&o.parameters!==""))', 1,
-        ]],
-      },
-      {
-        path: 'dist/forge.all.min.js', sha256: 'cb9ba4045a81825f8edb646c38d53a1ac30ce07665bf26042c8dea86d7208642',
-        replacements: [[
-          'if(!s.validate(a,d,o,c)||2!==a.value.length)',
-          'if(!s.validate(a,d,o,c)||2!==a.value.length||a.value[0].value.length!==("parameters"in o?2:1)||("parameters"in o&&o.parameters!==""))', 1,
-        ]],
       },
     ],
   },
@@ -159,7 +133,9 @@ export async function securityPatches({ root = projectRoot, install = false } = 
         files.push({ path: file.path, originalSha256: file.sha256, correctedSha256: hash(corrected) });
       }
       verified.push({ name: correction.name, version: expected.version, advisory: correction.advisory, path, files,
-        ...(expected.unmodifiedFiles ? { upstreamFixedFiles: expected.unmodifiedFiles } : {}) });
+        ...(expected.unmodifiedFiles ? (expected.evidenceKind
+          ? { verifiedUnmodifiedFiles: expected.unmodifiedFiles } : { upstreamFixedFiles: expected.unmodifiedFiles }) : {}),
+        ...(expected.evidenceKind ? { evidenceKind: expected.evidenceKind } : {}) });
     }
   }
   return verified;
@@ -167,5 +143,5 @@ export async function securityPatches({ root = projectRoot, install = false } = 
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   await securityPatches({ install: true });
-  console.log('Verified braces, node-forge, Zod and deepmerge compatibility source corrections applied.');
+  console.log('Verified glob, minimatch, braces, Zod and deepmerge source dispositions applied.');
 }

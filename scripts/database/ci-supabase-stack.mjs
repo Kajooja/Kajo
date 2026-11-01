@@ -2,12 +2,13 @@
 // runner. Shared by the platform and application installation checks.
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { isAbsolute, join, resolve } from 'node:path';
 import { setTimeout as wait } from 'node:timers/promises';
 import { bufferedSqlCommand } from './buffered-sql-command.mjs';
+import { withIsolatedSqlSession } from './isolated-sql-session.mjs';
 
 const cliVersion = '2.117.0';
 // Linux x64 image verified in CI #385. A moved tag fails closed.
@@ -393,6 +394,40 @@ async function withNewSupabaseStack(projectId, work, destination) {
         child.stdin.end(sql);
       });
     };
+    const withSqlSession = async (sessionWork, options = {}) => {
+      assert.equal(projectId, 'kajo_ci_cli_install', 'Persistent SQL is restricted to its newly owned CLI stack');
+      const { stage = 'persistent-sql', timeoutMs = 60_000 } = options;
+      const applicationName = 'kajo_ci_sql_' + randomUUID().replaceAll('-', '');
+      let backend;
+      try {
+        return await withIsolatedSqlSession('docker', ['--host', dockerHost, 'exec', '-i', '--env',
+          `PGOPTIONS=-c application_name=${applicationName} -c statement_timeout=30000 -c lock_timeout=10000 -c idle_in_transaction_session_timeout=30000`,
+          container, 'psql', '-X', '-qAt', '--set=ON_ERROR_STOP=1', '--set=VERBOSITY=sqlstate', '--username=postgres', '--dbname=postgres'],
+        { cwd: directory, env: environment, stage, timeoutMs }, async execSession => {
+          const [identified] = await execSession(`select jsonb_build_object('pid',pg_backend_pid(),'startedAt',
+            (select backend_start::text from pg_stat_activity where pid=pg_backend_pid()));`);
+          assert.ok(Number.isInteger(identified?.pid) && identified.pid > 0 && typeof identified.startedAt === 'string',
+            'Invalid isolated SQL backend acknowledgement');
+          backend = identified;
+          return sessionWork(execSession);
+        });
+      } catch (error) {
+        // Closing Docker stdin ordinarily closes psql. If a query was blocked,
+        // terminate only our exact backend (PID AND start time), even when the
+        // fixture changed application_name to make lock waits observable.
+        const identity = backend
+          ? `pid=${backend.pid} and backend_start='${backend.startedAt.replaceAll("'", "''")}'::timestamptz`
+          : `application_name='${applicationName}'`;
+        try {
+          await execConcurrentSql(`select jsonb_build_object('terminated',coalesce((select bool_and(pg_terminate_backend(pid))
+            from pg_stat_activity where datname='postgres' and ${identity}),'true'));`,
+          { stage: 'persistent-sql-cleanup', timeoutMs: 30_000 });
+        } catch (cleanupError) {
+          throw new AggregateError([error, cleanupError], 'Isolated SQL failure and backend cleanup both failed');
+        }
+        throw error;
+      }
+    };
     let resetCount = 0, rpcCount = 0;
     const catalogRpc = async (body, role = 'service_role') => {
       assert.equal(projectId, 'kajo_ci_cli_install');
@@ -438,7 +473,7 @@ async function withNewSupabaseStack(projectId, work, destination) {
       verifyCiPostgresImage(resetImage);
       return { image: resetImage, containerId: docker(['inspect', '--format', '{{.Id}}', container]).trim() };
     };
-    const result = await work(execSnapshots, { resetFromMigrations, applyMigrations, execConcurrentSql, catalogRpc });
+    const result = await work(execSnapshots, { resetFromMigrations, applyMigrations, execConcurrentSql, withSqlSession, catalogRpc });
     if (destination) {
       const report = { result, cliVersion, image, architecture: process.arch, projectId, containerId,
         workspace: directory, installedAt: new Date().toISOString(), cleanup: 'RETAINED_LOCAL',

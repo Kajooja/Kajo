@@ -38,7 +38,11 @@ test('native skip diagnostics isolate real root calls and exact-clock private pa
       create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
       grant usage on schema public,auth to anon,authenticated,service_role;`);
     const files = (await buildFreshInstallation()).files;
-    for (const file of files.slice(0, -1)) await db.exec(`begin;${file.sql}commit;`);
+    // This diagnostic is pinned to the optional skip forward, not the latest
+    // unrelated application migration. Preserve its original 53/54 source pair.
+    const skipIndex = files.findIndex(file => file.name === '20261028081350_native_skip_acquisition_prefilter.sql');
+    assert.ok(skipIndex > 0);
+    for (const file of files.slice(0, skipIndex)) await db.exec(`begin;${file.sql}commit;`);
     const baselineDefinition = await one("select to_jsonb(pg_get_functiondef('private.acquire_native_candidates_v1(jsonb)'::regprocedure));");
     await db.exec('begin;' + await nativeCandidateRequestFixtureSql() + 'commit;');
     const profileId = await one(`select to_jsonb(id) from public.profiles where owner_user_id='${actor}' and profile_type='PERSONAL';`);
@@ -70,7 +74,7 @@ test('native skip diagnostics isolate real root calls and exact-clock private pa
     const ledgerBefore = await one(skipLedgerHashSql);
     const context = { actor, profileId, request, call, auditSql, catalogSize: 40,
       originalSample: { functionTiming: summarizeFunctionTiming(observed[1], 'rank_items_feed_v1') },
-      baselineDefinition, migration: files.at(-1) };
+      baselineDefinition, migration: files[skipIndex] };
     const report = await collectSkipCallDiagnostics(exec, context);
     assert.equal(report.status, 'PASS', JSON.stringify(report.failure ?? report.restorationFailure)); assert.equal(report.functionsRestored, true);
     assert.deepEqual(report.protocol, skipCallDiagnosticProtocol({ contractTest: true }));
@@ -93,7 +97,7 @@ test('native skip diagnostics isolate real root calls and exact-clock private pa
       assert.equal(repetition.control.selectedItemIds.length, 5);
     }
     assert.equal(await one("select to_jsonb(pg_get_functiondef('private.acquire_native_candidates_v1(jsonb)'::regprocedure));"), baselineDefinition);
-    await db.exec('begin;' + files.at(-1).sql + 'commit;');
+    await db.exec('begin;' + files[skipIndex].sql + 'commit;');
     const candidateDefinition = await one("select to_jsonb(pg_get_functiondef('private.acquire_native_candidates_v1(jsonb)'::regprocedure));");
     assert.notEqual(candidateDefinition, baselineDefinition);
     const candidateOriginal = await exec(observeSql, { stage: 'skip-call-control-original' });

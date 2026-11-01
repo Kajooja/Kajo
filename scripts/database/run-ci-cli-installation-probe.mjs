@@ -52,6 +52,9 @@ import { verifySharedPreparedUpgrade, verifySharedPreparedConsumption, verifySha
 import { verifySharedPreparedConcurrency } from './shared-prepared-consumption-concurrency.mjs';
 import { verifySharedForecastOutcomes } from './shared-forecast-outcomes.mjs';
 import { verifyPersonalRatingBaseline } from './personal-rating-baseline.mjs';
+import { verifyPersonalRatingProspective } from './personal-rating-prospective.mjs';
+import { verifyPersonalRatingProspectiveConcurrency } from './personal-rating-prospective-concurrency.mjs';
+import { verifyPersonalRatingProspectiveUpgrade } from './personal-rating-prospective-upgrade.mjs';
 import { verifyNativeSkipPrefilter } from './native-skip-prefilter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
@@ -79,7 +82,7 @@ try {
   const historySql = installationHistorySql;
   const nativeSql = `begin read only; set local search_path=pg_catalog;
     ${functionDigestSql({ includeApplication: false })} rollback;`;
-  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations, execConcurrentSql, catalogRpc }) => {
+  const { result, ...runtime } = await withCiSupabaseStack('kajo_ci_cli_install', async (exec, { resetFromMigrations, applyMigrations, execConcurrentSql, catalogRpc, withSqlSession }) => {
     const [platformBefore, functionsBefore] = await exec(platformSql + '\n' + nativeSql);
     const operationalInstall = await installFreshDatabase(exec, applyMigrations, installation);
     // The server must cancel before Docker's deadline, aborting this entire
@@ -97,12 +100,21 @@ try {
       rollback: 'owned test table absent after server statement cancellation' };
     const nativePersonalRatingBaseline = await verifyPersonalRatingBaseline(exec);
     assert.equal(nativePersonalRatingBaseline.status, 'PASS');
+    const nativePersonalRatingProspective = await verifyPersonalRatingProspective(execConcurrentSql, withSqlSession);
+    const nativePersonalRatingProspectiveConcurrency = await verifyPersonalRatingProspectiveConcurrency(execConcurrentSql, withSqlSession);
+    assert.equal(nativePersonalRatingProspective.status, 'PASS');
+    assert.equal(nativePersonalRatingProspectiveConcurrency.status, 'PASS');
     const nativeDiscoveryParity = await verifyNativeDiscoveryParity(exec);
     assert.equal(nativeDiscoveryParity.status, 'PASS');
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), expected,
       'Discovery parity changed the installed source');
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
+    const numericProspectiveIndex = files.findIndex(file => file.name.endsWith('_personal_rating_prospective.sql'));
+    assert.ok(numericProspectiveIndex > 0);
+    await resetFromMigrations(files.slice(0, numericProspectiveIndex));
+    const nativePersonalRatingProspectiveUpgrade = await verifyPersonalRatingProspectiveUpgrade(execConcurrentSql, files[numericProspectiveIndex]);
+    assert.equal(nativePersonalRatingProspectiveUpgrade.status, 'PASS');
     const skipPrefilterIndex = files.findIndex(file => file.name.endsWith('_native_skip_acquisition_prefilter.sql'));
     assert.ok(skipPrefilterIndex > 0);
     await resetFromMigrations(files.slice(0, skipPrefilterIndex));
@@ -502,7 +514,8 @@ try {
       nativeItemSupport, nativeItemSupportUpgrade,
       personalSourceFusion, personalSourceFusionUpgrade,
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
-      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativePersonalRatingBaseline, nativeSkipPrefilter,
+      personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativePersonalRatingBaseline, nativePersonalRatingProspective,
+      nativePersonalRatingProspectiveConcurrency, nativePersonalRatingProspectiveUpgrade, nativeSkipPrefilter,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,

@@ -31,6 +31,26 @@ correction/withdrawal lineage. Response-model estimates belong to derived state,
 not new observed Events, and cannot rewrite the grade or pre-answer forecast.
 The target's own-scale meaning is in [PREDICTION_MODEL](PREDICTION_MODEL.md#11-personal-expected-rating-and-response-behavior--engine-v1-target).
 
+The private #400 numeric evaluation source preserves the existing Event vocabulary
+and canonical `commit_item_action_v1` writer. Its closed first-answer wrapper
+requires a separately committed immutable numeric forecast before accepting the
+first measurement. It records the original raw grade, action receipt and Event
+identity; every integer **0–10** is supported. Later public corrections, clear
+and Undo affect the current canonical state without rewriting that measurement.
+An answer arriving outside the closed boundary is not recovered as a first
+measurement by timestamp sorting. Earlier evaluation-only Taste answers also
+exclude a supposedly never-answered target, even when they wrote no native Event.
+
+Physical Event withdrawal removes dependent copied numeric evidence and retains
+the consumed capture allocation while its prediction source exists. Erasing that
+prediction source also removes the allocation. These checks cannot certify prior
+answers in erased history. An ordinary correction is not physical withdrawal.
+The synthetic/native origin declaration is retained, and delivery
+alone does not establish exposure, consumption time or recommendation benefit.
+This is private source infrastructure; no new public action or mobile route is
+activated. [Prediction model](PREDICTION_MODEL.md#durable-prospective-numeric-source--sprint-016--400)
+owns the numeric calculation and transaction boundary.
+
 The Personal source-fusion correction now resolves available same-owner native
 rating authority before assigning weights. Exact scoped canonical command
 receipt lineage governs revisions, including backdated/equal occurrence clocks;
