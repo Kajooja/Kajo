@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-10-29**
+Last updated: **2026-11-01**
 Milestone: **MVP 0.1 — first public Kajo**
 Sprint: **016 — expected ratings and each user's rating style**, durable prospective Personal numeric capture #400 source packet; the #398 baseline is accepted through #401. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
@@ -71,6 +71,17 @@ full local root check encounters inherited CLI stderr assertions because this
 workspace injects an experimental HTTP-proxy warning; it is not a full pass.
 Final required CI, source identities and native acceptance belong to the
 implementation PR. Never merge with a failed required gate.
+
+[PR #403](https://github.com/Kajooja/Kajo/pull/403) remains open. CI #819 passed
+2,314 tests, four exports and five required jobs. Its native CLI probe printed
+PASS after 24m45s, but the 25-minute job deadline cancelled artifact upload; that
+gate is not accepted. One exact-source retry then stopped before application SQL
+when `ubuntu-latest` moved from Ubuntu 24.04/Docker 28 to Ubuntu 26.04/Docker 29
+and reported a different image identity. The source now pins all five database
+jobs to Ubuntu 24.04 and gives only the CLI job a 30-minute outer budget, preserving
+all SQL/process deadlines and the exact reviewed image guard. Required CI for
+this final source remains pending; the PR owns the receipt. No new image or
+hosted version is admitted by these orchestration corrections.
 
 **Continuation rule:** finish #400 on its named branch and required CI. After integration, the sole next source packet is
 [#402](https://github.com/Kajooja/Kajo/issues/402): declared numeric evaluation
