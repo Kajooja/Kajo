@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398 and prospective numeric capture #400 accepted; declared numeric evaluation #402 in progress; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective numeric capture #400 and declared numeric evaluation #402 accepted; content-preference challenger #405 in progress; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -130,18 +130,18 @@ reports retain their ordinal-only capability contract.
 
 Accepted [#400](https://github.com/Kajooja/Kajo/issues/400) supplies durable
 prospective numeric capture and later-label reconciliation using the same
-computation. Active [#402](https://github.com/Kajooja/Kajo/issues/402)
+computation. Accepted [#402](https://github.com/Kajooja/Kajo/issues/402)
 adds declared numeric evaluation coverage and the Profile-macro report, before
 mean-loss comparison under development-selected requirements and
 an untouched final window. Existing Sprints 014/015 acceptance remains open;
-neither source packet makes the whole Sprint 016 or Engine V1 complete.
+these source packets do not make the whole Sprint 016 or Engine V1 complete.
 
-## Active source packet — #402
+## Declared numeric evaluation source — #402 (accepted)
 
-The bounded source implementation on `feat/personal-rating-evaluation` adds a
-versioned declaration, complete declared-opportunity inventory adapter and pure
-Profile-macro report. Pin roster, retrospective first-report target, BOOK/MOVIE
-scope, deterministic delivered-target selection, source/model/control versions,
+The accepted source adds a versioned declaration, complete declared-opportunity
+inventory adapter and pure Profile-macro report. Its declaration pins the roster,
+retrospective first-report target, BOOK/MOVIE scope, deterministic delivered-target
+selection, source/model/control versions,
 capture windows/checkpoints and chronological development/selection/final split.
 Retain the full integer **0–10** scale. Experience time remains unknown; this is
 not a new-experience cohort or an exposure/uplift claim.
@@ -165,17 +165,48 @@ requirements selected from development evidence before the untouched final
 window; descriptive source fixtures retain `qualityAdmission: NONE`.
 
 The source includes the private declaration/report CLI and logically read-only
-owner census. Forty focused core, adapter, private-file and actual database-path
-tests pass; required full CI and source acceptance remain pending. No quality,
+owner census. [PR #404](https://github.com/Kajooja/Kajo/pull/404) is accepted after
+all six [CI #823](https://github.com/Kajooja/Kajo/actions/runs/41348632726) gates,
+**2,372 tests and four configured iOS/Android exports**. The new native evaluation
+summary matches independent fixture expectations (MSE 49, MAE 7, bias 7, paired
+delta 0) and three exact source hashes. It does not retain raw census/report
+inputs for independent full-report reconstruction. No observed quality,
 mobile-route, hosted-installation or serving acceptance follows; STATUS and the
-implementation PR own the exact source/check receipt.
+PR own the complete source/check receipt.
 
-The owner approved publication and merge after all six required CI gates on
-2026-11-01. STATUS records local verification and environment limits; the PR
-must retain the exact source/CI receipt. After source acceptance, select
-one bounded item-differentiating content-preference challenger with frozen
-permitted feature inputs and the Personal-mean control. Observed development
-cohort collection and quality admission remain explicit separate dependencies.
+## Active source packet — #405
+
+[Issue #405](https://github.com/Kajooja/Kajo/issues/405) is the sole next bounded
+source packet on `feat/personal-content-rating`, starting from accepted #404.
+The owner approved this successor task's publication and uninterrupted
+continuation on **2026-11-02**. Implementation and source verification are in
+progress; no new test result or acceptance is claimed yet.
+
+Implement one transparent, strongly regularized content-residual model around
+the Personal/domain mean. Fit original integer **0–10** labels with a
+mean-targeting loss and retain bounded forecasts on the Profile's own scale.
+Use a small versioned allowlist of permitted structured catalogue features,
+with exact training-prefix and candidate features frozen at the prediction
+cutoff. Preserve identity, provenance and availability; later mutable metadata
+must not be substituted into historical forecasts.
+
+Keep the Personal-mean control and all old capture/model/report versions. Add
+only the versioned private capture and evaluation-adapter extension needed to
+compare both models before the same first answer. Sparse, constant, narrow-range,
+missing-feature and identical-feature cases need explicit support/fallback;
+identical supported inputs retain ties. Verify supported differentiation,
+strict/generous own-scale ordering, prediction-before-update, correction and
+withdrawal handling, and incremental/full-replay parity. Record model, configuration
+and feature lineage, support and resource limits. Synthetic checks retain
+`qualityAdmission: NONE` and `servingActivation: NONE`.
+
+A genuine declared DEVELOPMENT cohort through an authorized capture path remains
+the separate experiment needed to select regularization and numerical quality,
+coverage and precision requirements before SELECTION and untouched FINAL windows.
+Insufficient observations require an explicit collection dependency, not invented
+thresholds or a synthetic usefulness claim. New embeddings, external priors,
+Working-state activation and broad UI changes are outside this packet; broader
+adaptive state, transfer and Shared work keep their later sprint scopes.
 
 ## Delivery record
 
@@ -199,8 +230,26 @@ cohort collection and quality admission remain explicit separate dependencies.
   All 2,880 performance measurements and original rules independently match with
   no rule failures in this run; `admission` remains `NONE`. The PR records exact
   artifact identities and limits, including no hosted or mobile-route activation.
-- Declared evaluation source: #402 is under implementation; required checks and
-  source acceptance remain pending. STATUS owns the one active handoff.
+- Declared evaluation source / CI: #402 is accepted through
+  [#404](https://github.com/Kajooja/Kajo/pull/404), main
+  `1bc1ea7e6c83b369692bcfc862386ab157475f7e`, source
+  `34786d1b5ec19ad6358acfcfc7c3068ebc0a4469`, tested merge
+  `34a79573cfe9997efd20984eb9e47a57211d50f8`, source/tested/accepted tree
+  `7a4290d8f04beaec0df724bc1286ba141dc7533a`. All six CI #823 gates pass,
+  including 2,372 tests and four configured iOS/Android exports. Native review
+  retains 15 baseline cases, 24 prospective cases, all eleven grades, five lock
+  proofs, upgrade preservation and cleanup. The new evaluation section supports
+  source-bound summary verification, not raw census/report recomputation.
+  Performance review recomputes 2,880 measurements, 6,336 quantiles and the original
+  72 cohort/36 mechanism rules. One original regression fails: OFF_CATALOGUE_HISTORY,
+  1,000 Items, `taste-personal-next`, exact retry, pair 3, p50 9.553 → 10.860 ms
+  (+13.68%, allowance +10%); resource checks pass. The failed diagnostic is retained,
+  `admission` remains `NONE`, #391 stays uninstalled and #394/#399 remain deferred.
+- Content-preference source: #405 is ready for required CI. Local engine tests
+  (410), 39 native-fixture cases, populated V1 upgrade and eight upgrade mutation
+  rejections pass; bounded synthetic raw receipts support independent review.
+  Actual PostgreSQL contention proofs, required CI and source acceptance remain
+  pending. STATUS owns the one active handoff and local environment limitations.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.

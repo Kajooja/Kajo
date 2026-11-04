@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import * as core from '@kajo/prediction-engine';
 import { forecastPersonalRatingBaseline } from '@kajo/prediction-engine/personal-rating';
+import { forecastPersonalContentRating } from '@kajo/prediction-engine/personal-content-rating';
+import { normalizeKajoPersonalContentRatingPrefix } from '@kajo/prediction-engine/adapters/kajo-personal-content-rating';
 import { validatePersonalRatingEvaluationDeclaration, buildPersonalRatingEvaluationReport }
   from '@kajo/prediction-engine/personal-rating-evaluation';
 import { normalizeKajoPersonalRatingEvaluationInventory }
@@ -30,6 +32,10 @@ import { applyKajoContextualSkip, kajoContextualSkipRecords } from '@kajo/predic
 
 assert.equal(typeof core.predict, 'function');
 assert.equal(typeof forecastPersonalRatingBaseline, 'function');
+assert.equal(typeof forecastPersonalContentRating, 'function');
+assert.equal(typeof normalizeKajoPersonalContentRatingPrefix, 'function');
+assert.equal(core.forecastPersonalContentRating, undefined);
+assert.equal(core.normalizeKajoPersonalContentRatingPrefix, undefined);
 for (const fn of [validatePersonalRatingEvaluationDeclaration, buildPersonalRatingEvaluationReport,
   normalizeKajoPersonalRatingEvaluationInventory]) assert.equal(typeof fn, 'function');
 assert.equal(core.buildPersonalRatingEvaluationReport, undefined);
@@ -94,7 +100,8 @@ await inspect(join(root, 'index.js'));
 assert.ok((await readdir(root)).includes('index.d.ts'));
 // Optional computation and adapter graphs stay separate from the root and
 // contain no app or provider runtime dependency.
-for (const file of ['personal-rating-evaluation.js', 'adapters/kajo-personal-rating-evaluation.js',
+for (const file of ['personal-content-rating.js', 'adapters/kajo-personal-content-rating.js',
+  'personal-rating-evaluation.js', 'adapters/kajo-personal-rating-evaluation.js',
   'adapters/kajo-personal-rating-prospective.js', 'personal-rating.js', 'adapters/kajo-personal-rating.js', 'ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js', 'adapters/kajo-working-state.js',
   'ranking-conformance.js', 'adapters/kajo-native-prediction.js',
   'working-evaluation.js', 'adapters/kajo-working-evaluation.js', 'adapters/kajo-working-outcomes.js',
@@ -103,7 +110,10 @@ for (const file of ['personal-rating-evaluation.js', 'adapters/kajo-personal-rat
   const source = await readFile(join(root, file), 'utf8');
   const allowed = {
     'personal-rating-evaluation.js': [],
-    'adapters/kajo-personal-rating-evaluation.js': ['../personal-rating.js', './kajo-personal-rating-prospective.js'],
+    'personal-content-rating.js': ['./personal-rating.js'],
+    'adapters/kajo-personal-content-rating.js': ['./kajo-personal-rating-prospective.js'],
+    'adapters/kajo-personal-rating-evaluation.js': ['../personal-rating.js', '../personal-content-rating.js',
+      './kajo-personal-rating-prospective.js', './kajo-personal-content-rating.js'],
     'personal-rating.js': ['./rating-location.js'],
     'adapters/kajo-personal-rating-prospective.js': [],
     'adapters/kajo-personal-rating.js': ['../personal-rating.js'],

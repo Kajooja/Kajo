@@ -206,11 +206,120 @@ prefix-support slices are descriptive; rating-style parameters stay unidentified
 This source packet supplies descriptive arithmetic and explicit coverage checks.
 It does not estimate the declared uncertainty method, evaluate resource budgets,
 admit a model, establish new experience or causal recommendation benefit, or
-activate collection/serving. The current native-only candidate and Personal-mean
-control are equal. Native identities remain in private input bindings; alias-only
+activate collection/serving. The original `personal-domain-mean-v1` native-only
+candidate and Personal-mean control are equal. Native identities remain in private input bindings; alias-only
 reports are bounded, exclusive mode-0600 files outside Git, with a seven-day
 post-checkpoint retention limit. Files cannot prove current authorization or
 withdrawal status; callers must invalidate/delete stale exports with their sources.
+
+### Frozen-content numeric challenger — Sprint 016 / #405
+
+The active source implementation adds `./personal-content-rating` and
+`forecastPersonalContentRating`, with model `personal-content-rating-v1` and fit
+`centered-fixed-mean-ridge-v1`. It is an inactive, private evaluation challenger;
+[STATUS](../project/STATUS.md) owns verification and acceptance. The #398 location
+baseline, #400 capture generation and their frozen forecasts retain their original
+versions. Ratings still use every integer **0–10**; predicted points may be
+fractional on that same scale. No external prior is admitted.
+
+Let `μ` be the mean of **all** eligible resolved numeric labels for the Personal
+owner/domain, including labels whose content features are unavailable. Let `F`
+contain only training labels with complete eligible frozen feature vectors,
+`x̄` their feature mean and `zᵢ = xᵢ − x̄`. The fixed-intercept ridge calculation is:
+
+```text
+β = (Σᵢ∈F zᵢzᵢᵀ + λI)⁻¹ Σᵢ∈F zᵢ(yᵢ − μ)
+candidate(x) = clip[0,10](μ + βᵀ(x − x̄))
+control = μ
+```
+
+There is no fitted free intercept. Candidate vectors do not fit the feature
+schema, means or coefficients. Native configuration is explicitly pinned to
+`personal-native-content-ridge-v1`, `ridge: 2`; it is a source configuration,
+not a development-selected quality result. Coefficients are regularized
+associations, not identified latent taste, causal effects or response spread.
+Narrow observed rating ranges remain narrow evidence; the calculation does not
+normalize each person's grades to fill 0–10. Positive affine changes preserve
+the unclipped numerical relationship; clipping is reported separately.
+
+| Condition | Point and diagnostic |
+| --- | --- |
+| No eligible numeric labels | Candidate/control unavailable; `NO_NUMERIC_SUPPORT` |
+| Fewer than two feature-eligible labels | Full-prefix mean; `INSUFFICIENT_FEATURE_SUPPORT` |
+| Constant feature-eligible ratings | Full-prefix mean; `CONSTANT_FEATURED_RATINGS` |
+| No varying training feature | Full-prefix mean; `NO_TRAINING_FEATURE_VARIATION` |
+| Candidate feature unavailable, withdrawn or future | Full-prefix mean with the specific feature exclusion |
+| Candidate has no nonzero feature in a training-varied dimension | Full-prefix mean; `NO_SUPPORTED_CONTENT_FEATURE` |
+| Supported fitted candidate | Bounded ridge point, raw point, clipping and support retained; zero coefficients and genuine ties remain valid |
+
+The native adapter freezes the complete training/candidate union using the six
+existing `catalog-concepts-v1` concepts: fantasy, horror, mystery, romance,
+science-fiction and thriller. BOOK uses allowlisted Open Library subject
+assertions; MOVIE uses TMDB genre IDs. The original audit remains **1 or null**:
+null does not establish factual absence. The separate
+`catalog-assertion-presence-v1` representation uses 1/0 to record whether each
+assertion appears in an otherwise valid, permitted source containing at least
+one mapped assertion. A missing, unpermitted, malformed or unmapped whole source
+stays unavailable with a null vector; it is not an all-zero negative example.
+The fixed vocabulary does not imply book/movie transfer.
+
+The explicit `personal-content-feature-use-v1` manifest is a trusted operator
+assertion of purpose, origin, review reference, time interval, source allowlist
+and source-bound retention until withdrawal. It is not a rights certificate.
+The interval must cover the capture and complete answer horizon. A null manifest
+or unlisted provider permits no copied source payload and selects mean fallback.
+Only bounded genre IDs/subject labels, exact source/alias identity, source hashes
+and provenance are retained; descriptions, popularity and embeddings are not
+features. Native availability is the capture cutoff. Provider update time is
+diagnostic, not proof that Kajo knew the source at that earlier time.
+
+Private `prepare_personal_rating_forecast_v2` and
+`finalize_personal_rating_forecast_v2` reuse the #400 retained allocation,
+first-answer and erasure lifecycle. After numeric lifecycle/Event/Profile locks,
+capture takes `SHARE NOWAIT` relation fences in Item → source → alias order,
+before the cutoff and allocation. An already active catalogue writer causes
+SQLSTATE `55P03`; the worker rolls back the entire transaction without consuming
+an allocation. An explicit later retry, after the writer commits, takes a new
+cutoff and sees the committed metadata. There is no automatic retry. When capture
+gets the fences first, later catalogue writers wait through TypeScript
+computation, finalization and commit. The 8,192-Event resource inventory includes
+all owned Profile Events; only cutoff-eligible labels enter training.
+Same-transaction source/alias writes are ineligible. Later ordinary metadata
+refreshes never rewrite an old snapshot. Source/alias deletion or identity
+reassignment and explicit review withdrawal retire dependent copies while
+retaining consumed allocations as long as their prediction source exists.
+The complete dependent-copy retirement closure is capped at 250,000 rows, with
+parent input/forecast locks acquired before counting. A narrowly guarded,
+closed `SECURITY DEFINER` catalogue trigger preserves existing catalogue-writer
+authority to delete/reassign sources without granting evaluation-data access.
+Old generation APIs reject cross-generation use. SQL checks frozen bindings,
+support, modes and numerical bounds; the trusted compiled TypeScript worker
+owns the ridge solve.
+
+Each accepted label/correction/withdrawal change requires a newly resolved
+complete prefix and deterministic full refit. There is no persistent incremental
+fit cache that can restore removed evidence. Old returned forecasts and first
+answers remain immutable. The portable core bounds input to 8,192 raw labels,
+1–32 fixed dimensions, finite feature values in `[-1,1]` and ridge in
+`[1,1000000]`; the inherited portable pool cap is 3,000. Native capture is narrower:
+six dimensions, at most 50 delivered candidates, 8,192 total owned Profile Events
+(checked before catalogue fences and the cutoff), 128 retained allocations per
+owner and a 4 MiB adapter input. Source projection
+accepts at most 128 labels, each Open Library label at most 256 code points;
+oversized sources become unavailable without partial truncation. Cost counters
+describe bounded work, not measured latency or resource admission.
+
+The existing v1 evaluation declaration/census/report can bind the new model and
+its composite resolver/mapping/transform source version against the unchanged
+`personal-domain-mean-v1:PERSONAL_MEAN` control on the same first answer. It
+validates retained inputs/forecasts without fitting or rescoring them. Old
+allocations remain in the complete census; undeclared old allocations still make
+new-model reconciliation incomplete. No synthetic fixture establishes a useful
+gain, feature permission, native cohort, calibrated uncertainty or deployment.
+Genuine prospective DEVELOPMENT evidence must select regularization and the
+loss/coverage/precision requirements before SELECTION and untouched FINAL use.
+Until that evidence is eligible, quality remains insufficient and
+`qualityAdmission: NONE`, `servingActivation: NONE`.
 
 ### Three-action learning boundary
 

@@ -87,6 +87,14 @@
       "types": "./dist/personal-rating.d.ts",
       "import": "./dist/personal-rating.js"
     },
+    "./personal-content-rating": {
+      "types": "./dist/personal-content-rating.d.ts",
+      "import": "./dist/personal-content-rating.js"
+    },
+    "./adapters/kajo-personal-content-rating": {
+      "types": "./dist/adapters/kajo-personal-content-rating.d.ts",
+      "import": "./dist/adapters/kajo-personal-content-rating.js"
+    },
     "./adapters/kajo-personal-rating": {
       "types": "./dist/adapters/kajo-personal-rating.d.ts",
       "import": "./dist/adapters/kajo-personal-rating.js"

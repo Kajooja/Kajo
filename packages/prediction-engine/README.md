@@ -23,6 +23,70 @@ estimates are 7 (rating) and 50 (energy); after a known continuation, recalled
 estimates are 9 and 45. This demonstrates execution and portability, not learned
 quality, causal effects, calibrated confidence or real non-media competence.
 
+## Frozen-content numeric challenger — #405
+
+The active source implementation exports `./personal-content-rating` with
+`forecastPersonalContentRating` and model `personal-content-rating-v1`.
+The all-label Personal/domain mean remains the control and fixed intercept.
+Only available eligible training vectors determine feature centering and ridge
+coefficients; candidate vectors do not fit anything. Every original integer
+0–10 label remains on its own scale, including labels without usable features.
+The output is a fractional point clipped to 0–10, with raw point, clipping,
+feature support/coverage, fit/fallback status, coefficients and cost counters.
+The [canonical numerical contract](../../docs/domain/PREDICTION_MODEL.md#frozen-content-numeric-challenger--sprint-016--405)
+defines the equation and ordered fallbacks. No labels means unavailable; sparse,
+constant, invariant or unsupported content uses the full-prefix mean. Narrow
+response ranges and identical-feature ties are not expanded into invented spread.
+
+`./adapters/kajo-personal-content-rating` exports
+`normalizeKajoPersonalContentRatingPrefix`. It accepts
+`kajo-personal-content-rating-prefix-v1` from private
+`kajo-personal-content-rating-preparation-v1` with the distinct
+`native-content-prospective:<md5>` snapshot namespace, preserves the existing raw-label
+and delivered-pool validation, and pins
+`{version: 'personal-native-content-ridge-v1', ridge: 2}`. The previous location
+configuration stays `personal-native-location-v1`; the new model has no prior.
+Its source version combines `personal-content-source-v1`, the canonical resolver
+MD5, `catalog-concepts-v1`, the pinned mapping hash and
+`catalog-assertion-presence-v1`. The fixed native vector has six
+`provider-genre:` or `provider-subject:` dimensions: fantasy, horror, mystery,
+romance, science-fiction and thriller.
+
+The original catalogue audit's assertions are still `1 | null`. A separate
+assertion-presence vector is `1 | 0` only for a permitted valid source with at
+least one mapped assertion; zero does not establish factual absence. Missing,
+unpermitted or unmapped sources have null vectors. The closed
+`personal-content-feature-use-v1` manifest records explicit operator assertions
+of purpose, origin, review reference, interval, source allowlist and retention;
+it is not a rights certificate. Native capture checks the full answer horizon.
+A null manifest copies no source features. Sanitized genre IDs/subject labels,
+source/alias identity and exact capture provenance are frozen; mutable future
+metadata cannot reproduce a historical input.
+
+The core accepts at most 8,192 raw labels, 1–32 fixed dimensions, finite vectors
+in `[-1,1]`, ridge `[1,1000000]` and 3,000 portable candidates. Native capture
+limits the pool to 50 delivered Items, all owned Profile Events to 8,192 and
+retained allocations to 128 per owner; the adapter input limit is 4 MiB. Each
+source has at most 128 labels and each Open Library label at most 256 code points, with no
+partial truncation. Every update supplies a complete newly resolved prefix for
+deterministic full refit. Earlier forecasts are immutable, not updated in place.
+
+`scripts/database/personal-content-rating.mjs` invokes the compiled adapter/core
+between private v2 prepare/finalize calls in the same dedicated transaction.
+After lifecycle/Event/Profile locks, SQL takes `SHARE NOWAIT` relation fences on
+Items, sources and aliases, in that order, before the cutoff and allocation.
+An existing writer causes `55P03` and full transaction rollback with no consumed
+allocation; there is no automatic retry. An explicit retry after writer commit
+uses a new cutoff. If capture takes the fences first, later writers wait through
+TypeScript finalization and commit. SQL freezes training/candidate sources and
+validates the stored contract; the trusted worker owns the solve. Source/alias
+withdrawal and explicit review
+revocation retire dependent copies without making consumed IDs reusable. The
+complete dependent-copy retirement budget is 250,000 rows. Old
+capture/model generations remain distinct. No hosted installation, real cohort,
+quality admission or serving activation is implied; STATUS owns checks and
+acceptance. Synthetic fixtures are numerical/lifecycle evidence only.
+
 ## Declared numeric evaluation — #402
 
 `./personal-rating-evaluation` exposes
@@ -48,7 +112,7 @@ complete declarations never imply model admission.
 `./adapters/kajo-personal-rating-evaluation` normalizes a supplied attempt ledger
 and complete retained-allocation census. It verifies owner/source/target/pool,
 stored forecast and immutable measurement bindings without rescoring history.
-The native-only model is `personal-domain-mean-v1`, config
+The original native-only model is `personal-domain-mean-v1`, config
 `personal-native-location-v1`, control identity
 `personal-domain-mean-v1:PERSONAL_MEAN`, and source identity
 `personal-source-evidence-v1:<resolver MD5>`. Every owner, including one with
@@ -56,6 +120,14 @@ zero allocations, needs a census. Missing expected captures, missing owners or
 undeclared allocations make reconciliation unresolved. A supplied unavailable
 attempt is not proof of a native failure. Withdrawal/outside-path retirement
 invalidates primary metrics for the entire cohort; counts remain diagnostic.
+
+The #405 adapter extension also accepts explicitly declared
+`personal-content-rating-v1` forecasts and their composite content source
+version, paired with the same `personal-domain-mean-v1:PERSONAL_MEAN` control.
+It validates retained feature/fit/support/mode/clipping bindings without rerunning
+the fit. Declaration, census, report and private-file outer schemas remain v1.
+Old allocations stay in the census; an undeclared older model allocation is not
+silently dropped to complete a new-model cohort.
 
 Classification uses the frozen horizon and first-answer acceptance time.
 `observedThroughMicros` is the earliest supplied owner observation, distinct from

@@ -59,6 +59,27 @@ instead of removing an unfavorable observation from the denominator. Each fixed
 checkpoint uses immutable answer/horizon microseconds and a sufficiently recent
 owner census. A supplied failed-attempt ledger is not a native failure receipt.
 
+The active #405 content challenger adds no Event type or public answer route.
+Its versioned private capture freezes permitted structured catalogue features
+for the complete numeric training prefix and delivered candidate pool before
+the same #400 first-answer boundary. Both candidate and Personal-mean control
+use that one immutable original 0–10 answer. All eligible raw numeric labels
+still contribute to the mean; missing features do not remove their grades.
+List interest and Ohita do not become numerical content-training outcomes.
+
+Feature snapshots carry exact source/alias identity, projection and mapping
+versions, capture availability and an explicit operator feature-use assertion.
+An assertion-presence zero records a missing assertion in an eligible source;
+it is not an observed negative Event or proof that the Item lacks that property.
+Absent permission/source support leaves the whole vector unavailable. Ordinary
+metadata refresh and rating correction affect subsequent captures only. Source
+or alias deletion/identity reassignment and explicit review withdrawal retire
+dependent copies; consumed allocation identities remain until their prediction
+source is erased. Review withdrawal prevents reuse of that owner's review
+reference. Deletion is not converted to a fabricated zero or a newly reusable
+evaluation opportunity. The [content calculation](PREDICTION_MODEL.md#frozen-content-numeric-challenger--sprint-016--405)
+owns fallback and resource bounds; STATUS owns source/native acceptance.
+
 The Personal source-fusion correction now resolves available same-owner native
 rating authority before assigning weights. Exact scoped canonical command
 receipt lineage governs revisions, including backdated/equal occurrence clocks;

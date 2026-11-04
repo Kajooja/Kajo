@@ -56,6 +56,9 @@ import { verifyPersonalRatingProspective } from './personal-rating-prospective.m
 import { verifyPersonalRatingProspectiveConcurrency } from './personal-rating-prospective-concurrency.mjs';
 import { verifyPersonalRatingProspectiveUpgrade } from './personal-rating-prospective-upgrade.mjs';
 import { verifyPersonalRatingEvaluation } from './personal-rating-evaluation.mjs';
+import { verifyPersonalContentRating } from './personal-content-rating.mjs';
+import { verifyPersonalContentRatingConcurrency } from './personal-content-rating-concurrency.mjs';
+import { verifyPersonalContentRatingUpgrade } from './personal-content-rating-upgrade.mjs';
 import { verifyNativeSkipPrefilter } from './native-skip-prefilter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
@@ -107,12 +110,21 @@ try {
     assert.equal(nativePersonalRatingProspectiveConcurrency.status, 'PASS');
     const nativePersonalRatingEvaluation = await verifyPersonalRatingEvaluation(execConcurrentSql, withSqlSession);
     assert.equal(nativePersonalRatingEvaluation.status, 'PASS');
+    const nativePersonalContentRating = await verifyPersonalContentRating(execConcurrentSql, withSqlSession);
+    const nativePersonalContentRatingConcurrency = await verifyPersonalContentRatingConcurrency(execConcurrentSql, withSqlSession);
+    assert.equal(nativePersonalContentRating.status, 'PASS');
+    assert.equal(nativePersonalContentRatingConcurrency.status, 'PASS');
     const nativeDiscoveryParity = await verifyNativeDiscoveryParity(exec);
     assert.equal(nativeDiscoveryParity.status, 'PASS');
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), expected,
       'Discovery parity changed the installed source');
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
+    const contentRatingIndex = files.findIndex(file => file.name.endsWith('_personal_content_rating.sql'));
+    assert.ok(contentRatingIndex > 0);
+    await resetFromMigrations(files.slice(0, contentRatingIndex));
+    const nativePersonalContentRatingUpgrade = await verifyPersonalContentRatingUpgrade(execConcurrentSql, withSqlSession, files[contentRatingIndex]);
+    assert.equal(nativePersonalContentRatingUpgrade.status, 'PASS');
     const numericProspectiveIndex = files.findIndex(file => file.name.endsWith('_personal_rating_prospective.sql'));
     assert.ok(numericProspectiveIndex > 0);
     await resetFromMigrations(files.slice(0, numericProspectiveIndex));
@@ -519,6 +531,7 @@ try {
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativePersonalRatingBaseline, nativePersonalRatingProspective,
       nativePersonalRatingProspectiveConcurrency, nativePersonalRatingProspectiveUpgrade, nativePersonalRatingEvaluation, nativeSkipPrefilter,
+      nativePersonalContentRating, nativePersonalContentRatingConcurrency, nativePersonalContentRatingUpgrade,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,

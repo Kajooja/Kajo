@@ -26,6 +26,23 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Frozen-content Personal rating challenger — Sprint 016 / #405
+
+Active implementation; [STATUS](../project/STATUS.md) owns verification and acceptance.
+
+| Responsibility | Implementation |
+| --- | --- |
+| Transparent regularized own-scale point | `packages/prediction-engine/src/personal-content-rating.ts`, optional `./personal-content-rating`; all-label domain mean, training-only feature centering, bounded ridge residual, explicit fallback/clipping and deterministic full refit |
+| Frozen permitted feature normalization | `packages/prediction-engine/src/adapters/kajo-personal-content-rating.ts`, optional `./adapters/kajo-personal-content-rating`; fixed six-concept mapping, source/alias provenance, operator manifest and distinct assertion-presence semantics |
+| Versioned native capture and dependency retirement | `supabase/migrations/20261101221942_personal_content_rating.sql`; private v2 prepare/finalize, Item/source/alias `SHARE NOWAIT` relation fences, dependency refs, bounded review/source retirement and v1 generation guards; existing first-answer tables/writer retained |
+| Trusted worker and native fixtures | `scripts/database/personal-content-rating.mjs`, `.test.mjs`, `personal-content-rating-concurrency.mjs`; compiled core inside the dedicated capture transaction, capture-first lock witnesses and writer-first atomic `55P03`/explicit retry cases, including multi-Item batches and raw Item deletion |
+| Declared same-target evaluation | `packages/prediction-engine/src/adapters/kajo-personal-rating-evaluation.ts`; binds retained content/model/source versions and original first answers through the existing v1 declaration/census/report contracts; no historical rescoring |
+
+Core and adapter tests are `packages/prediction-engine/test/personal-content-rating.test.ts`
+and `kajo-personal-content-rating.test.ts`. Old location/capture versions remain
+intact. A synthetic numerical or concurrency fixture is not observed predictive
+quality, source permission or serving admission.
+
 ## Declared Personal numeric evaluation — Sprint 016 / #402
 
 | Responsibility | Implementation |
