@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-04**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, held SQL connection preparation after accepted guarded forwards #407 / #408. Baseline #398, durable capture #400 and declared evaluation #402 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, explicit session-pooler/private-runner preparation after accepted connection #409 / #410. Baseline #398, durable capture #400 and declared evaluation #402 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,50 +11,54 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — held SQL connection and read-only probe #409
+## Current handoff — explicit session pooler and private probe runner #411
 
-[PR #408](https://github.com/Kajooja/Kajo/pull/408) is accepted as main
-`1a3759dc43caec054ef4a532eac1a3d20e53d9d4`, source
-`48fc4b51634f3ae8d94b2a0cafaf319c80d8bc76`, tested merge
-`05e861b0a7b7abb25702da39a4e360fd24c67ead`, common tree
-`47a456f7eb048b6b0e757e6837258063748e5e90`. All six required
-[CI #829](https://github.com/Kajooja/Kajo/actions/runs/41797657404) gates pass:
-**2,456 tests and four configured iOS/Android exports**, lint/typecheck and audit
-with no unmitigated findings. The optional standalone APK was skipped.
-#407 is closed. The exact guarded-forward builder and native rehearsal are
-accepted source; do not repeat that implementation. PR #408 retains complete
-artifact identities and evidence limits, including one original optional-prefilter
-timing failure. The earlier #823/#825/#827 failures remain separate evidence.
-Optional #391 remains NOT_ADMITTED; #394/#399 stay deferred unless material to
-correctness, required capacity or a declared user-facing budget.
+[PR #410](https://github.com/Kajooja/Kajo/pull/410) is accepted as main
+`99bcf497d6203a5dcdbbc818e14c882d5398830a`, source
+`09168811bd540f0221a75b817b918ca074ff78b5`, tested merge
+`fdf755d49507b502b2c313d55131a0f344e4ba45`, common tree
+`7905b609c4d5d69ad0c908daf806a808c72c5a91`. All six required
+[CI #831](https://github.com/Kajooja/Kajo/actions/runs/41835050894) gates pass:
+**2,465 tests and four configured iOS/Android exports**, lint/typecheck and audit
+with no unmitigated findings. The optional standalone APK was skipped in that PR
+run. #409 is closed. The actual native connection probe and all 42 reported
+subchecks pass; the 56-entry SQL manifest/history match the accepted predecessor.
+The first isolated-stack startup failure, unchanged-source retry and local test
+limits remain in the PR receipt. Its optional performance diagnostic retains the
+pair-3 off-catalogue Taste exact-retry failure; optional #391 stays NOT_ADMITTED.
 
-The preceding #398/#400/#402/#405 source supplies the numerical baseline,
-durable capture, declared evaluation and frozen-content challenger. All eleven
-integer ratings **0–10** remain supported. Source fixtures and CI establish
-mechanisms rather than observed recommendation usefulness. Operational execution
-records are maintained privately; this public source handoff neither substitutes
-for their current target/permission checks nor publishes production metadata.
+The preceding #398/#400/#402/#405/#408 source supplies the numeric baseline,
+durable capture, declared evaluation, frozen-content challenger and guarded
+forward builder/rehearsal. Do not repeat those accepted implementations or infer
+operational execution from source acceptance. All eleven integer ratings **0–10**
+remain supported. Operational records stay private; source/CI evidence does not
+establish observed prediction usefulness or close Sprint 016/Engine V1.
 
-**One active source packet:** [Issue #409](https://github.com/Kajooja/Kajo/issues/409),
-branch `feat/personal-rating-operator-connection`. Add an explicit direct psql
-connection binding compatible with the existing capture/census callbacks, plus a
-read-only probe of one backend and one transaction across JavaScript computation.
-Reuse `isolated-sql-session.mjs`; no model, migration, collection framework or
-public/mobile endpoint is added. The binding requires explicit private connection
-configuration, certificate/hostname verification, a private password file and
-bounded deadlines. No linked-project discovery, inherited connection overrides,
-automatic retry or fallback to weaker TLS/pooling is included.
+**One active source packet:** [Issue #411](https://github.com/Kajooja/Kajo/issues/411),
+branch `feat/personal-rating-session-pooler`. IPv4-only operator environments need
+an explicitly selected session-pooler binding while preserving the accepted
+held-session callback. The separate configuration fixes port 5432/tenant login,
+requires the exact reviewed pooler host and preserves certificate/hostname,
+server identity and SSL verification. Both modes explicitly set and verify their
+session deadlines. There is no automatic fallback, transaction-pooler mode,
+credential discovery/reset or paid networking change.
 
-The probe reads connection metadata only and rolls back. Its disposable native
-CI execution verifies PostgreSQL transaction mechanics separately from the
-hosted TLS/credential path. Local configuration and real-process framing tests
-are not proof of a live connection. Required final-source CI remains pending for
-#409. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#private-operator-connection--sprint-016--409)
-owns the exact configuration and usage contract; CODEMAP owns implementation paths.
+A manual owner-only private-runner template lives under `scripts/database`,
+outside public executable workflows. It checks private repository/main/actor
+context and the configured reviewed source revision, stages owner-only temporary
+files and runs only the read-only probe. No repository, credentials or actual
+private execution are created by publishing this source. The implementation PR
+owns final-source CI acceptance. Native CI verifies the shared session initializer
+and transaction protocol; actual pooler behavior, hosted TLS and the private job
+remain separate runtime checks.
 
-**Next dependency:** run the read-only probe in the explicitly configured trusted
-operator environment. A successful connection probe does not authorize observation
-or establish capture permissions, a current schema checkpoint or useful predictions.
+[PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#explicit-session-pooler-and-private-runner--sprint-016--411)
+owns the configuration and private-runner setup contract; CODEMAP owns paths.
+**Next dependency:** configure an explicitly approved private operator environment
+with the accepted source revision, exact Session pooler host, project certificate
+and privately supplied database password; run and retain the read-only probe.
+Do not publish the resulting operational record in this public repository.
+
 Before genuine DEVELOPMENT, establish the authorized owner/Profile/domain scope,
 provider feature-use review, retained pre-window declaration and fresh first-answer
 route. Reuse existing capture, answer, complete census and report APIs. Keep all
@@ -62,11 +66,8 @@ declared attempts, unavailable/busy captures, missing answers and zero-opportuni
 Profiles; do not backfill old answers, refill after erasure or invent thresholds.
 Development observations select numerical quality, coverage and precision
 requirements before SELECTION and untouched FINAL windows. Quality admission and
-serving activation remain NONE; Sprint 016 and Engine V1 remain open.
-
-Broader adaptive state, transfer, Shared, UX and release work retain ROADMAP order.
-The previous dated source/runtime investigations remain in Git and their accepted
-PR receipts; no account, forecast, source identity or migration history is reset.
+serving activation remain NONE. Broader adaptive state, transfer, Shared, UX and
+release work retain ROADMAP order; existing accounts and evidence are preserved.
 
 ### Completed diagnostic evidence
 

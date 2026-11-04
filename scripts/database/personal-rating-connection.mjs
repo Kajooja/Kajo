@@ -9,14 +9,19 @@ const check = (condition, code) => {
   if (!condition) throw new Error(`PERSONAL_RATING_CONNECTION_${code}`);
 };
 const keys = ['version', 'projectRef', 'psqlPath', 'caFile', 'passwordFile'];
+const sessionVersion = 'personal-rating-session-connection-v1';
 
-/** Explicit direct-connection configuration only. No linked-project, environment,
+/** Explicit direct or session-pooler configuration. No linked-project, environment,
  * service-file or credential discovery. A password never enters JSON or argv. */
 export function personalRatingConnectionCommand(config) {
+  const session = config?.version === sessionVersion;
+  const expectedKeys = session ? [...keys, 'poolerHost'] : keys;
   check(config !== null && typeof config === 'object' && !Array.isArray(config)
-    && Object.keys(config).length === keys.length && keys.every(key => Object.hasOwn(config, key)), 'CONFIG');
-  check(config.version === 'personal-rating-connection-v1'
+    && Object.keys(config).length === expectedKeys.length && expectedKeys.every(key => Object.hasOwn(config, key)), 'CONFIG');
+  check((config.version === 'personal-rating-connection-v1' || session)
     && typeof config.projectRef === 'string' && /^[a-z]{20}$/.test(config.projectRef), 'TARGET');
+  if (session) check(typeof config.poolerHost === 'string'
+    && /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.pooler\.supabase\.com$/.test(config.poolerHost), 'POOLER_HOST');
   for (const key of ['psqlPath', 'caFile', 'passwordFile']) {
     check(typeof config[key] === 'string' && isAbsolute(config[key]) && config[key].length <= 4096
       && !/[\r\n\0]/.test(config[key]), 'PATH');
@@ -28,13 +33,15 @@ export function personalRatingConnectionCommand(config) {
     // PGPASSWORD, startup hooks and unrelated application secrets cannot override
     // the reviewed target or leak into this privileged child.
     options: { stage: 'personal-rating-connection', timeoutMs: 60_000, env: {
-      LANG: 'C', LC_ALL: 'C', PGHOST: `db.${config.projectRef}.supabase.co`, PGPORT: '5432',
-      PGDATABASE: 'postgres', PGUSER: 'postgres', PGPASSFILE: config.passwordFile,
+      LANG: 'C', LC_ALL: 'C', PGHOST: session ? config.poolerHost : `db.${config.projectRef}.supabase.co`, PGPORT: '5432',
+      PGDATABASE: 'postgres', PGUSER: session ? `postgres.${config.projectRef}` : 'postgres', PGPASSFILE: config.passwordFile,
       PGSSLMODE: 'verify-full', PGSSLROOTCERT: config.caFile, PGGSSENCMODE: 'disable',
       PGSSLMINPROTOCOLVERSION: 'TLSv1.2', PGCONNECT_TIMEOUT: '10', PGCLIENTENCODING: 'UTF8',
       PGAPPNAME: `kajo_rating_${randomUUID().replaceAll('-', '')}`,
-      PGOPTIONS: '-c search_path=pg_catalog -c timezone=UTC -c statement_timeout=30000'
-        + ' -c lock_timeout=5000 -c idle_in_transaction_session_timeout=30000',
+      // Preserve the direct contract. A pooler need not forward every startup
+      // GUC; both transports explicitly set and verify the same session values.
+      ...(session ? {} : { PGOPTIONS: '-c search_path=pg_catalog -c timezone=UTC -c statement_timeout=30000'
+        + ' -c lock_timeout=5000 -c idle_in_transaction_session_timeout=30000' }),
     } },
   };
 }
@@ -55,6 +62,23 @@ function validIdentity(row) {
 const identityFields = `'database',current_database(),'user',current_user,'sessionUser',session_user,
   'serverVersionNum',current_setting('server_version_num')::integer`;
 
+/** Fixed session settings, never project/role-wide configuration. The shared
+ * native CI transport exercises this exact initializer without hosted secrets. */
+export async function initializePersonalRatingSqlSession(exec) {
+  const rows = await exec(`set session search_path=pg_catalog;set session timezone='UTC';
+    set session statement_timeout='30s';set session lock_timeout='5s';
+    set session idle_in_transaction_session_timeout='30s';
+    select jsonb_build_object('searchPath',current_setting('search_path'),
+      'timezone',current_setting('timezone'),'statementTimeout',current_setting('statement_timeout'),
+      'lockTimeout',current_setting('lock_timeout'),
+      'idleTimeout',current_setting('idle_in_transaction_session_timeout'));`, { stage: 'session-settings' });
+  const row = rows[0];
+  check(rows.length === 1 && row?.searchPath === 'pg_catalog' && row.timezone === 'UTC'
+    && row.statementTimeout === '30s' && row.lockTimeout === '5s' && row.idleTimeout === '30s', 'SESSION_SETTINGS');
+  return { version: 'personal-rating-session-settings-v1', status: 'PASS',
+    statementTimeoutMs: 30_000, lockTimeoutMs: 5_000, idleTimeoutMs: 30_000 };
+}
+
 /** Compatible with the existing capture/census callback contract. Each invocation
  * owns one psql process; its caller still owns BEGIN/COMMIT. This does not authorize
  * a cohort or a write, and a successful probe does not admit a model. */
@@ -67,6 +91,7 @@ export async function withPersonalRatingSqlSession(config, work) {
   await regularFile(paths.passwordFile, true);
   try { await access(paths.psqlPath, constants.X_OK); } catch { check(false, 'EXECUTABLE'); }
   return withIsolatedSqlSession(launch.command, launch.args, launch.options, async exec => {
+    await initializePersonalRatingSqlSession(exec);
     const rows = await exec(`select jsonb_build_object(${identityFields},'ssl',
       coalesce((select ssl from pg_stat_ssl where pid=pg_backend_pid()),false));`, { stage: 'identify' });
     check(rows.length === 1 && validIdentity(rows[0]) && rows[0].ssl === true, 'IDENTITY_OR_TLS');
@@ -135,7 +160,8 @@ export async function runPersonalRatingConnectionCli(args) {
   check(args.length === 2 && args[0] === 'probe', 'USAGE_PROBE_ABSOLUTE_CONFIG');
   const config = await readPersonalRatingConnectionConfig(args[1]);
   const result = await probePersonalRatingSqlSession(work => withPersonalRatingSqlSession(config, work));
-  return { ...result, transport: 'DIRECT_PSQL_VERIFY_FULL', tlsVerified: true };
+  return { ...result, transport: config.version === sessionVersion
+    ? 'SUPAVISOR_SESSION_PSQL_VERIFY_FULL' : 'DIRECT_PSQL_VERIFY_FULL', tlsVerified: true };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

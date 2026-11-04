@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 in progress; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 in progress; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -212,9 +212,9 @@ source pins, preserved-state checks and optional54 exclusion remain unchanged.
 The native receipt and its limits are retained in PR #408. Runtime execution
 records are separate private evidence, not a reason to redo accepted source.
 
-## Active source packet — explicit operator connection #409
+## Accepted connection #409 and current session-pooler/private-runner #411
 
-[Issue #409](https://github.com/Kajooja/Kajo/issues/409) adds a bounded direct
+[Issue #409](https://github.com/Kajooja/Kajo/issues/409), accepted through #410, adds a bounded direct
 psql binding around the existing isolated-session transport and a read-only
 connection probe. Explicit private configuration pins the target and CA/password
 file references; certificate/hostname verification and sanitized errors are
@@ -224,6 +224,16 @@ same protocol, while hosted TLS/credentials and genuine observation remain
 separate acceptance. No model, schema or public/mobile route changes.
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md#private-operator-connection--sprint-016--409)
 owns usage and limitations. STATUS names the current source/check receipt.
+
+[Issue #411](https://github.com/Kajooja/Kajo/issues/411) adds an explicitly configured
+Supavisor session-mode path for IPv4-only operators, fixed session-setting
+verification and a manual private-repository-only probe template. The direct
+contract remains supported. The template is outside executable public workflows;
+actual private repository/credential setup, hosted pooler/TLS behavior and the
+private job result remain separate prerequisites. No model, migration, collection
+or public/mobile endpoint is added. The same native CI session tests the shared
+initializer without an extra reset. STATUS and the implementation PR own final
+source/CI acceptance.
 
 A genuine declared DEVELOPMENT cohort through an authorized capture path remains
 the experiment needed to select regularization and numerical quality, coverage
@@ -298,8 +308,12 @@ broader adaptive state, transfer and Shared work retain their later sprint scope
 - Guarded numeric forward source: [#407](https://github.com/Kajooja/Kajo/issues/407)
   accepted through #408 / all six CI #829 gates. Exact 55+56, source/native
   validation, operational execution and observed DEVELOPMENT are distinct facts.
-- Operator connection: #409 adds the explicit binding and read-only probe;
-  final-source CI and actual operator-environment acceptance remain pending.
+- Operator connection: #409 accepted through #410 / all six CI #831 gates,
+  2,465 tests and four configured exports; the actual native read-only probe passes.
+  Hosted TLS/credentials and genuine observation are not established by that CI.
+- Session pooler/private runner: #411 adds the explicit IPv4 path, session-setting
+  verification and private manual template. Source/CI and private execution remain
+  separate acceptance; no private job or observation is implied by publishing it.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.
