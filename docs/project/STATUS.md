@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-04**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, guarded private numeric forward preparation after accepted content-preference challenger #405 / #406. Baseline #398, durable capture #400 and declared evaluation #402 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, held SQL connection preparation after accepted guarded forwards #407 / #408. Baseline #398, durable capture #400 and declared evaluation #402 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,157 +11,62 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — guarded private numeric forward preparation #407
+## Current handoff — held SQL connection and read-only probe #409
 
-[PR #406](https://github.com/Kajooja/Kajo/pull/406) is accepted as main
-`1e58f0025ecf230ac4de0914f31be1615dc209a1`, with source/tested/accepted tree
-`c07738bd56229aada73871b4aba31b6714ec0eca`. Source head is
-`62f5482679030782aec30a9efbbd9956247ce838`; tested PR merge is
-`329a2ca5b3ebe92bad047e0334a673751baab104`. All six required
-[CI #827](https://github.com/Kajooja/Kajo/actions/runs/41360228441) gates passed
-on the final source, with **2,416 tests and four configured iOS/Android exports**.
-Lint/typecheck and the dependency audit pass with no unmitigated findings.
+[PR #408](https://github.com/Kajooja/Kajo/pull/408) is accepted as main
+`1a3759dc43caec054ef4a532eac1a3d20e53d9d4`, source
+`48fc4b51634f3ae8d94b2a0cafaf319c80d8bc76`, tested merge
+`05e861b0a7b7abb25702da39a4e360fd24c67ead`, common tree
+`47a456f7eb048b6b0e757e6837258063748e5e90`. All six required
+[CI #829](https://github.com/Kajooja/Kajo/actions/runs/41797657404) gates pass:
+**2,456 tests and four configured iOS/Android exports**, lint/typecheck and audit
+with no unmitigated findings. The optional standalone APK was skipped.
+#407 is closed. The exact guarded-forward builder and native rehearsal are
+accepted source; do not repeat that implementation. PR #408 retains complete
+artifact identities and evidence limits, including one original optional-prefilter
+timing failure. The earlier #823/#825/#827 failures remain separate evidence.
+Optional #391 remains NOT_ADMITTED; #394/#399 stay deferred unless material to
+correctness, required capacity or a declared user-facing budget.
 
-Independent native review verifies the full 56-file fresh lineage, 15 baseline,
-24 prospective and 39 content/evaluation cases, all eleven integer grades
-**0–10**, six content blocking witnesses, five content NOWAIT/rollback/retry
-witnesses and five retained legacy lock proofs. Populated content upgrade preserves
-96 old tables and all 291 function identities/metadata; only three exact
-reviewed function-body patches are allowed. Three retained frozen forecasts / 72 points and the complete
-synthetic census/report are independently reconstructed against six source hashes.
-Canonical and owned-stack cleanup pass. The deliberately losing evaluation
-fixture remains visible: candidate MSE 53.77777777777777 versus control 49,
-paired delta +4.7777777777777715. These are source-mechanics tests, not evidence
-of recommendation usefulness.
+The preceding #398/#400/#402/#405 source supplies the numerical baseline,
+durable capture, declared evaluation and frozen-content challenger. All eleven
+integer ratings **0–10** remain supported. Source fixtures and CI establish
+mechanisms rather than observed recommendation usefulness. Operational execution
+records are maintained privately; this public source handoff neither substitutes
+for their current target/permission checks nor publishes production metadata.
 
-The performance artifact independently reproduces 2,880 measurements, 6,336
-quantiles, 72 cohort rules and 36 mechanism rules; all 72 resource checks pass.
-Two original rules fail: EMPTY, 40 Items, `taste-personal-next`, fresh, pair 3,
-p50 **137.048 → 145.819 ms** (+6.40%, allowance +5%); and CATALOGUE_HISTORY,
-1,000 Items, `discovery-personal-movie`, pair 1, skip-decision calls **502 → 503**
-where the declared reduction is zero. Both remain failed diagnostics with
-`admission: NONE`; the required job's successful execution does not admit optional
-#391. PR #406 owns the exact artifact identities, hashes and verification limits.
+**One active source packet:** [Issue #409](https://github.com/Kajooja/Kajo/issues/409),
+branch `feat/personal-rating-operator-connection`. Add an explicit direct psql
+connection binding compatible with the existing capture/census callbacks, plus a
+read-only probe of one backend and one transaction across JavaScript computation.
+Reuse `isolated-sql-session.mjs`; no model, migration, collection framework or
+public/mobile endpoint is added. The binding requires explicit private connection
+configuration, certificate/hostname verification, a private password file and
+bounded deadlines. No linked-project discovery, inherited connection overrides,
+automatic retry or fallback to weaker TLS/pooling is included.
 
-Earlier attempts remain part of that receipt. CI #825 rejected an underscore in
-a concurrency diagnostic label; CI #826 rejected deletion of reused fixture Items
-still referenced by retained candidates. The corrected probe uses valid diagnostic
-labels and fresh non-discoverable Items, with actual-runner and full-schema
-cleanup regressions. CI #827 attempt 1 hit a PGlite WASM memory error during
-shutdown of the unchanged atomic-pages test; its focused recheck and attempt 2
-pass on identical source. No production constraint or test assertion was weakened.
-The prior CI #823 +13.68% retry regression and CI #825 call-count discrepancy
-remain retained in their PR receipts rather than being replaced by later results.
+The probe reads connection metadata only and rolls back. Its disposable native
+CI execution verifies PostgreSQL transaction mechanics separately from the
+hosted TLS/credential path. Local configuration and real-process framing tests
+are not proof of a live connection. Required final-source CI remains pending for
+#409. [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#private-operator-connection--sprint-016--409)
+owns the exact configuration and usage contract; CODEMAP owns implementation paths.
 
-#398, #400, #402 and #405 are closed through
-[#401](https://github.com/Kajooja/Kajo/pull/401),
-[#403](https://github.com/Kajooja/Kajo/pull/403),
-[#404](https://github.com/Kajooja/Kajo/pull/404) and #406. The last predecessor
-#404 was accepted as `1bc1ea7e6c83b369692bcfc862386ab157475f7e`, tree
-`7a4290d8f04beaec0df724bc1286ba141dc7533a`. Do not repeat the numerical baseline,
-durable capture, declared report or content model. The new challenger uses frozen
-permitted catalogue assertions and a strongly regularized residual around the
-Personal/domain mean. Sparse or unsupported inputs retain explicit fallback.
-All old capture/model/report versions and the full 0–10 scale remain intact.
-No actual owner cohort, mobile answer route, hosted forward or serving model was
-activated by these source packets. Experience time remains unknown; first-report
-evaluation is not exposure, new-experience or recommendation-benefit evidence.
-
-**One active source packet:** [Issue #407](https://github.com/Kajooja/Kajo/issues/407),
-branch `feat/personal-rating-hosted-readiness`, prepares the exact private numeric
-forwards. The implementation prepares the unchanged
-`20261029095452_personal_rating_prospective.sql` and
-`20261101221942_personal_content_rating.sql` together, in that order, for one
-provider-owned transaction and one explicit composite receipt. It excludes
-`20261028081350_native_skip_acquisition_prefilter.sql` from this target-specific
-operation; the canonical 56-file fresh-installation lineage remains unchanged.
-This is the concrete runtime prerequisite to an authorized DEVELOPMENT cohort,
-not another model, a general collection framework or a hosted execution command.
-
-The builder has no connection or credential discovery. It binds an independently
-verified target to complete metadata/history and retained-row count/digest
-checkpoints, rejects partial/already-installed state and predecessor drift, and
-checks only the intended old eraser change plus eight new empty tables, twenty
-functions and eighteen triggers. Column grants, function arguments/defaults,
-schemas/default ACLs and role memberships are included in preservation checks.
-Existing application locks and the SELECT-only provider-history exception are
-retained; there is no weaker-lock fallback. The operator must reconcile the
-observed migration history with accepted deployment receipts separately.
-
-The native rehearsal is placed before the existing skip-prefilter proof at the
-reset to the first 53 canonical migrations, adding no reset. Exact 55+56 SQL and a simulated provider
-receipt are checked inside one rollback-only transaction with populated old rows,
-injected failures and complete checkpoint restoration. Transaction-owning capture
-workers are not nested inside it. This proves the exercised guard boundary when
-native CI passes; it does not establish provider API atomicity, committed
-pre-#391 capture runtime, actual deployment or observed model quality. Required
-checks and native evidence for #407 remain pending publication/CI. Forty focused
-builder/helper tests pass locally, including the deadline/cleanup regression and
-the existing 15 baseline / 24 prospective / 39 content mechanisms in PGlite.
-This does not substitute for the required native PostgreSQL receipt.
-
-**Dated hosted readiness evidence:** read-only metadata on
-**2026-11-01T23:16:36.590497Z** contains 95 migration receipts, latest
-`20261027200523`, with neither numeric forward nor optional #391 installed.
-The acquisition body remains `6e0aba591a90c194c5bae49f0361084f` and source-evidence
-resolver `fc23518ea578c1db99498c958178aaf5`. The eraser check at
-**23:17:12.002199Z** matches predecessor `f69c58702752ee797d92c5f649489363`.
-The complete metadata-only comparison covers 95 tables, 278 public/private
-functions and 78 triggers. All three required predecessor bodies, security and
-argument/default/cost contracts match; no conflicting private/global default
-ACL was found. This dated snapshot is not a current deployment checkpoint.
-
-The broader comparison retains eighteen ACL-entry ordering differences, twenty
-other function-body hash differences and one extra platform function. Four
-unverified differences are upstream Personal receipt dependencies: policy
-attachment/resolution and genome validation/weights. The attempted read-only
-inspection of their hosted source was rejected by automatic tool approval review
-because target verification and explicit private-code inspection authorization
-were insufficient. No function-source query ran and no alternate retrieval was
-attempted. This
-is an operational approval block, not a new repository approval policy. Resolve
-that exact inspection scope and target evidence before repeating the request.
-Complete historical receipt reconciliation, a fresh authorized row checkpoint,
-actual executor/transaction verification and hosted operation acceptance remain
-open. No hosted state or personal rows were changed or exported in this work.
-
-**Continuation rule:** complete this guarded-forward source packet and its
-required CI first, retaining `qualityAdmission: NONE`, `servingActivation: NONE`
-and actual deployment as separate states. Before any observed collection, establish
-the authorized owner/Profile/domain scope, provider feature-use review, a genuinely
-retained pre-window DEVELOPMENT declaration, a trusted held SQL connection and
-real first-answer path. Reuse the existing capture, answer, census and report APIs.
-Keep every declared attempt, unavailable/busy capture, missing answer and
-zero-opportunity Profile. Do not backfill old answers or invent thresholds.
+**Next dependency:** run the read-only probe in the explicitly configured trusted
+operator environment. A successful connection probe does not authorize observation
+or establish capture permissions, a current schema checkpoint or useful predictions.
+Before genuine DEVELOPMENT, establish the authorized owner/Profile/domain scope,
+provider feature-use review, retained pre-window declaration and fresh first-answer
+route. Reuse existing capture, answer, complete census and report APIs. Keep all
+declared attempts, unavailable/busy captures, missing answers and zero-opportunity
+Profiles; do not backfill old answers, refill after erasure or invent thresholds.
 Development observations select numerical quality, coverage and precision
-requirements before SELECTION and untouched FINAL windows. Sprint 016 and Engine
-V1 remain open while that evidence is insufficient.
+requirements before SELECTION and untouched FINAL windows. Quality admission and
+serving activation remain NONE; Sprint 016 and Engine V1 remain open.
 
-The accepted source stack preserves the reviewed database image contract on
-Ubuntu 24.04 and the verified
-[dependency corrections](../architecture/ARCHITECTURE.md#verified-local-dependency-security-corrections--238).
-Source/CI success does not admit another hosted image. #397's ordinal-only
-feasibility labels remain unchanged. Under the owner's **2026-10-28** priority,
-#394/#399 remain deferred unless baseline/runtime evidence makes them material
-to correctness, required capacity or a declared user-facing budget. Optional
-#391 remains uninstalled and unadmitted; continue on the pre-#391 hosted baseline.
-No account, retained forecast, migration history or source identity is reset.
-Broader adaptive state, transfer, Shared, UX and release work keep ROADMAP order.
-
-The earlier **2026-10-28T18:09:54Z** aggregate inventory retained zero Personal
-Working enrollments/captures, zero Shared forecast consumptions/outcome captures,
-and 47 valid Taste panels across two sessions. Those counts do not establish
-eligible labels, a prospective cohort or numerical quality. No individual
-identity/label rows were exported by that check.
-
-**Retained diagnostic conclusion:** both #811 and #812 observed 503 calls in every
-original target/control and 500 acquisition + three availability calls in every
-trace. Historical 501/502 totals remain unexplained. #811's OFF_CATALOGUE_HISTORY
-Taste exact-retry p50 rose 7.710 → 10.553 ms (2.843 ms versus a 0.771 ms allowance);
-#812 did not reproduce it. Separate private replays preserve exact acquisition
-inputs/rows, not fixed-clock equality across separate public RPCs. No causal
-public-latency explanation or rollout admission follows. #807/#808 remain
-NOT_ADMITTED; #809 retains its individual declared-history passing result.
+Broader adaptive state, transfer, Shared, UX and release work retain ROADMAP order.
+The previous dated source/runtime investigations remain in Git and their accepted
+PR receipts; no account, forecast, source identity or migration history is reset.
 
 ### Completed diagnostic evidence
 

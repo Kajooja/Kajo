@@ -212,6 +212,73 @@ reports are bounded, exclusive mode-0600 files outside Git, with a seven-day
 post-checkpoint retention limit. Files cannot prove current authorization or
 withdrawal status; callers must invalidate/delete stale exports with their sources.
 
+### Private operator connection — Sprint 016 / #409
+
+The trusted private worker can bind its existing capture/census callbacks with
+`withPersonalRatingSqlSession` from `scripts/database/personal-rating-connection.mjs`.
+One invocation owns one direct psql connection; capture still owns its complete
+BEGIN → prepare → TypeScript computation → finalize → COMMIT transaction.
+Connection creation does not select a Profile, declare a cohort or authorize a
+write. Use only explicitly approved operator inputs. Do not put credentials or
+private connection/probe records in Git or a mobile application.
+
+The first supported operator environment is Linux with a reviewed native psql
+binary and network access to the independently verified project's direct
+PostgreSQL endpoint. Keep a regular, owner-private mode-0600 configuration file
+outside Git, using these exact fields (replace all placeholders):
+
+```json
+{
+  "version": "personal-rating-connection-v1",
+  "projectRef": "<verified project reference>",
+  "psqlPath": "/absolute/path/to/postgresql-17/bin/psql",
+  "caFile": "/private/operator/project-ca.crt",
+  "passwordFile": "/private/operator/project.pgpass"
+}
+```
+
+The reviewed CA comes from the project's connection settings. The explicit
+password file is an owner-private regular file; libpq reads it directly, and its
+contents never enter JSON, argv or diagnostics. The binding uses the direct
+`db.<projectRef>.supabase.co:5432` endpoint, database/login `postgres`,
+`sslmode=verify-full`, disabled GSS negotiation and no password prompt. It verifies
+server major 17, database, current/session role and actual SSL before yielding.
+The child receives only explicit connection settings, with no inherited PG
+overrides, service file, application secrets or startup scripts. Config/path
+failures are sanitized. The psql binary and referenced files must be regular
+files, not symlinks. These are local launch checks, not a credential provenance
+or authorization certificate.
+
+Run the only executable operation with:
+
+```sh
+node scripts/database/personal-rating-connection.mjs probe /private/operator/connection.json
+```
+
+This performs a READ ONLY / REPEATABLE READ transaction, verifies its backend,
+transaction timestamp and transaction-local marker across a JavaScript SHA-256
+round trip, then rolls back. It reads no application rows and returns only a
+small status summary. A rollback failure is a failure. The common transport
+retains a 60-second process deadline, 30-second statement and idle-transaction
+timeouts and a five-second lock timeout; the probe itself narrows statement/idle
+timeouts. Connection loss or an uncertain write outcome must be reconciled before
+an explicit retry. There is no automatic retry or connection-mode fallback.
+
+Direct Supabase endpoints require IPv6 unless the project has the IPv4 add-on.
+An IPv4-only operator without that route requires a separately reviewed session
+pooler binding; do not guess pooler hosts or silently weaken this contract.
+See [Supabase connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres),
+[PostgreSQL password files](https://www.postgresql.org/docs/17/libpq-pgpass.html)
+and [certificate verification](https://www.postgresql.org/docs/17/libpq-ssl.html).
+No CLI version or project networking change is made by this packet.
+
+Disposable native CI exercises the same probe over its existing CI-only transport.
+That proves the exercised transaction mechanics, not an actual hosted TLS/credential
+path or capture privileges. A live probe remains necessary in the approved
+operator environment. Genuine observation additionally needs the declared owner,
+Profile/domain/window, source-use review and fresh first-answer path described
+above. This helper neither launches collection nor establishes model usefulness.
+
 ### Frozen-content numeric challenger — Sprint 016 / #405
 
 The active source implementation adds `./personal-content-rating` and
