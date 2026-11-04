@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-11-02**
+Last updated: **2026-11-04**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, content-preference expected-rating challenger #405 source packet; baseline #398, durable capture #400 and declared evaluation #402 are accepted through #401/#403/#404. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, guarded private numeric forward preparation after accepted content-preference challenger #405 / #406. Baseline #398, durable capture #400 and declared evaluation #402 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,142 +11,148 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — content-preference expected ratings #405
+## Current handoff — guarded private numeric forward preparation #407
 
-[PR #404](https://github.com/Kajooja/Kajo/pull/404) is accepted as main
-`1bc1ea7e6c83b369692bcfc862386ab157475f7e`, with source/tested/accepted tree
-`7a4290d8f04beaec0df724bc1286ba141dc7533a`. Source head is
-`34786d1b5ec19ad6358acfcfc7c3068ebc0a4469`; tested PR merge is
-`34a79573cfe9997efd20984eb9e47a57211d50f8`. All six required
-[CI #823](https://github.com/Kajooja/Kajo/actions/runs/41348632726) gates passed:
-**2,372 tests and four configured iOS/Android exports**. Independent native
-review retains 15 baseline numerical cases, 24 prospective lifecycle cases,
-all eleven integer grades **0–10**, five independent-session lock proofs,
-populated-upgrade preservation and canonical cleanup. The new evaluation summary
-matches independent fixture expectations (MSE 49, MAE 7, bias 7, paired delta 0)
-and three exact source hashes. It does not retain the raw census/report inputs
-needed for independent full-report reconstruction.
+[PR #406](https://github.com/Kajooja/Kajo/pull/406) is accepted as main
+`1e58f0025ecf230ac4de0914f31be1615dc209a1`, with source/tested/accepted tree
+`c07738bd56229aada73871b4aba31b6714ec0eca`. Source head is
+`62f5482679030782aec30a9efbbd9956247ce838`; tested PR merge is
+`329a2ca5b3ebe92bad047e0334a673751baab104`. All six required
+[CI #827](https://github.com/Kajooja/Kajo/actions/runs/41360228441) gates passed
+on the final source, with **2,416 tests and four configured iOS/Android exports**.
+Lint/typecheck and the dependency audit pass with no unmitigated findings.
 
-Performance review independently recomputes 2,880 measurements, 6,336 quantiles,
-72 cohort rules and 36 mechanism rules. One original regression rule fails:
-OFF_CATALOGUE_HISTORY, 1,000 Items, `taste-personal-next`, exact retry, pair 3;
-p50 increases **9.553 → 10.860 ms** (+13.68%, original allowance +10%). The
-resource check passes. This failed diagnostic is retained; `admission` remains
-`NONE`, and optional #391 is not admitted or installed. The PR owns all artifact
-identities, verification limits and the exact source acceptance receipt.
+Independent native review verifies the full 56-file fresh lineage, 15 baseline,
+24 prospective and 39 content/evaluation cases, all eleven integer grades
+**0–10**, six content blocking witnesses, five content NOWAIT/rollback/retry
+witnesses and five retained legacy lock proofs. Populated content upgrade preserves
+96 old tables and all 291 function identities/metadata; only three exact
+reviewed function-body patches are allowed. Three retained frozen forecasts / 72 points and the complete
+synthetic census/report are independently reconstructed against six source hashes.
+Canonical and owned-stack cleanup pass. The deliberately losing evaluation
+fixture remains visible: candidate MSE 53.77777777777777 versus control 49,
+paired delta +4.7777777777777715. These are source-mechanics tests, not evidence
+of recommendation usefulness.
 
-#398, #400 and #402 are closed; their accepted source is retained through
+The performance artifact independently reproduces 2,880 measurements, 6,336
+quantiles, 72 cohort rules and 36 mechanism rules; all 72 resource checks pass.
+Two original rules fail: EMPTY, 40 Items, `taste-personal-next`, fresh, pair 3,
+p50 **137.048 → 145.819 ms** (+6.40%, allowance +5%); and CATALOGUE_HISTORY,
+1,000 Items, `discovery-personal-movie`, pair 1, skip-decision calls **502 → 503**
+where the declared reduction is zero. Both remain failed diagnostics with
+`admission: NONE`; the required job's successful execution does not admit optional
+#391. PR #406 owns the exact artifact identities, hashes and verification limits.
+
+Earlier attempts remain part of that receipt. CI #825 rejected an underscore in
+a concurrency diagnostic label; CI #826 rejected deletion of reused fixture Items
+still referenced by retained candidates. The corrected probe uses valid diagnostic
+labels and fresh non-discoverable Items, with actual-runner and full-schema
+cleanup regressions. CI #827 attempt 1 hit a PGlite WASM memory error during
+shutdown of the unchanged atomic-pages test; its focused recheck and attempt 2
+pass on identical source. No production constraint or test assertion was weakened.
+The prior CI #823 +13.68% retry regression and CI #825 call-count discrepancy
+remain retained in their PR receipts rather than being replaced by later results.
+
+#398, #400, #402 and #405 are closed through
 [#401](https://github.com/Kajooja/Kajo/pull/401),
-[#403](https://github.com/Kajooja/Kajo/pull/403) and #404. Do not repeat the
-numerical baseline, durable capture or declared evaluation implementation.
-The private path freezes forecasts before first answers and preserves those
-measurements through correction, Undo and clear. Its Profile-macro report keeps
-missing/unavailable/withdrawn coverage and fixed historical cuts explicit.
-Experience time remains unknown; this is not exposure, new-experience or
-recommendation-benefit evidence. No actual owner cohort, mobile answer route,
-hosted forward or serving model was activated by these source packets.
+[#403](https://github.com/Kajooja/Kajo/pull/403),
+[#404](https://github.com/Kajooja/Kajo/pull/404) and #406. The last predecessor
+#404 was accepted as `1bc1ea7e6c83b369692bcfc862386ab157475f7e`, tree
+`7a4290d8f04beaec0df724bc1286ba141dc7533a`. Do not repeat the numerical baseline,
+durable capture, declared report or content model. The new challenger uses frozen
+permitted catalogue assertions and a strongly regularized residual around the
+Personal/domain mean. Sparse or unsupported inputs retain explicit fallback.
+All old capture/model/report versions and the full 0–10 scale remain intact.
+No actual owner cohort, mobile answer route, hosted forward or serving model was
+activated by these source packets. Experience time remains unknown; first-report
+evaluation is not exposure, new-experience or recommendation-benefit evidence.
+
+**One active source packet:** [Issue #407](https://github.com/Kajooja/Kajo/issues/407),
+branch `feat/personal-rating-hosted-readiness`, prepares the exact private numeric
+forwards. The implementation prepares the unchanged
+`20261029095452_personal_rating_prospective.sql` and
+`20261101221942_personal_content_rating.sql` together, in that order, for one
+provider-owned transaction and one explicit composite receipt. It excludes
+`20261028081350_native_skip_acquisition_prefilter.sql` from this target-specific
+operation; the canonical 56-file fresh-installation lineage remains unchanged.
+This is the concrete runtime prerequisite to an authorized DEVELOPMENT cohort,
+not another model, a general collection framework or a hosted execution command.
+
+The builder has no connection or credential discovery. It binds an independently
+verified target to complete metadata/history and retained-row count/digest
+checkpoints, rejects partial/already-installed state and predecessor drift, and
+checks only the intended old eraser change plus eight new empty tables, twenty
+functions and eighteen triggers. Column grants, function arguments/defaults,
+schemas/default ACLs and role memberships are included in preservation checks.
+Existing application locks and the SELECT-only provider-history exception are
+retained; there is no weaker-lock fallback. The operator must reconcile the
+observed migration history with accepted deployment receipts separately.
+
+The native rehearsal is placed before the existing skip-prefilter proof at the
+reset to the first 53 canonical migrations, adding no reset. Exact 55+56 SQL and a simulated provider
+receipt are checked inside one rollback-only transaction with populated old rows,
+injected failures and complete checkpoint restoration. Transaction-owning capture
+workers are not nested inside it. This proves the exercised guard boundary when
+native CI passes; it does not establish provider API atomicity, committed
+pre-#391 capture runtime, actual deployment or observed model quality. Required
+checks and native evidence for #407 remain pending publication/CI. Forty focused
+builder/helper tests pass locally, including the deadline/cleanup regression and
+the existing 15 baseline / 24 prospective / 39 content mechanisms in PGlite.
+This does not substitute for the required native PostgreSQL receipt.
+
+**Dated hosted readiness evidence:** read-only metadata on
+**2026-11-01T23:16:36.590497Z** contains 95 migration receipts, latest
+`20261027200523`, with neither numeric forward nor optional #391 installed.
+The acquisition body remains `6e0aba591a90c194c5bae49f0361084f` and source-evidence
+resolver `fc23518ea578c1db99498c958178aaf5`. The eraser check at
+**23:17:12.002199Z** matches predecessor `f69c58702752ee797d92c5f649489363`.
+The complete metadata-only comparison covers 95 tables, 278 public/private
+functions and 78 triggers. All three required predecessor bodies, security and
+argument/default/cost contracts match; no conflicting private/global default
+ACL was found. This dated snapshot is not a current deployment checkpoint.
+
+The broader comparison retains eighteen ACL-entry ordering differences, twenty
+other function-body hash differences and one extra platform function. Four
+unverified differences are upstream Personal receipt dependencies: policy
+attachment/resolution and genome validation/weights. The attempted read-only
+inspection of their hosted source was rejected by automatic tool approval review
+because target verification and explicit private-code inspection authorization
+were insufficient. No function-source query ran and no alternate retrieval was
+attempted. This
+is an operational approval block, not a new repository approval policy. Resolve
+that exact inspection scope and target evidence before repeating the request.
+Complete historical receipt reconciliation, a fresh authorized row checkpoint,
+actual executor/transaction verification and hosted operation acceptance remain
+open. No hosted state or personal rows were changed or exported in this work.
+
+**Continuation rule:** complete this guarded-forward source packet and its
+required CI first, retaining `qualityAdmission: NONE`, `servingActivation: NONE`
+and actual deployment as separate states. Before any observed collection, establish
+the authorized owner/Profile/domain scope, provider feature-use review, a genuinely
+retained pre-window DEVELOPMENT declaration, a trusted held SQL connection and
+real first-answer path. Reuse the existing capture, answer, census and report APIs.
+Keep every declared attempt, unavailable/busy capture, missing answer and
+zero-opportunity Profile. Do not backfill old answers or invent thresholds.
+Development observations select numerical quality, coverage and precision
+requirements before SELECTION and untouched FINAL windows. Sprint 016 and Engine
+V1 remain open while that evidence is insufficient.
 
 The accepted source stack preserves the reviewed database image contract on
-Ubuntu 24.04 and resolves the recorded dependency findings with the verified
-[source corrections](../architecture/ARCHITECTURE.md#verified-local-dependency-security-corrections--238).
-Raw advisory findings remain visible and unknown/unverified findings fail.
-These source/CI corrections do not admit a new hosted image or version.
+Ubuntu 24.04 and the verified
+[dependency corrections](../architecture/ARCHITECTURE.md#verified-local-dependency-security-corrections--238).
+Source/CI success does not admit another hosted image. #397's ordinal-only
+feasibility labels remain unchanged. Under the owner's **2026-10-28** priority,
+#394/#399 remain deferred unless baseline/runtime evidence makes them material
+to correctness, required capacity or a declared user-facing budget. Optional
+#391 remains uninstalled and unadmitted; continue on the pre-#391 hosted baseline.
+No account, retained forecast, migration history or source identity is reset.
+Broader adaptive state, transfer, Shared, UX and release work keep ROADMAP order.
 
-The prior [#397](https://github.com/Kajooja/Kajo/pull/397) feasibility source is
-also accepted. Its ordinal-only capability labels remain unchanged. The
-separate [#399](https://github.com/Kajooja/Kajo/issues/399) CI diagnostics follow-up
-is not an implicit competing engine task.
-
-**Owner priority — 2026-10-28:** investigate performance deviations now only when
-material to development or MVP; otherwise continue required engine work. The
-#394 observations failed declared optimization rules but demonstrate neither a
-wrong result/data-preservation failure nor an end-user latency violation. Keep
-all failed results and thresholds; do not reinterpret them as accepted. Further
-investigation is **deferred**, with the optional #391 forward still uninstalled.
-Re-enter #394 before proposing its broader activation, or when baseline/runtime
-evidence links the issue to a correctness defect, required capacity or a declared
-user-facing performance budget. This does not close MVP-UX-008 or Sprint 015.
-
-Continue on the current **pre-#391 hosted serving baseline**. Fresh source-test
-installations include the 54th candidate forward; their CI success does not
-activate or admit that forward in the hosted application. No migration is removed
-or rewritten, and no account, retained forecast or history is reset.
-
-**Active source packet:** [Issue #405](https://github.com/Kajooja/Kajo/issues/405),
-branch `feat/personal-content-rating`, [PR #406](https://github.com/Kajooja/Kajo/pull/406), starts from accepted #404. The owner
-approved publication of this successor task and uninterrupted continuation on
-**2026-11-02**. The implementation is ready for required source CI. Local engine
-tests pass (410), as do 39 native-fixture cases, populated V1 upgrade and eight
-upgrade mutation rejections. The native fixture retains bounded synthetic raw
-inputs, forecasts, census and report evidence for independent reconstruction.
-Actual PostgreSQL contention proofs and required CI/source acceptance remain
-pending; no observed-quality, hosted or serving acceptance is claimed.
-
-CI #825 passed validation (2,413 tests/four configured exports) and all three
-platform/foundation jobs. Its native CLI job passed the new conformance cases,
-then rejected an underscore in a concurrency probe's diagnostic stage label.
-The corrected probe normalizes only the diagnostic label, preserving SQL backend
-identities and both strict runner validators; two actual-validator regressions
-pass. CI #826 then passed 2,415 tests/four exports and the three foundation jobs;
-native concurrency reached the final Item-deletion scenario before a valid
-foreign-key restriction rejected the reused MOVIE fixture Items. The probe now
-creates two fresh non-discoverable, unreferenced Items with scoped cleanup.
-A third full-schema regression verifies both real deletions and canonical
-cleanup on success and failure. Production constraints, model and SQL source
-are unchanged. Required CI on this corrected head and complete native contention
-evidence remain pending; neither failed run is an acceptance receipt.
-
-Local lint/typecheck, research and acceptance tests and four explicit-demo
-iOS/Android exports pass. The full local database regression passed 441 tests
-before the two new runner-contract tests. Local catalogue
-checks retain four inherited child-process stderr failures from this environment's
-injected `UNDICI-EHPA` proxy warning; Deno dependency retrieval is refused by the
-local network. Assertions and source checks are unchanged. Required CI must pass
-the canonical configured checks, dependency audit and native PostgreSQL paths.
-
-The packet implements one transparent, strongly regularized content-residual expected-rating
-challenger around the Personal/domain mean, using original integer **0–10**
-labels. The accepted location-only model gives every Item the same forecast;
-#405 must earn supported differentiation from a small versioned allowlist of
-permitted structured catalogue features. Freeze exact feature inputs, identity,
-provenance and availability for both training-prefix and candidate Items at the
-prediction cutoff. Today's mutable metadata cannot reconstruct a historical
-feature prefix. Do not rescale the old rank score and call it a rating.
-
-Preserve the existing Personal-mean control and all old capture/model/report
-versions. Add only the versioned capture/adapter extension needed to compare
-candidate and control before the same first answer through #400/#402. Keep
-sparse, constant-rating, narrow-range, missing-feature and identical-feature
-cases explicit; identical supported inputs retain ties. Verify that predictions
-precede updates, preserve correction/withdrawal behavior, and confirm
-incremental/full-replay parity.
-No inferred personality, forced min/max scale stretching, new external prior,
-embeddings or Working-state activation belongs to this packet.
-
-**Continuation rule:** finish #405 on its named branch, retain model, configuration
-and feature lineage and support/resource limits, and pass required source checks.
-Descriptive fixtures keep `qualityAdmission: NONE` and `servingActivation: NONE`.
-A genuine declared DEVELOPMENT cohort through an authorized capture path is
-the separate experiment needed to select regularization and numerical quality,
-coverage and precision requirements before SELECTION and untouched FINAL windows.
-Until eligible observations support those decisions, record insufficient quality
-evidence and the concrete collection dependency. Synthetic fixtures or pooled
-research RMSE cannot replace this evidence. #394/#399 remain separate deferred
-follow-ups; broader adaptive state, transfer and Shared work retain their later
-sprint scopes. Sprint 016 and Engine V1 acceptance remain open.
-
-A read-only hosted check on **2026-10-28T18:09:23Z** confirms acquisition body
-MD5 `6e0aba591a90c194c5bae49f0361084f` and no installed skip-prefilter forward.
-At **18:09:54Z**, aggregate feasibility counts are zero Personal Working
-enrollments/captures, zero Shared forecast consumptions/outcome captures, and
-47 valid retained Taste panels across two sessions. Counts do not establish
-eligible labels, independent support, a prospective sample or numeric forecasts.
-No individual identity/label rows were exported; no hosted state changed.
-
-Continue Sprint 016 from the accepted feasibility foundation using the existing
-research mathematics and canonical native evidence machinery. Preserve unresolved
-Sprint 015 quality/runtime observations as named acceptance obligations; do not
-wait for optional #391 tuning or claim the sprint/Engine V1 is already accepted.
+The earlier **2026-10-28T18:09:54Z** aggregate inventory retained zero Personal
+Working enrollments/captures, zero Shared forecast consumptions/outcome captures,
+and 47 valid Taste panels across two sessions. Those counts do not establish
+eligible labels, a prospective cohort or numerical quality. No individual
+identity/label rows were exported by that check.
 
 **Retained diagnostic conclusion:** both #811 and #812 observed 503 calls in every
 original target/control and 500 acquisition + three availability calls in every

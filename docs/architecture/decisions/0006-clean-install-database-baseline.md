@@ -96,6 +96,40 @@ evaluation. Full `MVP-ALG-009`, device/HTTP Auth, useful recommendation quality 
 release acceptance remain open. The dated sections below are historical evidence;
 this section supersedes their former pending adoption instructions.
 
+### Private numeric forward preparation — 2026-11-04
+
+Sprint 016 [#407](https://github.com/Kajooja/Kajo/issues/407) prepares the unchanged
+`20261029095452_personal_rating_prospective.sql` and
+`20261101221942_personal_content_rating.sql` as one target-specific provider
+transaction, followed by its one `personal_rating_private_evaluation` receipt.
+The provider owns transaction boundaries and receipt recording. Partial/already
+installed numeric state is rejected; this is not a repair or replay facility.
+Optional `20261028081350_native_skip_acquisition_prefilter.sql` is excluded from
+this operation while remaining in the canonical fresh-installation lineage.
+
+The [preparation modules](../CODEMAP.md#guarded-private-numeric-forward-preparation--sprint-016)
+bind an independently verified target to its full metadata/history and retained-row
+count/multiset-digest checkpoint. They preserve old identities, bodies, function
+arguments/defaults/costs, table/column grants, schemas/default ACLs, roles, rows
+and history, allowing only the exact old eraser-body change and the two files'
+closed new objects. Reuse the existing application/migration-history lock boundary;
+provider-owned `auth.schema_migrations` retains its checked SELECT-only ACCESS
+SHARE exception. Concurrent provider DML on that relation remains an observed
+before/after limitation, not a claim that its rows are write-locked.
+
+Preflight and receipt-bound postflight reject drift. The isolated native rehearsal
+uses the existing reset to the first 53 migrations before the skip-prefilter verifier, rolls both
+files and a simulated receipt back, and requires complete checkpoint restoration.
+It does not nest transaction-owning capture workers or establish real provider
+API atomicity. No extra reset or hosted executor is introduced.
+
+Source/CI acceptance, actual target/dependency/history reconciliation, the fresh
+authorized row checkpoint, provider execution and observed collection retain
+separate gates. Known historical formatting differences do not certify current
+unreviewed hosted bodies. Keep operator-specific snapshots outside Git and stop
+on unknown variants or an unresolved target/authorization boundary. STATUS owns
+the current source receipt, dated target observations and outstanding operation.
+
 ## Context
 
 #208 prevents a new database from replaying the repository history: the catalog

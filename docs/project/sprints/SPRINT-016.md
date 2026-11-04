@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective numeric capture #400 and declared numeric evaluation #402 accepted; content-preference challenger #405 in progress; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded private numeric forward preparation in progress; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -174,39 +174,77 @@ inputs for independent full-report reconstruction. No observed quality,
 mobile-route, hosted-installation or serving acceptance follows; STATUS and the
 PR own the complete source/check receipt.
 
-## Active source packet — #405
+## Frozen-content challenger source — #405 (accepted)
 
-[Issue #405](https://github.com/Kajooja/Kajo/issues/405) is the sole next bounded
-source packet on `feat/personal-content-rating`, starting from accepted #404.
-The owner approved this successor task's publication and uninterrupted
-continuation on **2026-11-02**. Implementation and source verification are in
-progress; no new test result or acceptance is claimed yet.
+[Issue #405](https://github.com/Kajooja/Kajo/issues/405) is accepted through
+[PR #406](https://github.com/Kajooja/Kajo/pull/406). The model fits original integer
+**0–10** labels with a bounded, strongly regularized content residual around the
+Personal/domain mean, retaining that mean as the fixed control. Its small
+versioned structured-feature allowlist freezes training and candidate assertions,
+identity, provenance, permission manifest and availability at the prediction cut.
+Later mutable metadata cannot replace historical feature inputs.
 
-Implement one transparent, strongly regularized content-residual model around
-the Personal/domain mean. Fit original integer **0–10** labels with a
-mean-targeting loss and retain bounded forecasts on the Profile's own scale.
-Use a small versioned allowlist of permitted structured catalogue features,
-with exact training-prefix and candidate features frozen at the prediction
-cutoff. Preserve identity, provenance and availability; later mutable metadata
-must not be substituted into historical forecasts.
+The private v2 capture and evaluation adapter preserve old capture/model/report
+versions and the original first-answer writer. Sparse, constant, narrow-range,
+missing-feature and identical-feature cases have explicit support/fallback;
+identical supported inputs retain ties. Source tests exercise supported
+differentiation, strict/generous own-scale behavior, prediction-before-update,
+correction/withdrawal and full-prefix reconstruction. Catalogue relation fences
+hold through actual TypeScript computation and native commit; an already-running
+writer produces `55P03`, full rollback and an explicit later retry.
 
-Keep the Personal-mean control and all old capture/model/report versions. Add
-only the versioned private capture and evaluation-adapter extension needed to
-compare both models before the same first answer. Sparse, constant, narrow-range,
-missing-feature and identical-feature cases need explicit support/fallback;
-identical supported inputs retain ties. Verify supported differentiation,
-strict/generous own-scale ordering, prediction-before-update, correction and
-withdrawal handling, and incremental/full-replay parity. Record model, configuration
-and feature lineage, support and resource limits. Synthetic checks retain
-`qualityAdmission: NONE` and `servingActivation: NONE`.
+All six CI #827 gates pass with 2,416 tests and four configured exports.
+Independent native review verifies 39 content/evaluation cases, six blocking and
+five NOWAIT witnesses, retained baseline/prospective cases and grades, populated
+upgrade and complete cleanup. The retained synthetic inputs support independent
+reconstruction of three forecasts / 72 points and the census/report arithmetic.
+The deliberately losing content fixture remains losing; source acceptance does
+not establish usefulness. Model/configuration/feature lineage and support/resource
+limits remain explicit, with `qualityAdmission: NONE` and `servingActivation: NONE`.
+
+## Active source packet — guarded private numeric forward preparation #407
+
+Continue [Issue #407](https://github.com/Kajooja/Kajo/issues/407) on
+`feat/personal-rating-hosted-readiness` after #406. Prepare the exact existing prospective/content forwards (55+56) for
+one provider-owned atomic transaction and receipt on the pre-#391 target. The
+optional skip-prefilter (54) stays excluded from this operation, while canonical
+fresh-installation history remains unchanged. Preserve old rows, metadata/grants,
+function contracts and receipts; reject unknown predecessors, drift and partial
+installation. [ADR-0006](../../architecture/decisions/0006-clean-install-database-baseline.md#private-numeric-forward-preparation--2026-11-04)
+owns the operational boundary; CODEMAP names the builder and native rehearsal.
+
+The source prepares SQL and target checks; it has no hosted connection or apply
+entry point. The native guard rehearsal reuses the reset to the first 53 migrations, inserts no
+extra reset, and restores complete checkpoints after exact 55+56, a simulated
+receipt and injected failures. Its rollback-only scope is distinct from real
+provider atomicity and committed pre-#391 capture/answer operation. Forty focused
+builder/helper tests pass locally, including the deadline/cleanup regression and
+existing 15/24/39 mechanisms in PGlite. Required #407 CI/native verification,
+actual hosted installation and collection acceptance remain open; STATUS owns
+exact progress and the dated metadata review.
+
+The 2026-11-01 metadata-only target comparison matches the three required
+predecessor bodies/security/contracts. It retains eighteen ACL-order differences,
+twenty other body hashes and an additional platform function. Four upstream
+Personal receipt bodies remain unverified after automatic tool approval rejected
+the private-source lookup for insufficient target/inspection authorization. This
+is an operational block, not a new repository policy or permission to work around
+the rejection. Historical receipt reconciliation, a fresh authorized row checkpoint
+and actual executor/transaction evidence remain before a hosted operation.
 
 A genuine declared DEVELOPMENT cohort through an authorized capture path remains
-the separate experiment needed to select regularization and numerical quality,
-coverage and precision requirements before SELECTION and untouched FINAL windows.
-Insufficient observations require an explicit collection dependency, not invented
-thresholds or a synthetic usefulness claim. New embeddings, external priors,
-Working-state activation and broad UI changes are outside this packet; broader
-adaptive state, transfer and Shared work keep their later sprint scopes.
+the experiment needed to select regularization and numerical quality, coverage
+and precision requirements before SELECTION and untouched FINAL windows. Establish
+the actual owner/Profile/domain scope, valid provider feature-use review,
+independently retained pre-window declaration, held trusted SQL connection and
+real first-answer path. Reuse the accepted capture, answer, census and report
+APIs. Keep unavailable/busy captures, missing answers and empty Profiles visible;
+never backfill old labels or refill a declared cohort after erasure.
+
+Insufficient observations require an explicit collection dependency rather than
+invented thresholds or a synthetic usefulness claim. New embeddings, external
+priors, Working-state activation and broad UI changes are outside this packet;
+broader adaptive state, transfer and Shared work retain their later sprint scopes.
 
 ## Delivery record
 
@@ -245,11 +283,28 @@ adaptive state, transfer and Shared work keep their later sprint scopes.
   1,000 Items, `taste-personal-next`, exact retry, pair 3, p50 9.553 → 10.860 ms
   (+13.68%, allowance +10%); resource checks pass. The failed diagnostic is retained,
   `admission` remains `NONE`, #391 stays uninstalled and #394/#399 remain deferred.
-- Content-preference source: #405 is ready for required CI. Local engine tests
-  (410), 39 native-fixture cases, populated V1 upgrade and eight upgrade mutation
-  rejections pass; bounded synthetic raw receipts support independent review.
-  Actual PostgreSQL contention proofs, required CI and source acceptance remain
-  pending. STATUS owns the one active handoff and local environment limitations.
+- Content-preference source / CI: #405 is accepted through
+  [#406](https://github.com/Kajooja/Kajo/pull/406), main
+  `1e58f0025ecf230ac4de0914f31be1615dc209a1`, source
+  `62f5482679030782aec30a9efbbd9956247ce838`, tested merge
+  `329a2ca5b3ebe92bad047e0334a673751baab104`, source/tested/accepted tree
+  `c07738bd56229aada73871b4aba31b6714ec0eca`. All six CI #827 gates pass,
+  including **2,416 tests and four configured iOS/Android exports**. Native review
+  verifies 56 installation files, 15 baseline / 24 prospective / 39 content cases,
+  all eleven grades, six content blocking / five NOWAIT witnesses and five legacy
+  locks. Populated upgrade preserves 96 old tables and 291 function identities/
+  metadata, allowing only three exact old-body patches. Independent arithmetic
+  reconstructs three frozen forecasts / 72 points and the complete raw synthetic
+  census/report against six source hashes. The candidate fixture MSE remains
+  53.77777777777777 versus control 49, paired delta +4.7777777777777715.
+  Performance review retains two original rule failures: EMPTY/40/fresh Taste
+  pair 3 p50 +6.40% versus +5% allowance; CATALOGUE_HISTORY/1000/Personal Discovery
+  pair 1 calls 502→503 versus required equality. All resource checks pass;
+  optimization admission remains NONE. PR #406 retains exact artifacts, earlier
+  failed runs and the limits; no hosted/collection/serving acceptance follows.
+- Guarded numeric forward preparation: [#407](https://github.com/Kajooja/Kajo/issues/407) reuses exact
+  55+56 and preserves the hosted pre-#391 baseline. Source/native verification,
+  actual deployment and the observed DEVELOPMENT cohort remain separate gates.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.

@@ -26,9 +26,31 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Guarded private numeric forward preparation — Sprint 016
+
+[Issue #407](https://github.com/Kajooja/Kajo/issues/407) source preparation on
+`feat/personal-rating-hosted-readiness`;
+[STATUS](../project/STATUS.md) owns its source/native acceptance and the separate
+hosted operation. The canonical fresh lineage remains unchanged.
+
+| Responsibility | Implementation |
+| --- | --- |
+| Target-bound exact forward and postflight | `scripts/database/personal-rating-hosted-upgrade.mjs`; ordered unchanged prospective/content SQL (55+56), explicit omission of optional54, complete metadata/history/row-digest checkpoint, drift/partial-install rejection and one provider-owned atomic receipt |
+| Preservation and failure regression | `scripts/database/personal-rating-hosted-upgrade.test.mjs`; populated old sources, non-superuser/SELECT-only provider-history boundary, table/column ACL and function-contract drift, exact receipt/replay checks and rollback |
+| Disposable native guard rehearsal | `scripts/database/personal-rating-hosted-native.mjs`, `.test.mjs`; required `run-ci-cli-installation-probe.mjs` stage before the existing first-53-migration skip-prefilter proof, populated rollback-only 55+56/receipt checks, fixed per-call deadlines and full restoration without an extra reset |
+
+The builder supplies SQL strings, with no network, credential or deployment
+executor. Its supplied project ref is not proof of the connected target, and its
+bound history is not independent reconciliation against accepted receipts.
+Metadata-only inventory is distinct from the authorized retained-row checkpoint.
+The native receipt is simulated in an isolated transaction; actual provider API
+atomicity, committed pre-#391 capture runtime, hosted deployment and observed
+DEVELOPMENT collection remain separate. See [ADR-0006](decisions/0006-clean-install-database-baseline.md#private-numeric-forward-preparation--2026-11-04).
+
 ## Frozen-content Personal rating challenger — Sprint 016 / #405
 
-Active implementation; [STATUS](../project/STATUS.md) owns verification and acceptance.
+Source accepted through [PR #406](https://github.com/Kajooja/Kajo/pull/406);
+[STATUS](../project/STATUS.md) retains exact verification and separate admission.
 
 | Responsibility | Implementation |
 | --- | --- |

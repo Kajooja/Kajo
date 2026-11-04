@@ -59,6 +59,7 @@ import { verifyPersonalRatingEvaluation } from './personal-rating-evaluation.mjs
 import { verifyPersonalContentRating } from './personal-content-rating.mjs';
 import { verifyPersonalContentRatingConcurrency } from './personal-content-rating-concurrency.mjs';
 import { verifyPersonalContentRatingUpgrade } from './personal-content-rating-upgrade.mjs';
+import { verifyPersonalRatingHostedUpgrade } from './personal-rating-hosted-native.mjs';
 import { verifyNativeSkipPrefilter } from './native-skip-prefilter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
@@ -133,6 +134,10 @@ try {
     const skipPrefilterIndex = files.findIndex(file => file.name.endsWith('_native_skip_acquisition_prefilter.sql'));
     assert.ok(skipPrefilterIndex > 0);
     await resetFromMigrations(files.slice(0, skipPrefilterIndex));
+    // Exact private 55+56 guard rehearsal rolls back to this same first53 state.
+    // No additional CLI reset and no change to the canonical fresh lineage.
+    const nativePersonalRatingHostedUpgrade = await verifyPersonalRatingHostedUpgrade(execConcurrentSql, { runtimeScope: 'OWNED_PINNED_NATIVE_CI' });
+    assert.equal(nativePersonalRatingHostedUpgrade.status, 'PASS');
     const nativeSkipPrefilter = await verifyNativeSkipPrefilter(execConcurrentSql, files[skipPrefilterIndex]);
     assert.equal(nativeSkipPrefilter.status, 'PASS');
     const reconciliationIndex = files.findIndex(file => file.name.endsWith('_shared_forecast_outcome_reconciliation.sql'));
@@ -531,7 +536,7 @@ try {
       personalTasteSession, personalTasteSessionConcurrency, personalTasteChallenge, personalTasteChallengeConcurrency,
       personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativePersonalRatingBaseline, nativePersonalRatingProspective,
       nativePersonalRatingProspectiveConcurrency, nativePersonalRatingProspectiveUpgrade, nativePersonalRatingEvaluation, nativeSkipPrefilter,
-      nativePersonalContentRating, nativePersonalContentRatingConcurrency, nativePersonalContentRatingUpgrade,
+      nativePersonalContentRating, nativePersonalContentRatingConcurrency, nativePersonalContentRatingUpgrade, nativePersonalRatingHostedUpgrade,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,
