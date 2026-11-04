@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-11-04**
+Last updated: **2026-11-05**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, bounded private-probe diagnostics after accepted connection #409 / #410 and session-pooler/private-runner #411 / #412. Baseline #398, durable capture #400 and declared evaluation #402 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, owned numeric evaluation preparation after accepted diagnostics #413 / #414. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,22 +11,31 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — bounded private-probe diagnostics #413
+## Current handoff — owned numeric DEVELOPMENT preparation
 
-[PR #412](https://github.com/Kajooja/Kajo/pull/412) is accepted as main
-`06f55e2ae44164e5b51a9332a13da8833e85e771`, source
-`6fad1a053147a7a3f2ae9668cae9b6f0d7cfab3d`, tested merge
-`11b1c70b1ece2f04ca768758bc5cf021fabf61ef`, common tree
-`3b7d6e67db18b757047472b872ad26f36b27ef7e`. All six required
-[CI #833](https://github.com/Kajooja/Kajo/actions/runs/41851232102) gates pass:
-**2,474 tests and four configured iOS/Android exports**, lint/typecheck and audit
-with no unmitigated findings. The optional standalone APK was skipped. #411 is
-closed. The native read-only probe, shared session initializer and all 43 reported
-subchecks pass; the 56-entry SQL manifest/history match the accepted predecessor.
-The optional performance diagnostic retains the pair-3 off-catalogue Taste
-exact-retry failure; optional #391 stays NOT_ADMITTED. PR #412 retains the complete
-source/CI receipt. Earlier connection acceptance remains in
-[the predecessor checkpoint](https://github.com/Kajooja/Kajo/blob/06f55e2ae44164e5b51a9332a13da8833e85e771/docs/project/STATUS.md).
+[PR #414](https://github.com/Kajooja/Kajo/pull/414) is accepted as main
+`50c5904e40cd36313ff88da9e1e24ee7f006e8ca`, source
+`9003153ef3e275b0520c1a97c10c0a65705888bb`, tested merge
+`2fa819c38d4a3d095058ffb8eb6d76d79ba0f3ed`, common tree
+`ee839d515a60dde5e84fe123cb5cd4f55df8a092`. All six required
+[CI #835](https://github.com/Kajooja/Kajo/actions/runs/41908295062) gates pass:
+**2,477 tests and four configured iOS/Android exports**, lint/typecheck and audit
+with no unmitigated findings. The optional standalone APK was skipped. #413 is
+closed. Source, tested and accepted trees match; the implementation PR retains
+the final acceptance receipt. Do not restart the diagnostics implementation.
+
+The fixed allowlist now distinguishes runtime, context, client, private-file and
+connection failures without exposing credentials, paths, SQL, environment values
+or arbitrary process/server text. Transport hints remain hints; unknown errors
+remain UNKNOWN. Existing private/main/owner/source, identity/TLS, timeout and
+cleanup guards are unchanged. Synthetic child-process tests establish disclosure
+and classification behavior, not a hosted connection result.
+
+The same CI retains all 43 native subchecks and the unchanged 56-entry SQL
+manifest/history. The optional performance diagnostic preserves the pair-3
+off-catalogue Taste exact-retry failure; optional #391 stays NOT_ADMITTED and
+#394 remains deferred. Earlier connection/session acceptance remains in
+[the predecessor checkpoint](https://github.com/Kajooja/Kajo/blob/50c5904e40cd36313ff88da9e1e24ee7f006e8ca/docs/project/STATUS.md).
 
 The preceding #398/#400/#402/#405/#408 source supplies the numeric baseline,
 durable capture, declared evaluation, frozen-content challenger and guarded
@@ -35,36 +44,44 @@ operational execution from source acceptance. All eleven integer ratings **0–1
 remain supported. Operational records stay private; source/CI evidence does not
 establish observed prediction usefulness or close Sprint 016/Engine V1.
 
-**One active source packet:** [Issue #413](https://github.com/Kajooja/Kajo/issues/413),
-branch `fix/private-probe-diagnostics`. Replace the private runner's opaque failure
-line with fixed, allowlisted stage/cause categories. Distinguish runtime, context,
-client, private-file and connection failures without exposing paths, credentials,
-SQL, environment values or arbitrary process/server text. Transport hints remain
-hints; unrecognized failures stay UNKNOWN. Synthetic child-process tests verify
-redaction and classification, not hosted connection success.
+**One next dependency:** prepare the first bounded, authorized owned-Profile
+DEVELOPMENT observation using these existing seams. [Issue #415](https://github.com/Kajooja/Kajo/issues/415)
+reconciles this documentation handoff; it adds no runtime or observation collector.
+Verify the privately retained connection result against an accepted source
+revision before writes. Preserve already installed migration receipts and never
+reapply a forward merely because a new conversation starts.
 
-The accepted direct/session configuration, private/main/owner/source guards,
-certificate/hostname and server identity checks, timeouts and cleanup remain
-unchanged. The manual template stays outside public executable workflows. No
-model, migration, credential reset, automatic retry or collection is introduced.
-The implementation PR owns final-source CI acceptance.
+Before genuine DEVELOPMENT, establish the exact owner/PersonalProfile and domain,
+provider feature-use review, retained pre-window declaration and fresh first-answer
+route. Keep actor identity separate from the target Profile. The ordinary mobile
+rating writer is not the private numeric first-answer route: its accepted use can
+retire a pending evaluation target. Do not tell an owner to rate through that
+route while claiming to measure the private frozen forecast.
+
+Reuse `capturePersonalContentRatingForecast` for one held BEGIN → prepare →
+TypeScript → finalize → COMMIT transaction. Only afterward submit the owner's
+actual integer rating through `private.commit_personal_rating_answer_v1`.
+Use `inspectPersonalRatingOwnerCensus` for every declared owner and the existing
+declaration/report CLI. A missing feature-use permission uses the documented
+mean fallback; it does not establish content-model usefulness. No new public RPC,
+mobile route, model or generic collector is implied by this preparation.
+
+Keep all declared attempts, unavailable/busy captures, missing answers and
+zero-opportunity Profiles; do not backfill old answers, refill after erasure or
+invent thresholds. First-report rating error with unknown experience time is
+separate from new-experience recommendation benefit. DEVELOPMENT observations
+select numerical quality, coverage and precision requirements before SELECTION
+and untouched FINAL windows. Quality admission and serving activation remain
+NONE. Broader adaptive state, transfer, Shared, UX and release work retain ROADMAP
+order; existing accounts and evidence are preserved.
 
 [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#explicit-session-pooler-and-private-runner--sprint-016--411)
-owns configuration and the bounded diagnostics contract; CODEMAP owns paths.
-**Next dependency:** accept this source after all required CI, then use the
-accepted revision in an explicitly approved private operator environment. Retain
-actual connection results privately and resolve a reported cause before an
-explicit retry. Do not publish operational records in this public repository.
-
-Before genuine DEVELOPMENT, establish the authorized owner/Profile/domain scope,
-provider feature-use review, retained pre-window declaration and fresh first-answer
-route. Reuse existing capture, answer, complete census and report APIs. Keep all
-declared attempts, unavailable/busy captures, missing answers and zero-opportunity
-Profiles; do not backfill old answers, refill after erasure or invent thresholds.
-Development observations select numerical quality, coverage and precision
-requirements before SELECTION and untouched FINAL windows. Quality admission and
-serving activation remain NONE. Broader adaptive state, transfer, Shared, UX and
-release work retain ROADMAP order; existing accounts and evidence are preserved.
+owns the connection/diagnostics contract and numeric observation semantics;
+[CODEMAP](../architecture/CODEMAP.md#declared-personal-numeric-evaluation--sprint-016--402)
+owns the existing implementation paths. Keep operational targets, identities,
+configuration, private execution results and experiment files out of this public
+repository. Continue from their authorized private records rather than inventing
+missing evidence or treating this public handoff as an execution receipt.
 
 ### Completed diagnostic evidence
 

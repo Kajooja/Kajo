@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 in progress; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; owned DEVELOPMENT preparation is next; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -245,7 +245,10 @@ stage/cause metadata and bounded transport hints. Unknown errors remain unknown;
 raw process/server output, paths, SQL and secrets never enter the report. Existing
 source/owner/runtime/TLS guards, cleanup and no-retry behavior remain unchanged.
 Synthetic child-process failures test disclosure boundaries without hosted inputs.
-STATUS and the implementation PR own final-source acceptance.
+#413 is accepted through [PR #414](https://github.com/Kajooja/Kajo/pull/414),
+all six CI #835 gates, 2,477 tests and four configured exports. STATUS records
+the exact public source/tested/accepted identities. This acceptance does not
+publish or certify private operational execution.
 
 A genuine declared DEVELOPMENT cohort through an authorized capture path remains
 the experiment needed to select regularization and numerical quality, coverage
@@ -253,7 +256,11 @@ and precision requirements before SELECTION and untouched FINAL windows. Establi
 the actual owner/Profile/domain scope, valid provider feature-use review,
 independently retained pre-window declaration, held trusted SQL connection and
 real first-answer path. Reuse the accepted capture, answer, census and report
-APIs. Keep unavailable/busy captures, missing answers and empty Profiles visible;
+APIs. The ordinary mobile rating writer is not this private first-answer route;
+complete capture commitment before the owner supplies the later actual 0–10
+answer through the dedicated writer. Never reuse an earlier answer or silently
+route a pending evaluation through ordinary rating. Keep unavailable/busy
+captures, missing answers and empty Profiles visible;
 never backfill old labels or refill a declared cohort after erasure.
 
 Insufficient observations require an explicit collection dependency rather than
@@ -325,8 +332,13 @@ broader adaptive state, transfer and Shared work retain their later sprint scope
   Hosted TLS/credentials and genuine observation are not established by that CI.
 - Session pooler/private runner: #411 accepted through #412 / all six CI #833 gates,
   2,474 tests and four exports. Source/CI and private execution remain separate.
-- Bounded private-probe diagnostics: #413 in progress; no operational execution
-  or observation is implied by publishing diagnostics source.
+- Bounded private-probe diagnostics: #413 accepted through #414 / all six CI #835
+  gates, 2,477 tests and four configured exports. Native probe/session checks pass,
+  all 43 subchecks and the 56-entry manifest remain intact. Private operational
+  execution and observed prediction usefulness remain separate evidence.
+- Current handoff: owned numeric DEVELOPMENT preparation through the existing
+  connection, capture, dedicated first-answer, complete census and report APIs;
+  #415 reconciles the source acceptance and preserves the private/public boundary.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.
