@@ -4,12 +4,41 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import test from 'node:test';
-import { personalRatingConnectionCommand, probePersonalRatingSqlSession, readPersonalRatingConnectionConfig,
+import { initializePersonalRatingSqlSession, personalRatingConnectionCommand, probePersonalRatingSqlSession, readPersonalRatingConnectionConfig,
   runPersonalRatingConnectionCli, withPersonalRatingSqlSession } from './personal-rating-connection.mjs';
 
 const config = { version: 'personal-rating-connection-v1', projectRef: 'abcdefghijklmnopqrst',
   psqlPath: '/reviewed/psql', caFile: '/private/ca.pem', passwordFile: '/private/password' };
 const identity = { database: 'postgres', user: 'postgres', sessionUser: 'postgres', serverVersionNum: 170006 };
+const settings = { searchPath: 'pg_catalog', timezone: 'UTC', statementTimeout: '30s', lockTimeout: '5s', idleTimeout: '30s' };
+const sessionConfig = { ...config, version: 'personal-rating-session-connection-v1',
+  poolerHost: 'aws-0-eu-west-1.pooler.supabase.com' };
+
+test('explicit session pooler fixes port and tenant user without weakening TLS or guessing its host', () => {
+  const { options: { env } } = personalRatingConnectionCommand(sessionConfig);
+  assert.equal(env.PGHOST, sessionConfig.poolerHost);
+  assert.equal(env.PGPORT, '5432');assert.equal(env.PGUSER, 'postgres.abcdefghijklmnopqrst');
+  assert.equal(env.PGSSLMODE, 'verify-full');assert.equal(env.PGSSLROOTCERT, config.caFile);
+  assert.equal(env.PGOPTIONS, undefined);assert.equal(env.PGPASSWORD, undefined);
+  for (const value of [{ ...sessionConfig, poolerHost: 'foreign.example' },
+    { ...sessionConfig, poolerHost: 'aws-0-eu-west-1.pooler.supabase.com.evil.example' },
+    { ...sessionConfig, poolerHost: 'postgres://secret@aws-0-eu-west-1.pooler.supabase.com' },
+    { ...sessionConfig, poolerHost: 'aws-0-eu-west-1.pooler.supabase.com:6543' },
+    { ...sessionConfig, port: 6543 }, { ...sessionConfig, sslmode: 'require' },
+    { ...sessionConfig, version: config.version }, { ...config, version: sessionConfig.version }]) {
+    assert.throws(() => personalRatingConnectionCommand(value), /PERSONAL_RATING_CONNECTION_/);
+  }
+});
+
+test('session initializer verifies all fixed settings and rejects absent or different values', async () => {
+  let sql;
+  const result = await initializePersonalRatingSqlSession(async value => { sql = value;return [settings]; });
+  assert.equal(result.status, 'PASS');assert.match(sql, /set session statement_timeout='30s'/);
+  assert.ok(!/\b(?:alter|create|insert|update|delete|commit)\b/i.test(sql));
+  for (const rows of [[], [settings, settings], ...Object.keys(settings).map(key => [{ ...settings, [key]: 'changed' }])]) {
+    await assert.rejects(initializePersonalRatingSqlSession(async () => rows), /SESSION_SETTINGS/);
+  }
+});
 
 test('explicit target and TLS command excludes inherited connection overrides and credentials', () => {
   const command = personalRatingConnectionCommand(config);
@@ -85,7 +114,8 @@ test('changed backend, transaction, role, major version, read-only state or comp
 async function fixture(run, options = {}) {
   const dir = await mkdtemp(join(tmpdir(), 'kajo-rating-connection-'));
   const cfg = { ...config, psqlPath: join(dir, 'psql-fixture'), caFile: join(dir, 'ca.pem'),
-    passwordFile: join(dir, 'password') };
+    passwordFile: join(dir, 'password'), ...(options.session
+      ? { version: sessionConfig.version, poolerHost: sessionConfig.poolerHost } : {}) };
   const configPath = join(dir, 'connection.json');
   const source = `#!${process.execPath}
 const fs=require('node:fs');const input=require('node:readline').createInterface({input:process.stdin});
@@ -95,7 +125,7 @@ let sql='',marker='';input.on('line',line=>{
  if(line.startsWith('\\\\echo ')){
   const match=/set local kajo.personal_rating_probe='([a-z0-9-]+)'/.exec(sql);if(match)marker=match[1];
   if(sql.includes('jsonb_build_object')){
-   const row=sql.includes('transactionAt')?${JSON.stringify({ ...identity, pid: 456, transactionAt: '2026-01-01+00', isolation: 'repeatable read', readOnly: 'on' })}:${JSON.stringify({ ...identity, ssl: options.ssl ?? true, ...options.identity })};
+   const row=sql.includes('transactionAt')?${JSON.stringify({ ...identity, pid: 456, transactionAt: '2026-01-01+00', isolation: 'repeatable read', readOnly: 'on' })}:sql.includes("'statementTimeout'")?${JSON.stringify({ ...settings, ...options.settings })}:${JSON.stringify({ ...identity, ssl: options.ssl ?? true, ...options.identity })};
    if(sql.includes('transactionAt'))row.marker=marker;
    process.stdout.write(JSON.stringify(row)+'\\n');
   }
@@ -161,6 +191,28 @@ test('password-file permission failure happens before process launch', async () 
     await assert.rejects(withPersonalRatingSqlSession(cfg, async () => {}), /PRIVATE_FILE/);
     await assert.rejects(readFile(join(dir, 'launch.json')), { code: 'ENOENT' });
   });
+});
+
+test('session configuration uses the owned process and reports its explicit transport', async () => {
+  await fixture(async ({ dir, configPath }) => {
+    const result = await runPersonalRatingConnectionCli(['probe', configPath]);
+    assert.equal(result.transport, 'SUPAVISOR_SESSION_PSQL_VERIFY_FULL');
+    assert.equal(result.tlsVerified, true);
+    const launch = JSON.parse(await readFile(join(dir, 'launch.json'), 'utf8'));
+    assert.equal(launch.env.PGHOST, sessionConfig.poolerHost);
+    assert.equal(launch.env.PGPORT, '5432');assert.equal(launch.env.PGOPTIONS, undefined);
+    assert.throws(() => process.kill(launch.pid, 0), { code: 'ESRCH' });
+  }, { session: true });
+});
+
+test('wrong session settings refuse application callback and close the process', async () => {
+  await fixture(async ({ cfg, dir }) => {
+    let called = false;
+    await assert.rejects(withPersonalRatingSqlSession(cfg, async () => { called = true; }), /SESSION_SETTINGS/);
+    assert.equal(called, false);
+    const { pid } = JSON.parse(await readFile(join(dir, 'launch.json'), 'utf8'));
+    assert.throws(() => process.kill(pid, 0), { code: 'ESRCH' });
+  }, { session: true, settings: { statementTimeout: '0' } });
 });
 
 test('CLI exposes only probe, prints no private paths or server output on failure', async () => {

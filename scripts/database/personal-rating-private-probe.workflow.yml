@@ -1,0 +1,46 @@
+# TEMPLATE ONLY. Copy into an explicitly approved PRIVATE operational repository
+# as .github/workflows/personal-rating-private-probe.yml. Never activate in Kajo.
+name: Private Kajo connection probe
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: private-kajo-connection-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    if: >-
+      github.event.repository.private == true &&
+      github.ref == 'refs/heads/main' &&
+      github.actor == github.repository_owner &&
+      github.triggering_actor == github.repository_owner
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Validate reviewed source revision
+        env:
+          KAJO_REVIEWED_SOURCE_SHA: ${{ vars.KAJO_REVIEWED_SOURCE_SHA }}
+        run: |
+          node -e 'if(!/^[a-f0-9]{40}$/.test(process.env.KAJO_REVIEWED_SOURCE_SHA || "")) process.exit(1)'
+
+      - name: Checkout reviewed public source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: Kajooja/Kajo
+          ref: ${{ vars.KAJO_REVIEWED_SOURCE_SHA }}
+          persist-credentials: false
+
+      # Ubuntu 24.04 supplies Node 22 and the PostgreSQL 16 client. The runner
+      # checks both majors; it does not install packages or start a database.
+      - name: Read-only connection probe
+        env:
+          KAJO_REVIEWED_SOURCE_SHA: ${{ vars.KAJO_REVIEWED_SOURCE_SHA }}
+          KAJO_PROJECT_REF: ${{ secrets.KAJO_PROJECT_REF }}
+          KAJO_POOLER_HOST: ${{ secrets.KAJO_POOLER_HOST }}
+          KAJO_DB_PASSWORD: ${{ secrets.KAJO_DB_PASSWORD }}
+          KAJO_DB_CA: ${{ secrets.KAJO_DB_CA }}
+        run: node scripts/database/personal-rating-private-probe.mjs

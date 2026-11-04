@@ -266,7 +266,8 @@ an explicit retry. There is no automatic retry or connection-mode fallback.
 
 Direct Supabase endpoints require IPv6 unless the project has the IPv4 add-on.
 An IPv4-only operator without that route requires a separately reviewed session
-pooler binding; do not guess pooler hosts or silently weaken this contract.
+pooler binding, specified below under #411; do not guess pooler hosts or silently
+weaken this contract.
 See [Supabase connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres),
 [PostgreSQL password files](https://www.postgresql.org/docs/17/libpq-pgpass.html)
 and [certificate verification](https://www.postgresql.org/docs/17/libpq-ssl.html).
@@ -278,6 +279,85 @@ path or capture privileges. A live probe remains necessary in the approved
 operator environment. Genuine observation additionally needs the declared owner,
 Profile/domain/window, source-use review and fresh first-answer path described
 above. This helper neither launches collection nor establishes model usefulness.
+
+### Explicit session pooler and private runner — Sprint 016 / #411
+
+An IPv4-only operator can explicitly select Supavisor **session mode**, using
+the host copied from the independently verified project's Connect panel. Keep
+the original direct configuration unchanged. The separate closed shape is:
+
+```json
+{
+  "version": "personal-rating-session-connection-v1",
+  "projectRef": "<verified project reference>",
+  "poolerHost": "<exact reviewed host>.pooler.supabase.com",
+  "psqlPath": "/absolute/path/to/reviewed/psql",
+  "caFile": "/private/operator/project-ca.crt",
+  "passwordFile": "/private/operator/project.pgpass"
+}
+```
+
+The host must have exactly one label below `pooler.supabase.com`; do not derive
+it from a region, accept a URL or use an arbitrary server. The binding fixes
+port **5432**, database `postgres` and login `postgres.<projectRef>`. Port 6543,
+transaction pooling, host-address overrides and weaker TLS modes are not
+configuration options. It keeps `verify-full`, the reviewed project CA, server
+major 17/current and session role `postgres`, and the server SSL check. The
+existing probe must pass on the actual endpoint before treating it as a working
+connection; native CI alone cannot establish pooler or hosted TLS behavior.
+
+Both transports explicitly set and read back the fixed search path, UTC and
+30-second statement/idle plus five-second lock timeouts before yielding to the
+application callback. These are session-only settings; no role or database
+defaults are changed. Direct startup settings remain compatible. The session
+pooler path does not assume that every startup `PGOPTIONS` setting is forwarded.
+The owned native CI session runs this same initializer before the existing
+read-only probe and reports `nativePersonalRatingSessionSettings`; no additional
+reset or hosted credentials are needed. Existing transaction ownership, bounded
+process lifetime and no-retry behavior remain intact.
+
+`scripts/database/personal-rating-private-probe.workflow.yml` is a **template**,
+outside executable `.github/workflows`. After explicit approval of a private
+operational repository, copy it there as
+`.github/workflows/personal-rating-private-probe.yml`. Never enable a production
+probe in the public Kajo repository or publish its operational result there.
+This source packet does not create a repository, configure credentials or run it.
+
+The private runner requires a manual owner-triggered run on `main`, a private
+repository event, the same original and rerun actor, and the exact source SHA
+configured in `KAJO_REVIEWED_SOURCE_SHA`. Set that repository variable to a
+reviewed, accepted Kajo commit with passing required CI; the syntax check alone
+does not establish source acceptance. The checkout action is pinned, Git
+credentials are not persisted and no dependency installation is performed.
+The Ubuntu 24.04 runner checks Node 22 and its native PostgreSQL 16 client at
+`/usr/lib/postgresql/16/bin/psql`; the connected server must still be major 17.
+A changed or missing runtime fails rather than downloading a replacement.
+
+Configure these **repository secrets directly in the private repository**:
+
+| Secret | Explicit operator input |
+| --- | --- |
+| `KAJO_PROJECT_REF` | Independently verified project reference |
+| `KAJO_POOLER_HOST` | Exact Session pooler host from that project's Connect panel |
+| `KAJO_DB_PASSWORD` | Existing database password; never send it through chat or commit it |
+| `KAJO_DB_CA` | Complete project root-certificate PEM from Database Settings |
+
+The runner writes one exact host/database/login password-file entry, escaping
+colons/backslashes and rejecting line injection. It uses mode-0600 files inside
+a mode-0700 temporary directory, passes no password in argv or inherited child
+environment, and removes the files in `finally`. Abrupt runner termination relies
+on disposal of the ephemeral runner; never repurpose this template for a shared
+persistent machine. Credentials exist only in the probe step. Its bounded report
+stays in the private job log, without an artifact upload or application-row reads.
+No schedule, observation writer, credential reset or paid network change exists.
+
+Only after that private probe passes may the separate authorized observation
+prerequisites above be considered. The source template and synthetic launch tests
+are not a successful private job or useful prediction evidence. Current provider
+references: [connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres),
+[session timeouts](https://supabase.com/docs/guides/database/postgres/timeouts),
+[psql and project CA](https://supabase.com/docs/guides/database/psql), and the
+[Ubuntu 24.04 runtime inventory](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md).
 
 ### Frozen-content numeric challenger — Sprint 016 / #405
 

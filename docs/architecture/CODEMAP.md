@@ -26,17 +26,27 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
-## Private numeric operator connection — Sprint 016 / #409
+## Private numeric operator connection — Sprint 016 / #409 and #411
 
 `scripts/database/personal-rating-connection.mjs` provides
 `withPersonalRatingSqlSession` for existing capture/census callers and the
 read-only `probe` CLI. It reuses `isolated-sql-session.mjs`, requires explicit
-private direct-connection configuration and verifies TLS plus the expected
+private direct or explicitly selected Supavisor session configuration and verifies TLS plus the expected
 PostgreSQL identity before yielding the connection. Its tests exercise invalid
 configuration, process isolation, changed backend/transaction and private errors.
+Both transports run `initializePersonalRatingSqlSession` to set and verify the
+fixed session settings before application work. The shared pooler host is explicit;
+port 5432 and tenant login are fixed, with no transaction-pooler/TLS fallback.
 `run-ci-cli-installation-probe.mjs` records `nativePersonalRatingConnection` by
 running the same read-only probe on its owned disposable stack, without another
-reset. That result does not validate hosted TLS/credentials or start collection.
+reset, and separately records `nativePersonalRatingSessionSettings`. These results
+do not validate hosted pooler/TLS/credentials or start collection.
+`personal-rating-private-probe.mjs` and its tests stage and remove private files
+for a manual owner-only private repository run. The accompanying
+`personal-rating-private-probe.workflow.yml` remains a non-executable template
+under `scripts/database`, never an active workflow in public Kajo. It pins a
+reviewed source revision and requires explicit private secrets; actual setup and
+execution are separate from source acceptance.
 [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#private-operator-connection--sprint-016--409)
 owns configuration and usage; STATUS owns acceptance.
 
