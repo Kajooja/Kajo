@@ -60,6 +60,7 @@ import { verifyPersonalContentRating } from './personal-content-rating.mjs';
 import { verifyPersonalContentRatingConcurrency } from './personal-content-rating-concurrency.mjs';
 import { verifyPersonalContentRatingUpgrade } from './personal-content-rating-upgrade.mjs';
 import { verifyPersonalRatingHostedUpgrade } from './personal-rating-hosted-native.mjs';
+import { probePersonalRatingSqlSession } from './personal-rating-connection.mjs';
 import { verifyNativeSkipPrefilter } from './native-skip-prefilter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
@@ -103,6 +104,8 @@ try {
     assert.equal(deadlineRollback.absent, true, 'Timed-out server statement left partial DDL');
     const sqlStatementDeadline = { status: 'PASS', serverTimeoutMs: 5000, dockerTimeoutMs: 10_000,
       rollback: 'owned test table absent after server statement cancellation' };
+    const nativePersonalRatingConnection = await probePersonalRatingSqlSession(withSqlSession);
+    assert.equal(nativePersonalRatingConnection.status, 'PASS');
     const nativePersonalRatingBaseline = await verifyPersonalRatingBaseline(exec);
     assert.equal(nativePersonalRatingBaseline.status, 'PASS');
     const nativePersonalRatingProspective = await verifyPersonalRatingProspective(execConcurrentSql, withSqlSession);
@@ -537,6 +540,7 @@ try {
       personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativePersonalRatingBaseline, nativePersonalRatingProspective,
       nativePersonalRatingProspectiveConcurrency, nativePersonalRatingProspectiveUpgrade, nativePersonalRatingEvaluation, nativeSkipPrefilter,
       nativePersonalContentRating, nativePersonalContentRatingConcurrency, nativePersonalContentRatingUpgrade, nativePersonalRatingHostedUpgrade,
+      nativePersonalRatingConnection,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,

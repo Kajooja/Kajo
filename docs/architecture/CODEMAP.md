@@ -26,12 +26,26 @@ supabase/functions/password-auth/
 .github/workflows/ci.yml
 ```
 
+## Private numeric operator connection — Sprint 016 / #409
+
+`scripts/database/personal-rating-connection.mjs` provides
+`withPersonalRatingSqlSession` for existing capture/census callers and the
+read-only `probe` CLI. It reuses `isolated-sql-session.mjs`, requires explicit
+private direct-connection configuration and verifies TLS plus the expected
+PostgreSQL identity before yielding the connection. Its tests exercise invalid
+configuration, process isolation, changed backend/transaction and private errors.
+`run-ci-cli-installation-probe.mjs` records `nativePersonalRatingConnection` by
+running the same read-only probe on its owned disposable stack, without another
+reset. That result does not validate hosted TLS/credentials or start collection.
+[PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#private-operator-connection--sprint-016--409)
+owns configuration and usage; STATUS owns acceptance.
+
 ## Guarded private numeric forward preparation — Sprint 016
 
-[Issue #407](https://github.com/Kajooja/Kajo/issues/407) source preparation on
-`feat/personal-rating-hosted-readiness`;
-[STATUS](../project/STATUS.md) owns its source/native acceptance and the separate
-hosted operation. The canonical fresh lineage remains unchanged.
+[Issue #407](https://github.com/Kajooja/Kajo/issues/407) source preparation is
+accepted through [PR #408](https://github.com/Kajooja/Kajo/pull/408).
+[STATUS](../project/STATUS.md) owns the current source continuation; operational
+execution evidence is separate. The canonical fresh lineage remains unchanged.
 
 | Responsibility | Implementation |
 | --- | --- |

@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded private numeric forward preparation in progress; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 in progress; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -202,35 +202,28 @@ The deliberately losing content fixture remains losing; source acceptance does
 not establish usefulness. Model/configuration/feature lineage and support/resource
 limits remain explicit, with `qualityAdmission: NONE` and `servingActivation: NONE`.
 
-## Active source packet — guarded private numeric forward preparation #407
+## Guarded private numeric forward source — #407 (accepted)
 
-Continue [Issue #407](https://github.com/Kajooja/Kajo/issues/407) on
-`feat/personal-rating-hosted-readiness` after #406. Prepare the exact existing prospective/content forwards (55+56) for
-one provider-owned atomic transaction and receipt on the pre-#391 target. The
-optional skip-prefilter (54) stays excluded from this operation, while canonical
-fresh-installation history remains unchanged. Preserve old rows, metadata/grants,
-function contracts and receipts; reject unknown predecessors, drift and partial
-installation. [ADR-0006](../../architecture/decisions/0006-clean-install-database-baseline.md#private-numeric-forward-preparation--2026-11-04)
-owns the operational boundary; CODEMAP names the builder and native rehearsal.
+[PR #408](https://github.com/Kajooja/Kajo/pull/408) accepts the exact 55+56
+builder and bounded native rehearsal after all six CI #829 gates, 2,456 tests
+and four configured exports. Source/tested/accepted tree is
+`47a456f7eb048b6b0e757e6837258063748e5e90`. The canonical fresh lineage, exact
+source pins, preserved-state checks and optional54 exclusion remain unchanged.
+The native receipt and its limits are retained in PR #408. Runtime execution
+records are separate private evidence, not a reason to redo accepted source.
 
-The source prepares SQL and target checks; it has no hosted connection or apply
-entry point. The native guard rehearsal reuses the reset to the first 53 migrations, inserts no
-extra reset, and restores complete checkpoints after exact 55+56, a simulated
-receipt and injected failures. Its rollback-only scope is distinct from real
-provider atomicity and committed pre-#391 capture/answer operation. Forty focused
-builder/helper tests pass locally, including the deadline/cleanup regression and
-existing 15/24/39 mechanisms in PGlite. Required #407 CI/native verification,
-actual hosted installation and collection acceptance remain open; STATUS owns
-exact progress and the dated metadata review.
+## Active source packet — explicit operator connection #409
 
-The 2026-11-01 metadata-only target comparison matches the three required
-predecessor bodies/security/contracts. It retains eighteen ACL-order differences,
-twenty other body hashes and an additional platform function. Four upstream
-Personal receipt bodies remain unverified after automatic tool approval rejected
-the private-source lookup for insufficient target/inspection authorization. This
-is an operational block, not a new repository policy or permission to work around
-the rejection. Historical receipt reconciliation, a fresh authorized row checkpoint
-and actual executor/transaction evidence remain before a hosted operation.
+[Issue #409](https://github.com/Kajooja/Kajo/issues/409) adds a bounded direct
+psql binding around the existing isolated-session transport and a read-only
+connection probe. Explicit private configuration pins the target and CA/password
+file references; certificate/hostname verification and sanitized errors are
+required. The probe exercises one transaction across actual JavaScript work and
+rolls back without reading application rows. Disposable native CI verifies the
+same protocol, while hosted TLS/credentials and genuine observation remain
+separate acceptance. No model, schema or public/mobile route changes.
+[PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md#private-operator-connection--sprint-016--409)
+owns usage and limitations. STATUS names the current source/check receipt.
 
 A genuine declared DEVELOPMENT cohort through an authorized capture path remains
 the experiment needed to select regularization and numerical quality, coverage
@@ -302,9 +295,11 @@ broader adaptive state, transfer and Shared work retain their later sprint scope
   pair 1 calls 502→503 versus required equality. All resource checks pass;
   optimization admission remains NONE. PR #406 retains exact artifacts, earlier
   failed runs and the limits; no hosted/collection/serving acceptance follows.
-- Guarded numeric forward preparation: [#407](https://github.com/Kajooja/Kajo/issues/407) reuses exact
-  55+56 and preserves the hosted pre-#391 baseline. Source/native verification,
-  actual deployment and the observed DEVELOPMENT cohort remain separate gates.
+- Guarded numeric forward source: [#407](https://github.com/Kajooja/Kajo/issues/407)
+  accepted through #408 / all six CI #829 gates. Exact 55+56, source/native
+  validation, operational execution and observed DEVELOPMENT are distinct facts.
+- Operator connection: #409 adds the explicit binding and read-only probe;
+  final-source CI and actual operator-environment acceptance remain pending.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.
