@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 in progress; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 in progress; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -235,6 +235,18 @@ or public/mobile endpoint is added. The same native CI session tests the shared
 initializer without an extra reset. STATUS and the implementation PR own final
 source/CI acceptance.
 
+### Bounded private-probe diagnostics — #413
+
+#411 is accepted through [PR #412](https://github.com/Kajooja/Kajo/pull/412), all
+six CI #833 gates, 2,474 tests and four configured exports. The exact session
+initializer and read-only native probe pass; private execution is separate.
+[Issue #413](https://github.com/Kajooja/Kajo/issues/413) adds allowlisted failure
+stage/cause metadata and bounded transport hints. Unknown errors remain unknown;
+raw process/server output, paths, SQL and secrets never enter the report. Existing
+source/owner/runtime/TLS guards, cleanup and no-retry behavior remain unchanged.
+Synthetic child-process failures test disclosure boundaries without hosted inputs.
+STATUS and the implementation PR own final-source acceptance.
+
 A genuine declared DEVELOPMENT cohort through an authorized capture path remains
 the experiment needed to select regularization and numerical quality, coverage
 and precision requirements before SELECTION and untouched FINAL windows. Establish
@@ -311,9 +323,10 @@ broader adaptive state, transfer and Shared work retain their later sprint scope
 - Operator connection: #409 accepted through #410 / all six CI #831 gates,
   2,465 tests and four configured exports; the actual native read-only probe passes.
   Hosted TLS/credentials and genuine observation are not established by that CI.
-- Session pooler/private runner: #411 adds the explicit IPv4 path, session-setting
-  verification and private manual template. Source/CI and private execution remain
-  separate acceptance; no private job or observation is implied by publishing it.
+- Session pooler/private runner: #411 accepted through #412 / all six CI #833 gates,
+  2,474 tests and four exports. Source/CI and private execution remain separate.
+- Bounded private-probe diagnostics: #413 in progress; no operational execution
+  or observation is implied by publishing diagnostics source.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.
