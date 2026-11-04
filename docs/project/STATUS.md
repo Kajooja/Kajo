@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-04**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, explicit session-pooler/private-runner preparation after accepted connection #409 / #410. Baseline #398, durable capture #400 and declared evaluation #402 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, bounded private-probe diagnostics after accepted connection #409 / #410 and session-pooler/private-runner #411 / #412. Baseline #398, durable capture #400 and declared evaluation #402 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,21 +11,22 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — explicit session pooler and private probe runner #411
+## Current handoff — bounded private-probe diagnostics #413
 
-[PR #410](https://github.com/Kajooja/Kajo/pull/410) is accepted as main
-`99bcf497d6203a5dcdbbc818e14c882d5398830a`, source
-`09168811bd540f0221a75b817b918ca074ff78b5`, tested merge
-`fdf755d49507b502b2c313d55131a0f344e4ba45`, common tree
-`7905b609c4d5d69ad0c908daf806a808c72c5a91`. All six required
-[CI #831](https://github.com/Kajooja/Kajo/actions/runs/41835050894) gates pass:
-**2,465 tests and four configured iOS/Android exports**, lint/typecheck and audit
-with no unmitigated findings. The optional standalone APK was skipped in that PR
-run. #409 is closed. The actual native connection probe and all 42 reported
+[PR #412](https://github.com/Kajooja/Kajo/pull/412) is accepted as main
+`06f55e2ae44164e5b51a9332a13da8833e85e771`, source
+`6fad1a053147a7a3f2ae9668cae9b6f0d7cfab3d`, tested merge
+`11b1c70b1ece2f04ca768758bc5cf021fabf61ef`, common tree
+`3b7d6e67db18b757047472b872ad26f36b27ef7e`. All six required
+[CI #833](https://github.com/Kajooja/Kajo/actions/runs/41851232102) gates pass:
+**2,474 tests and four configured iOS/Android exports**, lint/typecheck and audit
+with no unmitigated findings. The optional standalone APK was skipped. #411 is
+closed. The native read-only probe, shared session initializer and all 43 reported
 subchecks pass; the 56-entry SQL manifest/history match the accepted predecessor.
-The first isolated-stack startup failure, unchanged-source retry and local test
-limits remain in the PR receipt. Its optional performance diagnostic retains the
-pair-3 off-catalogue Taste exact-retry failure; optional #391 stays NOT_ADMITTED.
+The optional performance diagnostic retains the pair-3 off-catalogue Taste
+exact-retry failure; optional #391 stays NOT_ADMITTED. PR #412 retains the complete
+source/CI receipt. Earlier connection acceptance remains in
+[the predecessor checkpoint](https://github.com/Kajooja/Kajo/blob/06f55e2ae44164e5b51a9332a13da8833e85e771/docs/project/STATUS.md).
 
 The preceding #398/#400/#402/#405/#408 source supplies the numeric baseline,
 durable capture, declared evaluation, frozen-content challenger and guarded
@@ -34,30 +35,26 @@ operational execution from source acceptance. All eleven integer ratings **0–1
 remain supported. Operational records stay private; source/CI evidence does not
 establish observed prediction usefulness or close Sprint 016/Engine V1.
 
-**One active source packet:** [Issue #411](https://github.com/Kajooja/Kajo/issues/411),
-branch `feat/personal-rating-session-pooler`. IPv4-only operator environments need
-an explicitly selected session-pooler binding while preserving the accepted
-held-session callback. The separate configuration fixes port 5432/tenant login,
-requires the exact reviewed pooler host and preserves certificate/hostname,
-server identity and SSL verification. Both modes explicitly set and verify their
-session deadlines. There is no automatic fallback, transaction-pooler mode,
-credential discovery/reset or paid networking change.
+**One active source packet:** [Issue #413](https://github.com/Kajooja/Kajo/issues/413),
+branch `fix/private-probe-diagnostics`. Replace the private runner's opaque failure
+line with fixed, allowlisted stage/cause categories. Distinguish runtime, context,
+client, private-file and connection failures without exposing paths, credentials,
+SQL, environment values or arbitrary process/server text. Transport hints remain
+hints; unrecognized failures stay UNKNOWN. Synthetic child-process tests verify
+redaction and classification, not hosted connection success.
 
-A manual owner-only private-runner template lives under `scripts/database`,
-outside public executable workflows. It checks private repository/main/actor
-context and the configured reviewed source revision, stages owner-only temporary
-files and runs only the read-only probe. No repository, credentials or actual
-private execution are created by publishing this source. The implementation PR
-owns final-source CI acceptance. Native CI verifies the shared session initializer
-and transaction protocol; actual pooler behavior, hosted TLS and the private job
-remain separate runtime checks.
+The accepted direct/session configuration, private/main/owner/source guards,
+certificate/hostname and server identity checks, timeouts and cleanup remain
+unchanged. The manual template stays outside public executable workflows. No
+model, migration, credential reset, automatic retry or collection is introduced.
+The implementation PR owns final-source CI acceptance.
 
 [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#explicit-session-pooler-and-private-runner--sprint-016--411)
-owns the configuration and private-runner setup contract; CODEMAP owns paths.
-**Next dependency:** configure an explicitly approved private operator environment
-with the accepted source revision, exact Session pooler host, project certificate
-and privately supplied database password; run and retain the read-only probe.
-Do not publish the resulting operational record in this public repository.
+owns configuration and the bounded diagnostics contract; CODEMAP owns paths.
+**Next dependency:** accept this source after all required CI, then use the
+accepted revision in an explicitly approved private operator environment. Retain
+actual connection results privately and resolve a reported cause before an
+explicit retry. Do not publish operational records in this public repository.
 
 Before genuine DEVELOPMENT, establish the authorized owner/Profile/domain scope,
 provider feature-use review, retained pre-window declaration and fresh first-answer

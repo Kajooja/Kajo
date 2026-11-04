@@ -46,7 +46,9 @@ for a manual owner-only private repository run. The accompanying
 `personal-rating-private-probe.workflow.yml` remains a non-executable template
 under `scripts/database`, never an active workflow in public Kajo. It pins a
 reviewed source revision and requires explicit private secrets; actual setup and
-execution are separate from source acceptance.
+execution are separate from source acceptance. Its failure formatter emits only
+fixed stage/cause metadata and bounded hints from transport-owned errors; synthetic
+child tests reject raw stderr, SQL, paths, secrets and forged diagnostic objects.
 [PREDICTION_MODEL](../domain/PREDICTION_MODEL.md#private-operator-connection--sprint-016--409)
 owns configuration and usage; STATUS owns acceptance.
 
