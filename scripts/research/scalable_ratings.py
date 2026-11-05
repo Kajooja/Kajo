@@ -241,7 +241,8 @@ class Store:
         with self.raw.open('rb') as handle:
             handle.seek(state['offset'])
             if state['offset'] == 0 and self.domain == 'movie':
-                require(handle.readline() == b'userId,movieId,rating,timestamp\n', 'CSV header')
+                require(handle.readline() in (b'userId,movieId,rating,timestamp\n',
+                                              b'userId,movieId,rating,timestamp\r\n'), 'CSV header')
             while True:
                 batch, eof = [], False
                 for _ in range(self.protocol['budgets']['checkpointRows']):

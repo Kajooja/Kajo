@@ -103,6 +103,21 @@ class ScalableRatings(unittest.TestCase):
             self.assertEqual(sr.movie_prefix([(1, 3, 10), (2, 4, 10), (3, 5, 9)], 1), [])
             store.close()
 
+    def test_publisher_crlf_csv_is_preserved_and_accepted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            raw, source, protocol = fixture(root, 'movie')
+            data = raw.read_bytes().replace(b'\n', b'\r\n')
+            raw.write_bytes(data)
+            source['sourceVerification']['files']['ml-32m/ratings.csv'].update(sha256=bg.sha(data), bytes=len(data))
+            store = sr.Store(root / 'run', raw, 'movie', source, protocol, [])
+            store.ingest(stop_after=7)
+            store.close()
+            store = sr.Store(root / 'run', raw, 'movie', source, protocol, [])
+            self.assertEqual(store.ingest()['eligiblePairs'], 360)
+            self.assertEqual(bg.file_hash(raw), bg.sha(data))
+            store.close()
+
     def test_source_protocol_and_statistics_changes_reject_resume(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
