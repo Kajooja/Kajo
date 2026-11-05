@@ -29,12 +29,23 @@ guards. Both cohorts are now exposed development evidence.
 
 **One active packet:** [#421](https://github.com/Kajooja/Kajo/issues/421) compares
 one centered, regularized response slope with the exact location-only control.
-The [protocol](../../research/manifests/rating-response-spread-v1.json) declares
-parameters, fresh BOOK exclusion witnesses, MovieLens 32M temporal population,
-source bounds, support, resource limits and per-domain decision rules before
-cohort selection or fitting. Publish this source/protocol first, then normalize,
-freeze, fit/record selection before holdout, independently audit and replay.
-A rejected or insufficient-support result retains the location-only control.
+The [protocol](../../research/manifests/rating-response-spread-v1.json) and code
+were published as `8d3c50bcd940313f4bf26c9e97ff9ce81c8909d4` before either fresh
+cohort was selected. The [result](../../research/reports/rating-response-spread-v1.md)
+retains **location-only control in both domains**. BOOK: 500 new readers/31,152
+ratings, holdout macro RMSE 1.942582 → 1.950134. MOVIE: 500 users/298,690 ratings,
+holdout 1.690601 → 1.681982; its gain is below the fixed 0.02 margin. Validation
+also fails that gain rule. All cold guards pass. Both complete runs reproduce;
+independent source-row arithmetic and bootstrap checks verify 185,590 forecast
+values and 72 metric/interval entries. No post-score parameter or threshold change.
+Source/CI acceptance belongs to this packet's PR.
+
+**After #421 source acceptance:** [#422](https://github.com/Kajooja/Kajo/issues/422)
+prepares scalable individual-rating training and protected learning curves:
+inventory existing estimators, record intended-use source/artifact rights, freeze
+nested size/coverage/cost comparisons and protected evaluation before new fits.
+The rejected spread stays inactive. Do not repeat the accepted old experiments
+or assume the already exposed cohorts are fresh final evidence.
 
 MovieLens 32M's verified publisher archive replaces the inadequate unused small
 cohort for this experiment. Cross-release person overlap is unknown; validation

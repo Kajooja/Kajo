@@ -188,6 +188,13 @@ scoring, with fixed cold masks and explicit control retention on failure. The
 [protocol](../../research/manifests/book-genome-development-v2.json) owns numerical
 rules. A disjoint development cohort is not native FINAL or cross-domain evidence.
 
+The #421 response-spread experiment adds a third disjoint BOOK cohort and a
+separately dated MovieLens 32M cohort. Both retain the location-only control under
+the fixed decision rule. [Aggregate results](../../research/reports/rating-response-spread-v1.md)
+record source support, timing, exact replay and independent arithmetic/uncertainty
+checks; those cohorts are now exposed development evidence. #422 is the next
+scalable-training preparation after source acceptance.
+
 ### Goodreads and Amazon Reviews — optional candidates, rights unresolved
 
 [UCSD Goodreads][GOODREADS] offers shelves, ratings and book metadata, but specifies academic use only and no redistribution. The current independent non-commercial project has not established that it qualifies. [Amazon Reviews 2023][AMAZON] could support object/category experiments; its [maintainer states][AMAZON-RIGHTS] that the lab is not in a position to assign the dataset a license or dictate its usage terms.

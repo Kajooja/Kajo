@@ -441,3 +441,9 @@ This bounded experiment precedes the owner's broad individual-rating pretraining
 request (`MVP-ALG-013`). Scaling requires a separately frozen eligible-data plan,
 protected evaluation, learning curves, coverage/cost and a reproducible admitted
 artifact with rollback. Noncommercial research permission is not serving approval.
+
+The [actual response comparison](reports/rating-response-spread-v1.md) now retains
+the location-only control in both domains. BOOK has 31,152 ratings and MOVIE
+298,690; both complete runs reproduce and independent recomputation verifies
+185,590 prediction values. Original MovieLens D2 rejection remains unchanged.
+These cohorts are exposed development data, not reusable untouched final tests.

@@ -42,6 +42,13 @@ insufficient evidence. Source/CI acceptance and research usefulness stay separat
 Broad pre-release individual-rating training follows `MVP-ALG-013` after the
 selected model, intended-use rights and protected evaluation plan are ready.
 
+The [#421 result](../../../research/reports/rating-response-spread-v1.md) retains
+the location-only control in BOOK and MOVIE. BOOK worsens; MOVIE improves below
+the frozen practical margin. Both runs reproduce, independent source arithmetic
+and paired-bootstrap checks agree, and all cold guards pass. Source/CI acceptance
+remains separate. After it, #422 prepares scalable individual-rating training
+and protected learning curves without reusing these exposed outcomes as FINAL.
+
 ## Outcome
 
 Produce a supported post-experience expected rating on the user's own scale and
