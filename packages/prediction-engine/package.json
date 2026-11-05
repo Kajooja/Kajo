@@ -110,6 +110,14 @@
     "./adapters/kajo-personal-rating-evaluation": {
       "types": "./dist/adapters/kajo-personal-rating-evaluation.d.ts",
       "import": "./dist/adapters/kajo-personal-rating-evaluation.js"
+    },
+    "./research-static": {
+      "types": "./dist/research-static.d.ts",
+      "import": "./dist/research-static.js"
+    },
+    "./adapters/book-genome": {
+      "types": "./dist/adapters/book-genome.d.ts",
+      "import": "./dist/adapters/book-genome.js"
     }
   },
   "scripts": {

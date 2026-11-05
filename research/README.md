@@ -1,4 +1,7 @@
-# Isolated MovieLens research — D1 and D2
+# Isolated rating research — movies and books
+
+The [Book Genome extension](#book-genome--undated-static-research-417) adds a separate
+undated book experiment. The existing MovieLens path below remains dated.
 
 The owner authorized an available alternative to MovieLens 32M on 2026-09-12.
 D1 now uses **GroupLens MovieLens Latest Small, September 2018, Kaggle version 2**
@@ -25,6 +28,7 @@ it does not change that scope or prove Kajo product usefulness.
 | MovieLens 32M | Larger stable benchmark remains available as an explicit later intake. Its original file service fails upstream TLS verification in this environment; it no longer blocks the selected development experiment. |
 | GroupLens MovieLens 20M on Kaggle | Publisher metadata/file listing is available. Its transformed package has different filenames/timestamp representation and an Unknown license label; exact terms and package verification are separate work before use. |
 | Amazon Reviews 2023 | Useful candidate for broader categories, but the maintainer cannot assign its usage rights; unresolved for this project. |
+| GroupLens Book Genome subset | Reviewed separately for noncommercial static book research; see the bounded extension below. |
 | UCSD Goodreads | Book ratings/shelves are relevant, but its academic-only scope is not established for this independent project. |
 
 [DATA_ENRICHMENT](../docs/architecture/DATA_ENRICHMENT.md) owns source comparisons,
@@ -266,3 +270,81 @@ historical D2 report. Source, training, evidence of benefit and serving admissio
 remain separate facts. MovieLens cannot establish BOOK transfer, Shared behavior
 or native product usefulness; the source's research-only rights and the existing
 withdrawal/admission gates remain in force.
+
+## Book Genome — undated static research #417
+
+The exact reviewed source, CC BY-NC 3.0 attribution and permitted scope are in
+[`manifests/book-genome-2021.json`](manifests/book-genome-2021.json).
+This is GroupLens's specifically published Goodreads subset, not blanket
+approval for the UCSD dataset. Only its ratings member is used. Public Git
+contains authored code, manifests and aggregate evidence; histories, frozen
+partitions, fitted parameters and per-person predictions stay ignored locally.
+
+The original records have 1–5 integer grades and no timestamps. The adapter
+preserves the original grade and explicitly multiplies by two. Thus this source
+observes 2/4/6/8/10, while **native Kajo still accepts all eleven 0–10 grades**.
+Missing or unread is never zero. Source identity is not a native account and
+cannot link an integer book-user ID to a MovieLens user.
+
+Use Python standard library and the workspace's supported Node version:
+
+```sh
+npm run research:books:prepare
+npm run research:books:download
+npm run research:books:normalize
+npm run build --workspace @kajo/prediction-engine
+node scripts/research/evaluate-books.mjs freeze --input-dir <printed-normalized-path> --out research-artifacts/books-frozen
+node scripts/research/evaluate-books.mjs run --input-dir research-artifacts/books-frozen --out research-artifacts/books-run
+```
+
+An already acquired compressed member can be supplied with
+`research:books:normalize -- --member <ratings.deflate> --output-dir <new-stage-root>`.
+It passes the same pinned hashes/CRC/count checks. Download fetches only the
+selected 24,793,669 compressed bytes plus bounded header metadata over verified
+HTTPS; it never disables TLS verification or downloads the 1.49-GB whole ZIP.
+Existing member files and complete normalized stages are integrity-checked;
+partial failures do not replace accepted bytes. Source/code changes produce a
+new normalized stage identity. Ordinary tests use artificial sources offline.
+
+The two-pass normalizer validates all 5,152,656 ratings and source counts. It
+ranks potentially eligible readers by a fixed SHA-256 seed, deduplicates the
+first 2,000 candidates and takes the first 500 with at least 20 unique,
+nonconflicting ratings. All versions of a conflicting pair are excluded.
+Complete selected histories yield **31,144 rows**, minimum 20, maximum 965.
+The raw/expanded byte, row, line, identity, candidate and cohort bounds fail
+closed; an insufficient candidate pool is never silently expanded.
+
+The separate `./research-static` export accepts undated matrix evidence and
+shares the numeric shrinkage calculation with other research/native callers.
+It cannot be substituted for temporal E1 evidence. The
+[`static-v1` protocol](manifests/book-genome-static-v1.json) is deliberately an
+**exposed-development conformance replay**: 400 users supply 16,064 training,
+3,461 validation and 3,669 test rows; 100 held-out users supply 1,632 fixed targets.
+Hash masks are label-blind, not a simulation of real rating arrival. Global/item
+means fit only training rows; profile offsets use only the supplied visible mask.
+Three fixed baseline variants and shrinkage 10 were already declared. Validation
+selection is written before test scoring, and tests cannot update the model.
+
+| Static variant | Test MAE, mapped scale | Test RMSE, mapped scale |
+| --- | ---: | ---: |
+| Global mean | 1.689240 | 2.146890 |
+| Shrunken item mean | 1.667715 | 2.118500 |
+| Item mean plus shrunken profile offset | 1.537712 | 1.938469 |
+
+The 0/5/10/20 cold budgets mean **numbers of visible ratings**, never allowed
+grades. They retain exactly the same targets; the 20 budget has 16–20 available
+rows per subject. Profile-offset RMSE is respectively 1.947316, 1.898324,
+1.878759 and 1.844528. This selected cohort does not prove a universal benefit
+from every additional rating, recommendation uplift, calibrated uncertainty or
+native scale equivalence.
+
+[`reports/book-genome-static-v1.json`](reports/book-genome-static-v1.json)
+contains aggregate lineage, masks, metrics and conformance. All 31,144 raw-label
+and source-line triples and all 3,669 test predictions match the prior private
+Python audit (itself independently checked with SQLite); the largest difference
+among 54 aggregate metrics is 3.11e-15. A second built run has identical output.
+This is implementation evidence, **not a newly untouched final test**. Models,
+raw rows and private owner evidence are not published. Quality admission and
+serving activation remain **NONE**. A new model-selection question needs a
+separate frozen, disjoint cohort/protocol; MovieLens's already exposed final
+results likewise remain development/replay evidence.

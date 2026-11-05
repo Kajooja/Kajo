@@ -138,6 +138,42 @@ KuaiRand-1K samples 1,000 users, retaining standard and randomly intervened vide
 
 Use this later study to test sequence-aware recall and explicitly defined logged-feedback targets. Keep its own manifest/rights decision and domain adapter; short-video engagement is not movie satisfaction or native Kajo exposure.
 
+### Book Genome — reviewed Goodreads subset, undated research #417
+
+The [GroupLens Book Genome release](https://grouplens.org/datasets/book-genome/)
+and its [publisher README](https://files.grouplens.org/datasets/book-genome/book-genome-readme.txt)
+identify the specific subset and permission to publish it under **CC BY-NC 3.0**.
+The November 5 review permits this project's noncommercial offline research.
+This does not resolve the separate full UCSD Goodreads source below, commercial
+use, publication of raw histories/fitted artifacts, or native serving.
+Attribution and exact rights scope live in
+[`book-genome-2021.json`](../../research/manifests/book-genome-2021.json).
+
+Only `book_dataset/raw/ratings.json` is admitted: 5,152,656 original 1–5 ratings,
+350,332 source subjects and 9,374 books. No review text, descriptions or genome
+scores fitted over all ratings enter this experiment. Verified HTTPS byte ranges
+bind the archive ETag, length and Last-Modified; pinned compressed/expanded member
+SHA-256, CRC and sizes bind the selected payload. The whole archive is neither
+downloaded nor assigned a claimed checksum. These are locally computed hashes
+of publisher bytes, not publisher-issued checksums.
+
+There are **no occurrence dates**. `StaticResearchRating` is an explicitly
+separate matrix record, not a temporal E1 Observation with invented clocks.
+Original grades remain available; ×2 gives 2/4/6/8/10 for these records only.
+Native 0–10, missing/unread semantics and source-specific rating behavior remain
+unchanged. Namespaced source/release IDs prevent accidental book/movie user joins.
+A 2,000-subject candidate pool yields 500 complete eligible histories after
+identical-pair deduplication and full conflicting-pair exclusion; the frozen seed,
+bounds and failure behavior are part of the intake identity.
+
+The built static experiment reproduces a previously exposed development cohort,
+with fixed train/validation/test masks, 100 held-out subjects and fixed cold-test
+targets at 0/5/10/20 **visible-rating counts**. It reuses the shared shrunken
+residual calculation but establishes neither temporal learning nor native engine
+usefulness. A separate untouched cohort/protocol is required for new selection
+claims. [Commands and aggregate evidence](../../research/README.md#book-genome--undated-static-research-417)
+retain these restrictions; source completion does not admit a serving artifact.
+
 ### Goodreads and Amazon Reviews — optional candidates, rights unresolved
 
 [UCSD Goodreads][GOODREADS] offers shelves, ratings and book metadata, but specifies academic use only and no redistribution. The current independent non-commercial project has not established that it qualifies. [Amazon Reviews 2023][AMAZON] could support object/category experiments; its [maintainer states][AMAZON-RIGHTS] that the lab is not in a position to assign the dataset a license or dictate its usage terms.

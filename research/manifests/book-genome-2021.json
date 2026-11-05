@@ -1,0 +1,85 @@
+{
+  "schema": "book-genome-intake-v1",
+  "datasetId": "grouplens-book-genome",
+  "releaseId": "2021-12-30",
+  "landingUrl": "https://grouplens.org/datasets/book-genome/",
+  "readmeUrl": "https://files.grouplens.org/datasets/book-genome/book-genome-readme.txt",
+  "readmeSha256": "f2ea6594172d12ce14ffba8dbd9649aab7cef6c96380d1a9e05b4bfe3bdd821c",
+  "readmeBytes": 14628,
+  "archiveUrl": "https://files.grouplens.org/datasets/book-genome/book-genome.zip",
+  "archiveBytes": 1485651632,
+  "etag": "\"588d3eb0-5d464e9c33da7\"",
+  "lastModified": "Thu, 30 Dec 2021 22:52:47 GMT",
+  "member": {
+    "name": "book_dataset/raw/ratings.json",
+    "headerOffset": 1398678863,
+    "method": 8,
+    "compressedBytes": 24793669,
+    "expandedBytes": 271599056,
+    "crc32": 3178991182,
+    "compressedSha256": "5cfe2e2342912321391c9f94f0b388cfb1a16bbf5fdefae85cad4013a49c522f",
+    "expandedSha256": "1524ea4ad61da974b5f36c6968befcc98163514113f7ee8c06dc0c2b81e37444"
+  },
+  "hashOrigin": "Computed from retrieved publisher member bytes; not publisher-issued checksums. Whole ZIP not downloaded or hashed.",
+  "expectedCounts": {
+    "ratings": 5152656,
+    "subjects": 350332,
+    "objects": 9374
+  },
+  "rights": {
+    "license": "CC BY-NC 3.0",
+    "purpose": "NONCOMMERCIAL_RESEARCH_ONLY",
+    "reviewedAt": "2026-11-05",
+    "evidence": "Publisher README Usage License and acknowledgement of permission to publish this specific Goodreads subset.",
+    "rawRedistribution": "not-approved-for-this-project",
+    "fittedArtifactRedistribution": "not-approved-for-this-project",
+    "commercialUse": "not-approved",
+    "productionServing": "not-approved",
+    "nativeImport": false,
+    "attribution": "Kotkov, Denis; Medlar, Alan; Maslov, Alexandr; Satyal, Umesh Raj; Neovius, Mats; Glowacka, Dorota (2022). The Tag Genome Dataset for Books. CHIIR 2022. https://doi.org/10.1145/3498366.3505833"
+  },
+  "cohort": {
+    "seed": "kajo-book-genome-development-20261105-v1",
+    "size": 500,
+    "candidatePool": 2000,
+    "minUniqueRatings": 20,
+    "selection": "Rank users with at least 20 raw rows by SHA256(seed + colon + numeric ID). Deduplicate the first 2000 candidates, exclude all conflicting pair versions, then take first 500 eligible complete histories. Fail if bounded pool is insufficient."
+  },
+  "semantics": {
+    "originalScale": [
+      1,
+      5
+    ],
+    "multiplier": 2,
+    "mappedValues": [
+      2,
+      4,
+      6,
+      8,
+      10
+    ],
+    "sourceOccurredAt": null,
+    "time": "NOT_PROVIDED",
+    "temporalEvaluation": "UNSUPPORTED",
+    "nativeEvent": false,
+    "crossDatasetUserJoin": false,
+    "exposure": "unknown",
+    "platformScaleEquivalence": "not-established"
+  },
+  "budgets": {
+    "chunkBytes": 4194304,
+    "maxLineBytes": 4096,
+    "maxRows": 5200000,
+    "maxSubjects": 360000,
+    "maxObjects": 10000,
+    "maxCandidateRows": 1000000,
+    "maxHistoryRows": 10000,
+    "maxCohortRows": 100000,
+    "maxSeconds": 300
+  },
+  "excludedMembers": [
+    "reviews",
+    "descriptions",
+    "genome scores fitted on all source ratings"
+  ]
+}

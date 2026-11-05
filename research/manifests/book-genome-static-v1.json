@@ -1,0 +1,54 @@
+{
+  "version": "book-genome-engine-static-replay-v1",
+  "scope": "EXPOSED_DEVELOPMENT_CONFORMANCE_REPLAY",
+  "purpose": "Replay the exposed November 5 static matrix experiment through the portable research implementation; no new holdout or quality admission.",
+  "seed": "kajo-book-static-development-20261105-v1",
+  "cohortSubjects": 500,
+  "heldOutSubjects": 100,
+  "split": "Hash subjects for the 100 cold users. For each regular user, hash unique item IDs: first floor(70%) train, next to floor(85%) validation, remainder test. For held-out users, last 20% by the same hash are fixed targets; the first 80% are eligible visible evidence. No source times are fabricated.",
+  "sourceScale": [
+    1,
+    5
+  ],
+  "evaluationScale": [
+    2,
+    10
+  ],
+  "scaleTransform": "twice original rating; preserve original value; no observed zeros",
+  "models": [
+    "global-mean",
+    "item-mean",
+    "profile-offset"
+  ],
+  "itemShrinkage": 10,
+  "profileShrinkage": 10,
+  "modelDefinitions": {
+    "global-mean": "Mean of permitted global training labels",
+    "item-mean": "(training item sum + 10 * global mean) / (training item count + 10)",
+    "profile-offset": "Clipped item mean plus sum of visible user residuals against frozen training item means divided by (visible count + 10)"
+  },
+  "selection": "Select lowest validation RMSE once; declared model order breaks ties. Save selection before reading test ratings for scoring. No tuning after test.",
+  "coldEvidenceBudgets": [
+    0,
+    5,
+    10,
+    20
+  ],
+  "coldEvidenceMeaning": "Number of visible rating records, never an allowed grade list; hash order is a diagnostic mask and not real history",
+  "metrics": [
+    "MAE",
+    "RMSE",
+    "subject-macro MAE"
+  ],
+  "bootstrapReplicates": 0,
+  "admission": "NONE; descriptive isolated pilot only, not a second final selection or production promotion",
+  "excludedClaims": [
+    "temporal learning",
+    "cross-domain user linkage",
+    "recommendation benefit",
+    "native engine conformance",
+    "calibrated confidence",
+    "full 0-10 source coverage"
+  ],
+  "priorProtocol": "book-genome-static-development-v1"
+}

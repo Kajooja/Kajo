@@ -1,9 +1,18 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; owned DEVELOPMENT preparation is next; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 is active; owned DEVELOPMENT continues from private records; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
+
+## Bounded external numeric research — #417
+
+The separately reviewed Book Genome subset now has an undated matrix contract,
+pinned ratings-only intake and built static baseline replay. Its 500-reader
+exposed cohort validates implementation arithmetic, source/scale separation and
+masked-evidence controls. It does not close the native later-label, supported
+rating-style, recommendation-benefit or Sprint 016 quality gates. MovieLens is
+reused through its existing dated path. See [research commands and limits](../../../research/README.md#book-genome--undated-static-research-417).
 
 ## Outcome
 

@@ -972,6 +972,14 @@ Requirements: `MVP-ENG-001..003`. Canonical design: ADR-0008 and [DATA_ENRICHMEN
 
 **D2 — reproducible baseline evaluation ([#237](https://github.com/Kajooja/Kajo/issues/237)).** Compare train-only transparent means/neighbors and an explicit-rating factorization challenger through the same research contract. Include one bounded declared static-state versus ordered-prefix/trajectory-retrieval experiment; a negative or insufficient-evidence result is valid. Freeze global chronological splits, held-out-subject cold-start prefixes, transforms/artifact cutoffs, baselines, metrics and final test before selection. Report coverage, uncertainty, task limitations, cost and prior/enrichment ablations where available. Scale to the full dataset only after the small run is correct and resource-bounded.
 
+**Undated BOOK extension (#417, November 5).** The owner also authorizes book
+ratings research. The separately reviewed Book Genome subset enters a distinct
+static matrix contract because it supplies no timestamps. Its pinned intake and
+exposed-cohort conformance replay extend the same independent package without
+inventing temporal prefixes, linking MovieLens users, importing native Events or
+admitting an external prior. Subsequent research must declare a disjoint cohort
+and model question before scoring; Sprint 016/native gates remain unchanged.
+
 D2’s [actual development report](../../research/reports/movielens-small-d2.md) records
 46,410 training rows, fixed temporal/held-out-subject tests, two matching executions
 and rejection of the validation-selected challenger under the frozen rule. This

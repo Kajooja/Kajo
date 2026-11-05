@@ -902,6 +902,16 @@ verified; the earlier 32M transport failure is not its prerequisite. This source
 not implement D2 training, automatic rights approval, dataset redistribution or native
 serving; the generic computation root does not import this external adapter.
 
+## Undated Book Genome research — #417
+
+| Area | Source | Scope |
+| --- | --- | --- |
+| Reviewed source and intake | `research/manifests/book-genome-2021.json`; `scripts/research/book_genome.py` | Pinned README/member, bounded verified HTTPS ranges, streaming strict JSON, deterministic complete histories, duplicate/conflict handling and checked atomic stage reuse; whole archive not downloaded |
+| Portable static contract | `packages/prediction-engine/src/research-static.ts`; `./research-static` | Undated external matrix records; generic global/item/profile-offset estimators reuse `rating-location.ts`; fit/query leakage guards, explicit source/scale, no E1 clocks or root/serving dependency |
+| Book adapter | `packages/prediction-engine/src/adapters/book-genome.ts`; `./adapters/book-genome` | Exact reviewed member identity, original 1–5 integer grades and ×2 mapping; source zero IDs remain valid, unknown time stays null; no native accounts/Events |
+| Frozen experiment | `research/manifests/book-genome-static-v1.json`; `scripts/research/evaluate-books.mjs` | Existing exposed cohort integration replay, source/code/runtime freeze, static disjoint masks, selection before test scoring, same-target cold evidence counts and immutable fit |
+| Verification and results | `test/research-static.test.ts`; `scripts/research/test_book_genome.py`, `evaluate-books.test.mjs`; `research/reports/book-genome-static-v1.json` | Artificial offline integrity/leakage/media/non-media fixtures in root checks plus aggregate real-data arithmetic conformance; no real download in CI or native quality/serving admission |
+
 ## Offline model/state comparison — D2 #237
 
 | Area | Source | Scope |
