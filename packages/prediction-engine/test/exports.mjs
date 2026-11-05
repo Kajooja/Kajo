@@ -1,3 +1,4 @@
+import { fitRatingResponse, predictRatingResponse } from '@kajo/prediction-engine/research-response';
 import assert from 'node:assert/strict';
 import { fitStaticRatings, predictStaticRatings } from '@kajo/prediction-engine/research-static';
 import { interpretBookGenomeRating } from '@kajo/prediction-engine/adapters/book-genome';
@@ -33,6 +34,9 @@ import { decideContextualSkip } from '@kajo/prediction-engine/contextual-skip';
 import { applyKajoContextualSkip, kajoContextualSkipRecords } from '@kajo/prediction-engine/adapters/kajo-contextual-skip';
 
 assert.equal(typeof core.predict, 'function');
+assert.equal(typeof fitRatingResponse, 'function');
+assert.equal(typeof predictRatingResponse, 'function');
+assert.equal(core.fitRatingResponse, undefined);
 for (const fn of [fitStaticRatings, predictStaticRatings, interpretBookGenomeRating]) assert.equal(typeof fn, 'function');
 assert.equal(core.fitStaticRatings, undefined);
 assert.equal(core.interpretBookGenomeRating, undefined);
@@ -105,7 +109,7 @@ await inspect(join(root, 'index.js'));
 assert.ok((await readdir(root)).includes('index.d.ts'));
 // Optional computation and adapter graphs stay separate from the root and
 // contain no app or provider runtime dependency.
-for (const file of ['research-static.js', 'adapters/book-genome.js', 'personal-content-rating.js', 'adapters/kajo-personal-content-rating.js',
+for (const file of ['research-response.js', 'research-static.js', 'adapters/book-genome.js', 'personal-content-rating.js', 'adapters/kajo-personal-content-rating.js',
   'personal-rating-evaluation.js', 'adapters/kajo-personal-rating-evaluation.js',
   'adapters/kajo-personal-rating-prospective.js', 'personal-rating.js', 'adapters/kajo-personal-rating.js', 'ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js', 'adapters/kajo-working-state.js',
   'ranking-conformance.js', 'adapters/kajo-native-prediction.js',
@@ -114,6 +118,7 @@ for (const file of ['research-static.js', 'adapters/book-genome.js', 'personal-c
   'contextual-skip.js', 'adapters/kajo-contextual-skip.js']) {
   const source = await readFile(join(root, file), 'utf8');
   const allowed = {
+    'research-response.js': ['./rating-location.js'],
     'research-static.js': ['./rating-location.js'],
     'adapters/book-genome.js': [],
     'personal-rating-evaluation.js': [],

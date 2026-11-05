@@ -890,7 +890,7 @@ is added; exact source acceptance remains in STATUS.
 
 | Area | Source | Scope |
 | --- | --- | --- |
-| Exact source and rights | `research/manifests/movielens-small-v2.json`; `movielens-32m.json` | Selected GroupLens Kaggle v2 development source with reviewed scope and actual archive/member hashes; separately pending 32M source, release-specific selection and resource bounds |
+| Exact source and rights | `research/manifests/movielens-small-v2.json`; `movielens-32m.json` | Selected GroupLens Kaggle v2 development source with reviewed scope and actual archive/member hashes; separately verified 32M source, release-specific selection and resource bounds |
 | Bounded archive/CSV normalization | `scripts/research/movielens.py` | Publisher metadata gate, verified atomic download, allowlisted ZIP streams, complete deterministic subject histories, quarantine and hash-verified stage reuse |
 | Engine research adapter | `packages/prediction-engine/src/adapters/movielens.ts`; `scripts/research/normalize-movielens.mjs` | Actual E1 Observation export from original ratings, release namespaces and explicit unknown exposure/action context; separate atomic output stage |
 | Research verification | `scripts/research/test_movielens.py`, `movielens.test.mjs`; engine `test/movielens.test.ts`; root `test:research` | Artificial ZIP → Python → built TypeScript tests plus parser, bounds, integrity, provenance and time-group cases; Python 3.12 configured in ordinary CI, no dataset download |
@@ -912,6 +912,14 @@ serving; the generic computation root does not import this external adapter.
 | Frozen experiment | `research/manifests/book-genome-static-v1.json`; `scripts/research/evaluate-books.mjs` | Existing exposed cohort integration replay, source/code/runtime freeze, static disjoint masks, selection before test scoring, same-target cold evidence counts and immutable fit |
 | Disjoint development comparison | `research/manifests/book-genome-development-v2.json`; `scripts/research/rating-macro-comparison.mjs` | Prior-cohort exclusion witness, fixed item/profile comparison, equal-reader paired bootstrap, validation-before-holdout selection, mandatory cold guards and explicit research-only disposition |
 | Verification and results | `test/research-static.test.ts`; `scripts/research/test_book_genome.py`, `evaluate-books.test.mjs`, `rating-macro-comparison.test.mjs`; `research/reports/book-genome-static-v1.json` | Artificial offline integrity/leakage/media/non-media fixtures in root checks plus aggregate real-data arithmetic conformance; no real download in CI or native quality/serving admission |
+
+## Centered response research — #421
+
+| Area | Source | Scope |
+|---|---|---|
+| Identified response arithmetic | `packages/prediction-engine/src/research-response.ts`; `./research-response` | Centered single ridge slope, exact location control, sparse/constant fallback; no root/native export |
+| Frozen experiment | `research/manifests/rating-response-spread-v1.json`; `scripts/research/evaluate-response.mjs` | Third disjoint BOOK cohort and dated MovieLens 32M; per-domain selection before holdout, equal-user bootstrap and fixed cold targets |
+| Source validation | `book_genome.py`, `movielens.py` | Two exact exclusion witnesses, label-blind temporal support, complete histories and pinned archive/member identities |
 
 ## Offline model/state comparison — D2 #237
 

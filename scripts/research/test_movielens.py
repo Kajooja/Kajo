@@ -30,6 +30,8 @@ def fixture(directory, *, source="32m", users=8, movies=None, links=None, rating
         writer.writerows(entries)
         content[ml.source_member(plan, name)] = stream.getvalue()
     content[ml.source_member(plan, "README.txt")] = "Artificial test archive; not MovieLens source evidence."
+    if source == "32m":
+        content['ml-32m/checksums.txt'] = 'Artificial fixture checksum document.'
     if overrides:
         content.update(overrides)
     path = Path(directory) / "fixture.zip"
@@ -37,6 +39,9 @@ def fixture(directory, *, source="32m", users=8, movies=None, links=None, rating
         for name, text in content.items():
             archive.writestr(name, text)
     plan["sourceVerification"]["publisherMd5"] = hashlib.md5(path.read_bytes(), usedforsecurity=False).hexdigest()
+    # Artificial archives have their own identity, never the real source checksum.
+    for field in ("publisherFileMd5", "archiveSha256", "archiveBytes"):
+        plan["sourceVerification"].pop(field, None)
     if source == "small":
         files = {name: {"sha256": hashlib.sha256(value.encode()).hexdigest(), "bytes": len(value.encode())} for name, value in content.items()}
         plan["sourceVerification"].update(archiveSha256=ml.digest(path), archiveBytes=path.stat().st_size,
@@ -47,6 +52,23 @@ def fixture(directory, *, source="32m", users=8, movies=None, links=None, rating
 
 
 class MovieLensIntakeTests(unittest.TestCase):
+    def test_temporal_population_is_label_blind_and_never_truncates_complete_histories(self):
+        rule = {'trainBefore': 2, 'testFrom': 3, 'minimumTrainRatings': 1,
+                'minimumValidationRatings': 1, 'minimumTestRatings': 1, 'maximumHistoryRatings': 3}
+        rows = [{'timestamp': t, 'rating': .5} for t in [1, 2, 3]]
+        self.assertTrue(ml.temporal_support(rows, rule))
+        self.assertTrue(ml.temporal_support([{**r, 'rating': 5} for r in rows], rule))
+        self.assertFalse(ml.temporal_support(rows[:2], rule))
+        self.assertFalse(ml.temporal_support(rows + rows[:1], rule))
+        self.assertTrue(ml.temporal_support(rows, None))
+
+    def test_publisher_member_checksum_is_verified_independently_of_archive_hash(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path, plan = fixture(tmp)
+            plan['sourceVerification']['publisherFileMd5'] = {'ratings.csv': '0' * 32}
+            with zipfile.ZipFile(path) as archive, self.assertRaisesRegex(ValueError, 'publisher checksum'):
+                ml.inspect_archive(archive, plan)
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -243,6 +265,8 @@ class MovieLensIntakeTests(unittest.TestCase):
 
     def test_prepare_reads_only_small_metadata_and_does_not_approve_unknown_terms(self):
         plan = ml.load_plan()
+        plan['sourceVerification']['status'] = 'pending-publisher-availability'
+        plan['rights']['research'] = 'pending-exact-source-review'
         class Response(io.BytesIO):
             pass
         calls = []

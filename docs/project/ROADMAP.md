@@ -89,6 +89,15 @@ evidence passes. Do not rename old sprint history or repeat accepted source work
 | [020 — operating learning lifecycle](sprints/SPRINT-020.md) | Real replay, evaluated consolidation, bounded challengers and deployable version/rollback lifecycle | 015–019; independent final evaluation, artifact/source deletion, failed-worker recovery, reproducibility and native fallback; synthetic outcomes never validate themselves |
 | [021 — integrated Engine V1 acceptance](sprints/SPRINT-021.md) | Useful BOOK/MOVIE predictions throughout actual owned-Profile Taste/Discovery/Shared operation, with operating evidence and portable boundaries | All required prior slices; fresh end-to-end hosted/device outcomes, temporal and category checks, quality/latency/coverage budgets and explicit owner acceptance of the evidence |
 
+**Pre-release training refinement — owner direction 2026-11-05:** once the
+model and admissible data are ready, Sprints 020–021 must execute the broad
+individual-rating pretraining gate `MVP-ALG-013` before publication. Research may
+start with bounded cohorts, then expand using predeclared learning curves and
+resource budgets. Keep untouched evaluation labels outside training, preserve
+source identities/grades, and admit a reproducible artifact only for permitted
+uses after quality, coverage and rollback checks. This does not require a losing
+challenger to win or authorize research-only data in serving.
+
 Every sprint is a substantial deliverable with multiple narrow implementation
 PRs as needed. Its file specifies inputs, deliverables, non-goals, controls,
 failure/stop conditions, review evidence and successor. Do not reduce a sprint
@@ -979,12 +988,14 @@ exposed-cohort conformance replay extend the same independent package without
 inventing temporal prefixes, linking MovieLens users, importing native Events or
 admitting an external prior. Subsequent research must declare a disjoint cohort
 and model question before scoring; Sprint 016/native gates remain unchanged.
-Accepted #418 supplies that foundation. **#419** is the next bounded comparison:
-exclude the exposed reader cohort, fix item mean versus profile offset, use
-equal-reader errors and retain the predeclared holdout/cold-start decision.
-MovieLens already has a chronological equivalent; preserve its rejected
-challenger and separate source identities instead of treating its replay as a
-new untouched experiment.
+Accepted #418 supplies that foundation; #419/#420 retained the profile-offset
+baseline on a second, disjoint cohort. **#421** now predeclares one centered,
+regularized response-spread comparison against location-only control. Exclude
+both BOOK cohorts and use a newly verified, bounded MovieLens 32M temporal cohort
+with post-small-snapshot outcomes. Preserve the original movie rejection and
+separate source identities; unknown cross-release person overlap is not disjointness.
+Freeze code/protocol before selection and save selection before holdout scoring.
+
 
 D2’s [actual development report](../../research/reports/movielens-small-d2.md) records
 46,410 training rows, fixed temporal/held-out-subject tests, two matching executions

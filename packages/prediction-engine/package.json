@@ -118,6 +118,10 @@
     "./adapters/book-genome": {
       "types": "./dist/adapters/book-genome.d.ts",
       "import": "./dist/adapters/book-genome.js"
+    },
+    "./research-response": {
+      "types": "./dist/research-response.d.ts",
+      "import": "./dist/research-response.js"
     }
   },
   "scripts": {

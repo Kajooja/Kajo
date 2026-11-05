@@ -1,0 +1,396 @@
+{
+  "schema": "rating-response-development-v1",
+  "domain": "movie",
+  "freezeSha256": "f284651bc0d892ffd59cf3ba70ec655ae234ab6d3bde2d0ada1986762463f384",
+  "lineage": {
+    "sourceSha256": "463188e435ab97234d3b50326c443549c4750fbbfadc313316eebbd16e97cf65",
+    "protocolSha256": "619cffa1842ee8c4d3f30c80c7c5e67d8211d05b3b6f87026c5c511c1eb29078",
+    "code": {
+      "scripts/research/book_genome.py": "06cda200ade91c13907c7bd65e11122ea904ddc038694e06197def2094be0ead",
+      "scripts/research/movielens.py": "78a27960b4b9b4e2c7bdf260e1b9f0da4ace9c0cd3bd841e65df38df819fb838",
+      "scripts/research/evaluate-books.mjs": "876551d1e7bfa701cb829bbdcc966463efc991ca13352d995e66b31a41657915",
+      "scripts/research/evaluate-response.mjs": "4d25bab7d61adec495dd5ea809f92d7e59ef309f6f130bf96fdb0441adea1a00",
+      "scripts/research/rating-macro-comparison.mjs": "7ac95eb7693a6055aac35707d9946676112088ec9ecc9c77ad4d052223812b3b",
+      "packages/prediction-engine/dist/research-response.js": "6dc3cb3021ec0492ee360172a66c9a1040d5d43ba6d807d49f9344aa24696014",
+      "packages/prediction-engine/dist/rating-location.js": "76fea4b0e1347234b8ef1cd6df7ee240e580cd68fd6e3b7b5f0185d7ba1b3ad1",
+      "packages/prediction-engine/dist/adapters/book-genome.js": "a6fea6ed1c85ae0351eb7bd6ee41b4b6c89f595033287a1bd1a7a62d131abd8a"
+    },
+    "node": "v24.22.1"
+  },
+  "sourceCounts": {
+    "movies": 87585,
+    "ratings": 32000204,
+    "subjects": 200948,
+    "tags": 2000072
+  },
+  "cohort": {
+    "maximumHistory": 1493,
+    "minimumHistory": 77,
+    "ratings": 298690,
+    "seed": "kajo-movie-response-20261105-v1",
+    "subjects": 500,
+    "subjectsSha256": "c8f6fa0783c2b892f8a8174556845526ac37429b0da2206135f07e5fc2c530bb"
+  },
+  "cohortSha256": "96cb1e6469d0aaf2bb3484247d21d264d5edbafaf24d1f8d9bc081cd299bbb4f",
+  "exclusions": [],
+  "partitions": {
+    "train": {
+      "rows": 177120,
+      "subjects": 400,
+      "membershipSha256": "b3351f0d6c6b30f9678aa048333024f48472e8745f3059731b12c161f7fd55cb"
+    },
+    "validation": {
+      "rows": 26012,
+      "subjects": 400,
+      "membershipSha256": "7445529fef7d313285ef72d1a09322a256e284d7e9a6fd1eb69f0a3f28b604a6"
+    },
+    "test": {
+      "rows": 27134,
+      "subjects": 400,
+      "membershipSha256": "e24dff8dab8aa5a5d20c46b6d66af3570860f541a94d65b3e91ef072859da51c"
+    },
+    "coldVisible": {
+      "rows": 61583,
+      "subjects": 100,
+      "membershipSha256": "230f1990886d584ea5d48745161c4f7840b4188d6b1143a40c9425312d488f20"
+    },
+    "coldTargets": {
+      "rows": 6841,
+      "subjects": 100,
+      "membershipSha256": "c03654eb2927c5edf5ce853191292614f3f900ace7ace13bde47075f0d442b94"
+    }
+  },
+  "selection": {
+    "selected": "profile-offset",
+    "comparison": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 400,
+      "ratings": 26012,
+      "losses": {
+        "control": {
+          "macroRmse10": 1.6735781064718704,
+          "macroMae10": 1.2362337415683116
+        },
+        "challenger": {
+          "macroRmse10": 1.6567912532653317,
+          "macroMae10": 1.2190389831453956
+        }
+      },
+      "macroRmseDelta10": -0.01678685320653872,
+      "macroMaeDelta10": -0.017194758422915957,
+      "pairedRmseDelta95": [
+        -0.02403322440802777,
+        -0.009608825821872554
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:movie:validation",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE"
+    },
+    "eligibility": {
+      "passed": false,
+      "checks": {
+        "usefulGain": false,
+        "pairedInterval": true,
+        "maeNoninferiority": true,
+        "coverage": true,
+        "support": true
+      }
+    },
+    "supportedSubjects": 400,
+    "modelSha256": "6fe24e4fd01036304ae942dc2c19186ffaa5754997a5e6e022e5afe99c0c201c",
+    "testLabelsUsedForFitOrSelection": false
+  },
+  "holdout": {
+    "control": "profile-offset",
+    "challenger": "response-spread",
+    "subjects": 400,
+    "ratings": 27134,
+    "losses": {
+      "control": {
+        "macroRmse10": 1.690600988575171,
+        "macroMae10": 1.255929335652944
+      },
+      "challenger": {
+        "macroRmse10": 1.6819820095465803,
+        "macroMae10": 1.2482487969237865
+      }
+    },
+    "macroRmseDelta10": -0.008618979028590656,
+    "macroMaeDelta10": -0.007680538729157416,
+    "pairedRmseDelta95": [
+      -0.0143487053142907,
+      -0.0030778553136441107
+    ],
+    "predictionCoverage": 1,
+    "bootstrapReplicates": 2000,
+    "bootstrapSeed": "kajo-response-spread-20261105-v1:movie:test",
+    "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE"
+  },
+  "cold": {
+    "0": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 100,
+      "ratings": 6841,
+      "losses": {
+        "control": {
+          "macroRmse10": 1.820565587673989,
+          "macroMae10": 1.406780394279492
+        },
+        "challenger": {
+          "macroRmse10": 1.820565587673989,
+          "macroMae10": 1.406780394279492
+        }
+      },
+      "macroRmseDelta10": 0,
+      "macroMaeDelta10": 0,
+      "pairedRmseDelta95": [
+        0,
+        0
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:movie:cold-0",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "supportedSubjects": 0,
+      "actualVisibleRatings": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "targetMembershipSha256": "c03654eb2927c5edf5ce853191292614f3f900ace7ace13bde47075f0d442b94",
+      "equalControlEveryTarget": true
+    },
+    "5": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 100,
+      "ratings": 6841,
+      "losses": {
+        "control": {
+          "macroRmse10": 1.7087346921286244,
+          "macroMae10": 1.3166402159370798
+        },
+        "challenger": {
+          "macroRmse10": 1.7087346921286244,
+          "macroMae10": 1.3166402159370798
+        }
+      },
+      "macroRmseDelta10": 0,
+      "macroMaeDelta10": 0,
+      "pairedRmseDelta95": [
+        0,
+        0
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:movie:cold-5",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "supportedSubjects": 0,
+      "actualVisibleRatings": {
+        "minimum": 0,
+        "maximum": 5
+      },
+      "targetMembershipSha256": "c03654eb2927c5edf5ce853191292614f3f900ace7ace13bde47075f0d442b94",
+      "equalControlEveryTarget": true
+    },
+    "10": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 100,
+      "ratings": 6841,
+      "losses": {
+        "control": {
+          "macroRmse10": 1.687118573852824,
+          "macroMae10": 1.293183955759477
+        },
+        "challenger": {
+          "macroRmse10": 1.6843447980685071,
+          "macroMae10": 1.2907039686227235
+        }
+      },
+      "macroRmseDelta10": -0.002773775784316923,
+      "macroMaeDelta10": -0.0024799871367535697,
+      "pairedRmseDelta95": [
+        -0.006706318095654018,
+        0.0010689342705611283
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:movie:cold-10",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "supportedSubjects": 98,
+      "actualVisibleRatings": {
+        "minimum": 7,
+        "maximum": 10
+      },
+      "targetMembershipSha256": "c03654eb2927c5edf5ce853191292614f3f900ace7ace13bde47075f0d442b94",
+      "equalControlEveryTarget": false
+    },
+    "20": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 100,
+      "ratings": 6841,
+      "losses": {
+        "control": {
+          "macroRmse10": 1.664957316194606,
+          "macroMae10": 1.2590754938835362
+        },
+        "challenger": {
+          "macroRmse10": 1.6603378313607045,
+          "macroMae10": 1.2548682772665785
+        }
+      },
+      "macroRmseDelta10": -0.0046194848339016215,
+      "macroMaeDelta10": -0.004207216616957776,
+      "pairedRmseDelta95": [
+        -0.009149962186897426,
+        -0.0009882120052706412
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:movie:cold-20",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "supportedSubjects": 99,
+      "actualVisibleRatings": {
+        "minimum": 7,
+        "maximum": 20
+      },
+      "targetMembershipSha256": "c03654eb2927c5edf5ce853191292614f3f900ace7ace13bde47075f0d442b94",
+      "equalControlEveryTarget": false
+    }
+  },
+  "decision": {
+    "disposition": "RETAIN_LOCATION_ONLY_CONTROL",
+    "support": {
+      "regular": 400,
+      "cold20": 99
+    },
+    "validationEligible": false,
+    "holdout": {
+      "passed": false,
+      "checks": {
+        "usefulGain": false,
+        "pairedInterval": true,
+        "maeNoninferiority": true,
+        "coverage": true
+      }
+    },
+    "cold": {
+      "0": {
+        "passed": true,
+        "macroRmseDelta10": 0,
+        "macroMaeDelta10": 0
+      },
+      "5": {
+        "passed": true,
+        "macroRmseDelta10": 0,
+        "macroMaeDelta10": 0
+      },
+      "10": {
+        "passed": true,
+        "macroRmseDelta10": -0.002773775784316923,
+        "macroMaeDelta10": -0.0024799871367535697
+      },
+      "20": {
+        "passed": true,
+        "macroRmseDelta10": -0.0046194848339016215,
+        "macroMaeDelta10": -0.004207216616957776
+      }
+    },
+    "qualityAdmission": "NONE",
+    "servingActivation": "NONE"
+  },
+  "nativeRowsWritten": 0,
+  "qualityAdmission": "NONE",
+  "servingActivation": "NONE",
+  "limitations": [
+    "External observed-rating development task; not native FINAL or recommendation benefit.",
+    "Conditional longitudinal-support population; no claim of disjoint people across MovieLens releases. Test outcomes postdate 2018 snapshot.",
+    "One centered predictive interaction cannot identify psychological response scale separately from taste.",
+    "Original grades preserved; source mappings do not supply native zeros or platform equivalence.",
+    "No book/movie people linkage, missing-rating negatives, calibrated personal confidence or serving permission."
+  ],
+  "attribution": "F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems 5, 4, Article 19. https://doi.org/10.1145/2827872",
+  "predeclaration": {
+    "sourceHead": "8d3c50bcd940313f4bf26c9e97ff9ce81c8909d4",
+    "tree": "fc84296545ebecd064a78d7b96b0bfc9029e16c0",
+    "publishedBeforeCohortSelection": true
+  },
+  "reproduction": {
+    "deterministicFilesMatched": 16,
+    "independentAudit": {
+      "status": "PASS",
+      "domain": "movie",
+      "sourceRows": 298690,
+      "partitionMembershipsVerified": true,
+      "predictionValuesChecked": 161020,
+      "maxAbsolutePredictionDifference": 1.396660564978447e-13,
+      "metricsAndIntervalEndpointsChecked": 36,
+      "maxAbsoluteMetricDifference": 6.661338147750939e-16,
+      "seconds": 5.1181293049994565,
+      "method": "Independent Python source partition reconstruction, accurate sums, centered ridge forecasts and paired-bootstrap recomputation; no saved-model use"
+    }
+  },
+  "resources": {
+    "intake": {
+      "exitCode": 0,
+      "seconds": 286.2263623880026,
+      "maxRssKiB": 316528
+    },
+    "firstRun": {
+      "seconds": 1.995516037,
+      "maxRssMiB": 333.0234375
+    },
+    "replay": {
+      "seconds": 2.260178011,
+      "maxRssMiB": 331.58984375
+    }
+  },
+  "coverageDiagnostics": {
+    "validation": {
+      "rows": 26012,
+      "subjects": 400,
+      "items": 7828,
+      "fittedItemCoverage": 0.8505689681685376,
+      "slopeSupportedPredictionFraction": 1.0
+    },
+    "test": {
+      "rows": 27134,
+      "subjects": 400,
+      "items": 8856,
+      "fittedItemCoverage": 0.6806589518685044,
+      "slopeSupportedPredictionFraction": 1.0
+    },
+    "cold-0": {
+      "rows": 6841,
+      "subjects": 100,
+      "items": 3807,
+      "fittedItemCoverage": 0.6434731764361935,
+      "slopeSupportedPredictionFraction": 0.0
+    },
+    "cold-5": {
+      "rows": 6841,
+      "subjects": 100,
+      "items": 3807,
+      "fittedItemCoverage": 0.6434731764361935,
+      "slopeSupportedPredictionFraction": 0.0
+    },
+    "cold-10": {
+      "rows": 6841,
+      "subjects": 100,
+      "items": 3807,
+      "fittedItemCoverage": 0.6434731764361935,
+      "slopeSupportedPredictionFraction": 0.9859669638941675
+    },
+    "cold-20": {
+      "rows": 6841,
+      "subjects": 100,
+      "items": 3807,
+      "fittedItemCoverage": 0.6434731764361935,
+      "slopeSupportedPredictionFraction": 0.9881596257857038
+    }
+  }
+}

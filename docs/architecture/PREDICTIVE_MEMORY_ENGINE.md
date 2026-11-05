@@ -47,6 +47,14 @@ Learning rating response behavior is separate from claiming to identify absolute
 happiness or a person's psychology. [PREDICTION_MODEL section 1.1](../domain/PREDICTION_MODEL.md#11-personal-expected-rating-and-response-behavior--engine-v1-target)
 owns the precise Kajo conditioning, initial model and acceptance contract.
 
+The November 5 owner refinement adds broad individual-observation pretraining
+before publication, after model selection and data-use admission. Efficient
+minibatches retain the individual rating objective and source/user namespaces;
+aggregate item means are controls, not replacements for observed training rows.
+Protected tests, coverage/learning curves, resource limits and reproducible
+artifact/withdrawal/rollback evidence are required by `MVP-ALG-013` and
+[DATA_ENRICHMENT](DATA_ENRICHMENT.md#broad-pre-release-training--2026-11-05).
+
 ## 2. General cycle
 
 ```text

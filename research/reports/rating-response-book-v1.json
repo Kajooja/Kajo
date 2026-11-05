@@ -1,0 +1,406 @@
+{
+  "schema": "rating-response-development-v1",
+  "domain": "book",
+  "freezeSha256": "06f7dc513fe67f09877eef304e67c74783ef8327196e4246c01d4ab51b8c103b",
+  "lineage": {
+    "sourceSha256": "c94a5f0429f6e97098770f96b6c4eaa5c929d6d089b3e340d2ce40bdbda2e41e",
+    "protocolSha256": "619cffa1842ee8c4d3f30c80c7c5e67d8211d05b3b6f87026c5c511c1eb29078",
+    "code": {
+      "scripts/research/book_genome.py": "06cda200ade91c13907c7bd65e11122ea904ddc038694e06197def2094be0ead",
+      "scripts/research/movielens.py": "78a27960b4b9b4e2c7bdf260e1b9f0da4ace9c0cd3bd841e65df38df819fb838",
+      "scripts/research/evaluate-books.mjs": "876551d1e7bfa701cb829bbdcc966463efc991ca13352d995e66b31a41657915",
+      "scripts/research/evaluate-response.mjs": "4d25bab7d61adec495dd5ea809f92d7e59ef309f6f130bf96fdb0441adea1a00",
+      "scripts/research/rating-macro-comparison.mjs": "7ac95eb7693a6055aac35707d9946676112088ec9ecc9c77ad4d052223812b3b",
+      "packages/prediction-engine/dist/research-response.js": "6dc3cb3021ec0492ee360172a66c9a1040d5d43ba6d807d49f9344aa24696014",
+      "packages/prediction-engine/dist/rating-location.js": "76fea4b0e1347234b8ef1cd6df7ee240e580cd68fd6e3b7b5f0185d7ba1b3ad1",
+      "packages/prediction-engine/dist/adapters/book-genome.js": "a6fea6ed1c85ae0351eb7bd6ee41b4b6c89f595033287a1bd1a7a62d131abd8a"
+    },
+    "node": "v24.22.1"
+  },
+  "sourceCounts": {
+    "ratings": 5152656,
+    "subjects": 350332,
+    "objects": 9374
+  },
+  "cohort": {
+    "subjects": 500,
+    "ratings": 31152,
+    "minHistory": 20,
+    "maxHistory": 625
+  },
+  "cohortSha256": "35ccad2d3547c46149d4bef59c1a5521d0b0575a53ce21c7c9815c08ae39f633",
+  "exclusions": [
+    {
+      "sha256": "9bd43253223a84c3091d849bea9d0391547dd2aa72156903fc40ffb3ebc20b90",
+      "subjects": 500,
+      "ratings": 31144,
+      "overlapSubjects": 0
+    },
+    {
+      "sha256": "44cbc15a09c677f5de501ed5b5ac0b59ed732bd4d594fd62181b0c94dca1f112",
+      "subjects": 500,
+      "ratings": 33243,
+      "overlapSubjects": 0
+    }
+  ],
+  "partitions": {
+    "train": {
+      "rows": 17974,
+      "subjects": 400,
+      "membershipSha256": "6f9e52e7f827ae85c86e1adf79cdeef89aa04898e0c3a983e208d37eb23ebefe"
+    },
+    "validation": {
+      "rows": 3873,
+      "subjects": 400,
+      "membershipSha256": "6d0690168c78ccfdc00b7f013565a4569971840a9b82eff5d7f0fb3c53a4ea4f"
+    },
+    "test": {
+      "rows": 4088,
+      "subjects": 400,
+      "membershipSha256": "2fa8899afe05398491aa3406caac3271a4c6b40607672a269d2b0730cfbcb8f1"
+    },
+    "coldVisible": {
+      "rows": 4136,
+      "subjects": 100,
+      "membershipSha256": "5c127b209293e06e2302d7de42f8d2c1670d5fe3bd81ce7c39e2006193d35d21"
+    },
+    "coldTargets": {
+      "rows": 1081,
+      "subjects": 100,
+      "membershipSha256": "b16b9410388f6bf6d77fc592f4fcdef6bbe001e09ab23a1044a9687e8a221064"
+    }
+  },
+  "selection": {
+    "selected": "profile-offset",
+    "comparison": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 400,
+      "ratings": 3873,
+      "losses": {
+        "control": {
+          "macroRmse10": 1.9440378503500921,
+          "macroMae10": 1.5347636172937893
+        },
+        "challenger": {
+          "macroRmse10": 1.9493497172982992,
+          "macroMae10": 1.5372139431984977
+        }
+      },
+      "macroRmseDelta10": 0.005311866948207067,
+      "macroMaeDelta10": 0.0024503259047083947,
+      "pairedRmseDelta95": [
+        0.0009885676893134022,
+        0.009770310490520327
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:book:validation",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE"
+    },
+    "eligibility": {
+      "passed": false,
+      "checks": {
+        "usefulGain": false,
+        "pairedInterval": false,
+        "maeNoninferiority": true,
+        "coverage": true,
+        "support": true
+      }
+    },
+    "supportedSubjects": 399,
+    "modelSha256": "dba1c49c159e427bdda7a2f074254dbdd9ddd48a888a9f7422574b8b6cef4091",
+    "testLabelsUsedForFitOrSelection": false
+  },
+  "holdout": {
+    "control": "profile-offset",
+    "challenger": "response-spread",
+    "subjects": 400,
+    "ratings": 4088,
+    "losses": {
+      "control": {
+        "macroRmse10": 1.9425820301928824,
+        "macroMae10": 1.5357689894798887
+      },
+      "challenger": {
+        "macroRmse10": 1.9501338219189095,
+        "macroMae10": 1.5367194796998374
+      }
+    },
+    "macroRmseDelta10": 0.007551791726027046,
+    "macroMaeDelta10": 0.0009504902199486409,
+    "pairedRmseDelta95": [
+      0.002909893503897676,
+      0.012216176249298034
+    ],
+    "predictionCoverage": 1,
+    "bootstrapReplicates": 2000,
+    "bootstrapSeed": "kajo-response-spread-20261105-v1:book:test",
+    "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE"
+  },
+  "cold": {
+    "0": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 100,
+      "ratings": 1081,
+      "losses": {
+        "control": {
+          "macroRmse10": 2.1303694068785792,
+          "macroMae10": 1.6779045825349033
+        },
+        "challenger": {
+          "macroRmse10": 2.1303694068785792,
+          "macroMae10": 1.6779045825349033
+        }
+      },
+      "macroRmseDelta10": 0,
+      "macroMaeDelta10": 0,
+      "pairedRmseDelta95": [
+        0,
+        0
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:book:cold-0",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "supportedSubjects": 0,
+      "actualVisibleRatings": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "targetMembershipSha256": "b16b9410388f6bf6d77fc592f4fcdef6bbe001e09ab23a1044a9687e8a221064",
+      "equalControlEveryTarget": true
+    },
+    "5": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 100,
+      "ratings": 1081,
+      "losses": {
+        "control": {
+          "macroRmse10": 2.086503910117866,
+          "macroMae10": 1.652356553566453
+        },
+        "challenger": {
+          "macroRmse10": 2.086503910117866,
+          "macroMae10": 1.652356553566453
+        }
+      },
+      "macroRmseDelta10": 0,
+      "macroMaeDelta10": 0,
+      "pairedRmseDelta95": [
+        0,
+        0
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:book:cold-5",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "supportedSubjects": 0,
+      "actualVisibleRatings": {
+        "minimum": 5,
+        "maximum": 5
+      },
+      "targetMembershipSha256": "b16b9410388f6bf6d77fc592f4fcdef6bbe001e09ab23a1044a9687e8a221064",
+      "equalControlEveryTarget": true
+    },
+    "10": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 100,
+      "ratings": 1081,
+      "losses": {
+        "control": {
+          "macroRmse10": 2.043058100693208,
+          "macroMae10": 1.6117228966712185
+        },
+        "challenger": {
+          "macroRmse10": 2.0441906122683573,
+          "macroMae10": 1.6139842940105555
+        }
+      },
+      "macroRmseDelta10": 0.0011325115751494863,
+      "macroMaeDelta10": 0.0022613973393370568,
+      "pairedRmseDelta95": [
+        -0.0017833585235898064,
+        0.004207907297999652
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:book:cold-10",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "supportedSubjects": 99,
+      "actualVisibleRatings": {
+        "minimum": 10,
+        "maximum": 10
+      },
+      "targetMembershipSha256": "b16b9410388f6bf6d77fc592f4fcdef6bbe001e09ab23a1044a9687e8a221064",
+      "equalControlEveryTarget": false
+    },
+    "20": {
+      "control": "profile-offset",
+      "challenger": "response-spread",
+      "subjects": 100,
+      "ratings": 1081,
+      "losses": {
+        "control": {
+          "macroRmse10": 2.0332949848468256,
+          "macroMae10": 1.604242449171236
+        },
+        "challenger": {
+          "macroRmse10": 2.035355468343846,
+          "macroMae10": 1.6074208225708133
+        }
+      },
+      "macroRmseDelta10": 0.002060483497020371,
+      "macroMaeDelta10": 0.0031783733995773833,
+      "pairedRmseDelta95": [
+        -0.0017566690831023247,
+        0.005904595530592796
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-response-spread-20261105-v1:book:cold-20",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "supportedSubjects": 100,
+      "actualVisibleRatings": {
+        "minimum": 16,
+        "maximum": 20
+      },
+      "targetMembershipSha256": "b16b9410388f6bf6d77fc592f4fcdef6bbe001e09ab23a1044a9687e8a221064",
+      "equalControlEveryTarget": false
+    }
+  },
+  "decision": {
+    "disposition": "RETAIN_LOCATION_ONLY_CONTROL",
+    "support": {
+      "regular": 399,
+      "cold20": 100
+    },
+    "validationEligible": false,
+    "holdout": {
+      "passed": false,
+      "checks": {
+        "usefulGain": false,
+        "pairedInterval": false,
+        "maeNoninferiority": true,
+        "coverage": true
+      }
+    },
+    "cold": {
+      "0": {
+        "passed": true,
+        "macroRmseDelta10": 0,
+        "macroMaeDelta10": 0
+      },
+      "5": {
+        "passed": true,
+        "macroRmseDelta10": 0,
+        "macroMaeDelta10": 0
+      },
+      "10": {
+        "passed": true,
+        "macroRmseDelta10": 0.0011325115751494863,
+        "macroMaeDelta10": 0.0022613973393370568
+      },
+      "20": {
+        "passed": true,
+        "macroRmseDelta10": 0.002060483497020371,
+        "macroMaeDelta10": 0.0031783733995773833
+      }
+    },
+    "qualityAdmission": "NONE",
+    "servingActivation": "NONE"
+  },
+  "nativeRowsWritten": 0,
+  "qualityAdmission": "NONE",
+  "servingActivation": "NONE",
+  "limitations": [
+    "External observed-rating development task; not native FINAL or recommendation benefit.",
+    "Third disjoint reader cohort; no dates or temporal claim.",
+    "One centered predictive interaction cannot identify psychological response scale separately from taste.",
+    "Original grades preserved; source mappings do not supply native zeros or platform equivalence.",
+    "No book/movie people linkage, missing-rating negatives, calibrated personal confidence or serving permission."
+  ],
+  "attribution": "Kotkov, Denis; Medlar, Alan; Maslov, Alexandr; Satyal, Umesh Raj; Neovius, Mats; Glowacka, Dorota (2022). The Tag Genome Dataset for Books. CHIIR 2022. https://doi.org/10.1145/3498366.3505833",
+  "predeclaration": {
+    "sourceHead": "8d3c50bcd940313f4bf26c9e97ff9ce81c8909d4",
+    "tree": "fc84296545ebecd064a78d7b96b0bfc9029e16c0",
+    "publishedBeforeCohortSelection": true
+  },
+  "reproduction": {
+    "deterministicFilesMatched": 16,
+    "independentAudit": {
+      "status": "PASS",
+      "domain": "book",
+      "sourceRows": 31152,
+      "partitionMembershipsVerified": true,
+      "predictionValuesChecked": 24570,
+      "maxAbsolutePredictionDifference": 2.0250467969162855e-13,
+      "metricsAndIntervalEndpointsChecked": 36,
+      "maxAbsoluteMetricDifference": 1.3322676295501878e-15,
+      "seconds": 2.8020368719990074,
+      "method": "Independent Python source partition reconstruction, accurate sums, centered ridge forecasts and paired-bootstrap recomputation; no saved-model use"
+    }
+  },
+  "resources": {
+    "intake": {
+      "exitCode": 0,
+      "seconds": 66.91337955700146,
+      "maxRssKiB": 75020
+    },
+    "firstRun": {
+      "seconds": 1.9515259240000002,
+      "maxRssMiB": 138.84375
+    },
+    "replay": {
+      "seconds": 1.608501534,
+      "maxRssMiB": 141.92578125
+    }
+  },
+  "coverageDiagnostics": {
+    "validation": {
+      "rows": 3873,
+      "subjects": 400,
+      "items": 2621,
+      "fittedItemCoverage": 0.8486961012135296,
+      "slopeSupportedPredictionFraction": 0.9992254066615027
+    },
+    "test": {
+      "rows": 4088,
+      "subjects": 400,
+      "items": 2703,
+      "fittedItemCoverage": 0.850293542074364,
+      "slopeSupportedPredictionFraction": 0.99926614481409
+    },
+    "cold-0": {
+      "rows": 1081,
+      "subjects": 100,
+      "items": 899,
+      "fittedItemCoverage": 0.8603145235892692,
+      "slopeSupportedPredictionFraction": 0.0
+    },
+    "cold-5": {
+      "rows": 1081,
+      "subjects": 100,
+      "items": 899,
+      "fittedItemCoverage": 0.8603145235892692,
+      "slopeSupportedPredictionFraction": 0.0
+    },
+    "cold-10": {
+      "rows": 1081,
+      "subjects": 100,
+      "items": 899,
+      "fittedItemCoverage": 0.8603145235892692,
+      "slopeSupportedPredictionFraction": 0.996299722479186
+    },
+    "cold-20": {
+      "rows": 1081,
+      "subjects": 100,
+      "items": 899,
+      "fittedItemCoverage": 0.8603145235892692,
+      "slopeSupportedPredictionFraction": 1.0
+    }
+  }
+}

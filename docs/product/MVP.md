@@ -374,6 +374,24 @@ no release requirement is closed solely by source, build or deployment checks.
 
 D3 Tag Genome, D4 Beliefs and D5 KuaiRand are optional independent enrichment/research packets after D2. E2 serving integration is conditional on rights, useful evidence, compatibility and the existing native reliability/rollback gates. External hidden-rating accuracy does not close Kajo first-session, exposure, Shared, cross-domain or device acceptance. A useful transparent baseline remains acceptable; indefinite model search is not a release requirement.
 
+### Broad individual-rating pretraining — owner direction 2026-11-05
+
+- [ ] `MVP-ALG-013` Before publication, pretrain the selected engine on the broadest
+  practically supported set of **eligible individual observed ratings** across
+  BOOK/MOVIE. Preserve each source grade, source/release and subject namespace;
+  do not substitute item averages for the training observations or invent native
+  Profiles. Batches may process many individual observations efficiently.
+  Source and derived-artifact rights must cover the intended published use.
+  Freeze source deduplication, protected selection/final windows, scale mappings,
+  model/configuration and bounded scaling schedule before the final fit. Report
+  learning curves, domain/item/subject coverage, sparse/constant slices, compute
+  cost and held-out quality against the fixed control. Produce a reproducible,
+  versioned artifact with provenance, fallback, withdrawal/retraining and rollback.
+  Train only admitted components: a rejected experiment stays inactive, and
+  research-only permissions do not become production rights. If suitable scale or
+  rights is missing, record the concrete gap and next acquisition/permission task;
+  this requirement remains open. Native usefulness and release gates still apply.
+
 ## Growth/funnel measurement — release blockers
 
 - [ ] `MVP-GROWTH-001` Funnel telemetry can reconstruct public link/open → Taste start/response/completion → challenge → preview → auth conversion → Friend invite/open/accept → Friendship → SharedSession invitation/acceptance/activation/end. Internal Profile allocation is distinct from successful joint session activation.

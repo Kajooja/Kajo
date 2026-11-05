@@ -193,3 +193,15 @@ Discovery without resetting the Profile. BOOK → MOVIE remains the guided order
   post-experience rating are different targets.
 - **Build the complete neural/dreaming architecture before testing usefulness:**
   rejected; V1 must earn complexity through supported improvements.
+
+## Pre-release training refinement — 2026-11-05
+
+The owner requests broad training from individual observed ratings before the
+ready algorithm is published. `MVP-ALG-013` makes this an explicit acceptance
+item; ROADMAP schedules it through the operating/integrated acceptance work.
+Choose and validate the model first, then fit it on the broadest practical data
+eligible for the intended use, retaining original grades, separate source users,
+protected tests, reproducibility, coverage/cost evidence and rollback. Efficient
+minibatches are permitted; item averages alone are not individual observations.
+This refines the release preparation, without requiring any rejected challenger
+or research-only prior to enter serving.

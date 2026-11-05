@@ -198,11 +198,21 @@ def excluded_subjects(path, expected):
     return subjects, data
 
 
-def normalize(path, output, plan, exclusion_path=None):
+def normalize(path, output, plan, exclusion_path=None, exclusion_paths=None):
     expected_exclusion = plan['cohort'].get('excludedCohort')
     excluded, exclusion_bytes = excluded_subjects(exclusion_path, expected_exclusion) if expected_exclusion else (set(), None)
     if exclusion_path is not None and expected_exclusion is None:
         raise ValueError('Undeclared exclusion witness')
+    expected_many = plan['cohort'].get('excludedCohorts', [])
+    if len(exclusion_paths or []) != len(expected_many) or (expected_many and expected_exclusion):
+        raise ValueError('Exactly the declared exclusion witnesses are required')
+    witnesses = []
+    for witness_path, expected in zip(exclusion_paths or [], expected_many):
+        subjects, data = excluded_subjects(witness_path, expected)
+        if subjects & excluded:
+            raise ValueError('Declared disjoint exclusion cohorts overlap')
+        excluded.update(subjects)
+        witnesses.append(data)
     lineage = {'planSha256': sha(canonical(plan)), 'codeSha256': file_hash(Path(__file__)),
                'compressedSha256': plan['member']['compressedSha256']}
     run_id = sha(canonical(lineage))
@@ -215,6 +225,10 @@ def normalize(path, output, plan, exclusion_path=None):
         if expected_exclusion and ((target / 'excluded-ratings.jsonl').read_bytes() != exclusion_bytes
                                    or receipt.get('exclusion') != {**expected_exclusion, 'overlapSubjects': 0}):
             raise ValueError('Cached exclusion integrity mismatch')
+        if expected_many and (receipt.get('exclusions') != [{**e, 'overlapSubjects': 0} for e in expected_many]
+                             or any((target / f'excluded-{i}.jsonl').read_bytes() != data
+                                    for i, data in enumerate(witnesses))):
+            raise ValueError('Cached exclusions integrity mismatch')
         return target, receipt, True
     started = time.monotonic()
     counts, histogram, objects = collections.Counter(), collections.Counter(), set()
@@ -262,6 +276,8 @@ def normalize(path, output, plan, exclusion_path=None):
     try:
         if exclusion_bytes is not None:
             (temporary / 'excluded-ratings.jsonl').write_bytes(exclusion_bytes)
+        for i, data in enumerate(witnesses):
+            (temporary / f'excluded-{i}.jsonl').write_bytes(data)
         with (temporary / 'ratings.jsonl').open('xb') as f:
             for u in sorted(selected):
                 for i, (grade, line) in sorted(histories[u].items()):
@@ -281,6 +297,10 @@ def normalize(path, output, plan, exclusion_path=None):
             if set(selected) & excluded:
                 raise ValueError('Excluded subject entered cohort')
             receipt['exclusion'] = {**expected_exclusion, 'overlapSubjects': 0}
+        if expected_many:
+            if set(selected) & excluded:
+                raise ValueError('Excluded subject entered cohort')
+            receipt['exclusions'] = [{**e, 'overlapSubjects': 0} for e in expected_many]
         save(temporary / 'manifest.json', receipt)
         temporary.rename(target)
         return target, receipt, False
@@ -295,14 +315,21 @@ def main():
     parser.add_argument('--data-dir', type=Path, default=ROOT / 'research-data/book-genome-2021')
     parser.add_argument('--member', type=Path)
     parser.add_argument('--output-dir', type=Path, default=ROOT / 'research-artifacts/book-genome-intake')
-    parser.add_argument('--experiment', choices=['replay', 'development'], default='replay')
+    parser.add_argument('--experiment', choices=['replay', 'development', 'response'], default='replay')
     parser.add_argument('--exclude-cohort', type=Path)
+    parser.add_argument('--exclude-cohorts', type=Path, nargs=2)
     args = parser.parse_args()
+    if args.exclude_cohorts is not None and args.experiment != 'response':
+        raise ValueError('Multiple exclusions require the declared response experiment')
     plan = json.loads(PLAN.read_text())
     if args.experiment == 'development':
         if args.command != 'normalize':
             raise ValueError('Development selection applies only to normalize')
         plan['cohort'] = json.loads(DEVELOPMENT.read_text())['cohort']
+    elif args.experiment == 'response':
+        if args.command != 'normalize':
+            raise ValueError('Response selection applies only to normalize')
+        plan['cohort'] = json.loads((ROOT / 'research/manifests/rating-response-spread-v1.json').read_text())['book']['cohort']
     elif args.exclude_cohort is not None:
         raise ValueError('Exclusions require declared development experiment')
     if args.command == 'prepare':
@@ -318,7 +345,7 @@ def main():
     elif args.command == 'download':
         print(json.dumps({'path': str(download(args.data_dir, plan))}))
     else:
-        path, receipt, reused = normalize(args.member or args.data_dir / 'ratings.deflate', args.output_dir, plan, args.exclude_cohort)
+        path, receipt, reused = normalize(args.member or args.data_dir / 'ratings.deflate', args.output_dir, plan, args.exclude_cohort, args.exclude_cohorts)
         print(json.dumps({'path': str(path), 'cohort': receipt['cohort'],
                           'cohortSha256': receipt['cohortSha256'], 'reused': reused}))
 

@@ -8,29 +8,83 @@
   "checksumUrl": "https://files.grouplens.org/datasets/movielens/ml-32m.zip.md5",
   "archiveUrl": "https://files.grouplens.org/datasets/movielens/ml-32m.zip",
   "sourceVerification": {
-    "readmeSha256": null,
-    "publisherMd5": null,
-    "status": "pending-publisher-availability",
-    "lastAttempt": "2026-09-12",
-    "lastResult": "HTTP 502 on retry; HTTPS proxy reports: Certificate verify failed: certificate has expired"
+    "readmeSha256": "e6dcbfef34db80c937babd537b3fab2f33f4d62c904a57b7b1811f6b9e4f7353",
+    "publisherMd5": "d472be332d4daa821edc399621853b57",
+    "status": "verified",
+    "lastAttempt": "2026-11-05",
+    "lastResult": "Verified HTTPS archive matches publisher MD5; locally pinned SHA256 and length",
+    "publisherFileMd5": {
+      "links.csv": "8f033867bcb4e6be8792b21468b4fa6e",
+      "movies.csv": "0df90835c19151f9d819d0822e190797",
+      "ratings.csv": "cf12b74f9ad4b94a011f079e26d4270a",
+      "tags.csv": "963bf4fa4de6b8901868fddd3eb54567"
+    },
+    "archiveSha256": "e4a68655d7386b8f95f2f2424b2ff975dfdd15ffd59e0d864a14dca43e99d6ee",
+    "archiveBytes": 238950008,
+    "files": {
+      "ml-32m/README.txt": {
+        "sha256": "aadef501245798f04f085b1edc024bad41343e0f065b5e4682eff38d54e1cb32",
+        "bytes": 9227
+      },
+      "ml-32m/checksums.txt": {
+        "sha256": "99ba602a83a00640aa40a5862212de7c16558499b9efced3cc63a470b88e6758",
+        "bytes": 178
+      },
+      "ml-32m/links.csv": {
+        "sha256": "ef17da7710be76f7d510d5768d1b61826e3af4bf57812b9ca377e4c912123b22",
+        "bytes": 1950748
+      },
+      "ml-32m/movies.csv": {
+        "sha256": "b37ca1abc7798de741138ed252b62f69f7e37c84b8a8fab1b82d409b4c6c5cc2",
+        "bytes": 4242926
+      },
+      "ml-32m/ratings.csv": {
+        "sha256": "91159850e41ee59c86231165a688709647e2726cab2e7ba9faf04001bd5261ee",
+        "bytes": 877076222
+      },
+      "ml-32m/tags.csv": {
+        "sha256": "c52e458a89b9deee410f50813e7a64491fbe92a6f07b5c4b58e64c0b3cc95b89",
+        "bytes": 72353890
+      }
+    }
   },
   "rights": {
     "purpose": "NONCOMMERCIAL_RESEARCH_ONLY",
-    "research": "pending-exact-source-review",
-    "reviewedBy": null,
-    "reviewedAt": null,
+    "research": "approved-for-noncommercial-research",
+    "reviewedBy": "Kajo research source review",
+    "reviewedAt": "2026-11-05",
     "rawRedistribution": "not-approved",
     "fittedArtifactRedistribution": "not-approved",
     "commercialUse": "not-approved",
     "productionServing": "not-approved",
-    "publication": ["authored-code", "schemas", "non-identifying-manifests", "aggregate-reports", "attribution"]
+    "publication": [
+      "authored-code",
+      "schemas",
+      "non-identifying-manifests",
+      "aggregate-reports",
+      "attribution"
+    ]
   },
   "attribution": "F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems 5, 4, Article 19. https://doi.org/10.1145/2827872",
-  "expectedCounts": { "ratings": 32000204, "subjects": 200948, "movies": 87585, "tags": 2000072 },
-  "cohort": { "size": 1000, "seed": "kajo-d1-ml32-v1", "selection": "lowest-sha256-of-release-seed-subject", "minimumSourceRatings": 20 },
+  "expectedCounts": {
+    "ratings": 32000204,
+    "subjects": 200948,
+    "movies": 87585,
+    "tags": 2000072
+  },
+  "cohort": {
+    "size": 1000,
+    "seed": "kajo-d1-ml32-v1",
+    "selection": "lowest-sha256-of-release-seed-subject",
+    "minimumSourceRatings": 20
+  },
   "semantics": {
     "target": "external-explicit-rating",
-    "rawScale": { "min": 0.5, "max": 5, "step": 0.5 },
+    "rawScale": {
+      "min": 0.5,
+      "max": 5,
+      "step": 0.5
+    },
     "timestamp": "rating-record-seconds-since-unix-epoch-utc",
     "availability": "assumed-at-occurrence-for-offline-simulation",
     "equalTimestampPolicy": "exclude-entire-equal-time-group-from-query-prefix",

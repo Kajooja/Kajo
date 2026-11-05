@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 is active; owned DEVELOPMENT continues from private records; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 is active; owned DEVELOPMENT continues from private records; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -30,6 +30,24 @@ retains 500 disjoint readers/33,243 ratings, a 0.122847 equal-reader held-out RM
 improvement and passing cold guards. Every built output is reproduced; independent
 SQL/Python checks match 42,018 forecast values. This retains a research baseline,
 not source/CI acceptance, native quality or a completed Sprint 016.
+
+## Centered response-spread comparison — #421
+
+Compare exactly one bounded ridge slope with the fixed location-only control,
+using the [predeclared protocol](../../../research/manifests/rating-response-spread-v1.json).
+BOOK excludes both previous cohorts; MovieLens 32M uses post-small-snapshot
+validation/test outcomes and declared longitudinal support. Freeze before scoring,
+save validation selection before holdout, and retain the control on failed or
+insufficient evidence. Source/CI acceptance and research usefulness stay separate.
+Broad pre-release individual-rating training follows `MVP-ALG-013` after the
+selected model, intended-use rights and protected evaluation plan are ready.
+
+The [#421 result](../../../research/reports/rating-response-spread-v1.md) retains
+the location-only control in BOOK and MOVIE. BOOK worsens; MOVIE improves below
+the frozen practical margin. Both runs reproduce, independent source arithmetic
+and paired-bootstrap checks agree, and all cold guards pass. Source/CI acceptance
+remains separate. After it, #422 prepares scalable individual-rating training
+and protected learning curves without reusing these exposed outcomes as FINAL.
 
 ## Outcome
 

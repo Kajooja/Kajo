@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 
 /** Paired, equal-subject losses. Prolific readers cannot dominate this target. */
 export function compareRatingSubjects(journal, { control, challenger, bootstrapReplicates, seed }) {
-  assert.ok(journal.length > 0 && journal.length <= 100000, 'Comparison row budget');
+  assert.ok(journal.length > 0 && journal.length <= 500000, 'Comparison row budget');
   assert.ok(Number.isInteger(bootstrapReplicates) && bootstrapReplicates >= 100 && bootstrapReplicates <= 10000);
   assert.ok(typeof seed === 'string' && seed.length > 0 && seed.length <= 256);
   assert.ok(typeof control === 'string' && typeof challenger === 'string' && control !== challenger);

@@ -185,6 +185,9 @@ def archive_identity(path, plan):
             raise ValueError("Archive does not match the pinned publisher-version bytes")
     elif md5.hexdigest() != verification["publisherMd5"]:
         raise ValueError("Archive does not match the reviewed publisher checksum")
+    if verification.get("archiveSha256") and (sha.hexdigest() != verification["archiveSha256"]
+                                              or path.stat().st_size != verification["archiveBytes"]):
+        raise ValueError("Archive differs from pinned bytes")
     return {"sha256": sha.hexdigest(), "md5": md5.hexdigest(), "bytes": path.stat().st_size}
 
 
@@ -215,6 +218,8 @@ def inspect_archive(archive, plan):
     """Read allowlisted members directly; never extract supplied paths to disk."""
     total, found, hashes = 0, set(), {}
     members = {source_member(plan, name) for name in (*HEADERS, "README.txt")}
+    if plan["releaseId"] == "ml-32m":
+        members.add("ml-32m/checksums.txt")
     readme_name = source_member(plan, "README.txt")
     for info in archive.infolist():
         if info.is_dir() and plan["releaseId"] == "ml-32m" and info.filename == "ml-32m/":
@@ -229,20 +234,39 @@ def inspect_archive(archive, plan):
             raise ValueError("Expanded archive budget exceeded")
         if info.filename == readme_name and info.file_size > 64 * 1024:
             raise ValueError("Archive README exceeds budget")
+        if info.filename.endswith('/checksums.txt') and info.file_size > 4096:
+            raise ValueError("Archive checksum document exceeds budget")
     if found != members:
         raise ValueError("Required archive members are missing")
     for name in sorted(found):
-        sha, size = hashlib.sha256(), 0
+        sha, md5, size = hashlib.sha256(), hashlib.md5(usedforsecurity=False), 0
         with archive.open(name) as stream:
             for chunk in iter(lambda: stream.read(1024 * 1024), b""):
                 size += len(chunk)
                 if size > archive.getinfo(name).file_size:
                     raise ValueError("Expanded member differs from declared size")
                 sha.update(chunk)
+                md5.update(chunk)
         hashes[name] = {"sha256": sha.hexdigest(), "bytes": size}
+        expected_md5 = plan["sourceVerification"].get("publisherFileMd5", {}).get(name.rsplit("/", 1)[-1])
+        if expected_md5 and md5.hexdigest() != expected_md5:
+            raise ValueError("Member differs from publisher checksum")
     if plan["releaseId"] == SMALL_RELEASE and hashes != plan["sourceVerification"]["files"]:
         raise ValueError("Source member bytes differ from the pinned publisher version")
     return hashes
+
+
+def temporal_support(history, rule):
+    """Label-blind conditional population; retain complete histories, never truncate."""
+    if rule is None:
+        return True
+    before, final = rule["trainBefore"], rule["testFrom"]
+    if not 0 <= before < final:
+        raise ValueError("Invalid temporal cutoffs")
+    return (len(history) <= rule["maximumHistoryRatings"]
+            and sum(row["timestamp"] < before for row in history) >= rule["minimumTrainRatings"]
+            and sum(before <= row["timestamp"] < final for row in history) >= rule["minimumValidationRatings"]
+            and sum(row["timestamp"] >= final for row in history) >= rule["minimumTestRatings"])
 
 
 def rows(archive, name, counts, limit, plan):
@@ -409,6 +433,8 @@ def normalize_archive(path, output_root, plan):
                 valid_count += len(history)
                 if len(history) < plan["cohort"]["minimumSourceRatings"]:
                     return
+                if not temporal_support(history, plan["cohort"].get("temporalSupport")):
+                    return
                 eligible_subjects += 1
                 rank = int(hashlib.sha256(f"movielens:{plan['releaseId']}:{plan['cohort']['seed']}:{user_id}".encode()).hexdigest(), 16)
                 candidate = (-rank, -int(user_id), history)
@@ -514,8 +540,13 @@ def main():
     parser.add_argument("--source", choices=("small", "32m"), default="small")
     parser.add_argument("--data-dir")
     parser.add_argument("--output-dir")
+    parser.add_argument("--experiment", choices=("default", "response"), default="default")
     args = parser.parse_args()
     plan = load_plan(args.source)
+    if args.experiment == "response":
+        if args.source != "32m" or args.stage != "normalize":
+            raise ValueError("Response selection requires 32m normalization")
+        plan["cohort"] = json.loads((REPO / "research/manifests/rating-response-spread-v1.json").read_text())["movie"]["cohort"]
     folder = "movielens-small" if args.source == "small" else "movielens-32m"
     data_dir = location("research-data", args.data_dir or REPO / "research-data" / folder)
     if args.stage == "prepare":
