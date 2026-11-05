@@ -85,7 +85,7 @@ next card after every answer is promised.
 The **October 25 guided-Discovery refinement** is part of the open
 `MVP-TASTE-002/003/004`, `MVP-ALG-010/011` and `MVP-UX-007` requirements:
 [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md) requires
-common retrieval/scoring/learning, BOOK → MOVIE phases, verified covers and a
+common retrieval/scoring/learning, MOVIE → BOOK phases, verified covers and a
 validated readiness meter with automatic phase advancement/completion. Conditional
 cohort recall and cross-domain transfer need actual admitted support. Current V4
 INSUFFICIENT output, the shared card and CI do not close these requirements. This

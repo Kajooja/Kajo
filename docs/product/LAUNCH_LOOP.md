@@ -180,8 +180,10 @@ open gates. Retained sessions are not rewritten by this clarification.
 
 The owner requires one continuous recommendation/learning experience, specified
 in [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md).
-New guided Taste starts with **BOOK**, stays in that domain until supported
-readiness, then transitions to **MOVIE**. Both use the same PersonalProfile and
+New guided Taste starts with **MOVIE**, stays in that domain until supported
+readiness, then transitions to **BOOK** (owner order correction 2026-11-05).
+The #428 native correction uses a bounded insufficient transition until calibrated
+readiness is admitted; ADR-0011 records its exact limits. Both use the same PersonalProfile and
 shared Discovery prediction/retrieval service; there is no separate test model.
 After a rating, the next fresh recommendation uses that committed evidence and
 the shared personal expected-rating objective. The model learns the person's

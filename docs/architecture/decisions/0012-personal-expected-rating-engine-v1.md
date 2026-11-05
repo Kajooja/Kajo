@@ -160,7 +160,7 @@ sequential method or predeclared checkpoints, with assumptions and scope stated.
 Readiness is per task/domain and can weaken after contradiction, correction,
 withdrawal or drift. It is not a universal percentage of how well Kajo knows a
 person. Taste may stop with insufficient evidence and continue learning in
-Discovery without resetting the Profile. BOOK → MOVIE remains the guided order.
+Discovery without resetting the Profile. MOVIE → BOOK remains the guided order.
 
 ## Consequences and acceptance
 

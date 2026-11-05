@@ -25,7 +25,7 @@ ADRs preserve **why** durable decisions were made. Create one for material archi
   Supersedes rating-ten maximization; implementation/quality acceptance stays open.
 
 - [0011](0011-taste-as-guided-discovery.md) — Taste as guided use of the shared
-  Discovery prediction loop; BOOK → MOVIE progression, measured readiness,
+  Discovery prediction loop; MOVIE → BOOK progression, measured readiness,
   supported conditional recall and verified covers. Product direction is accepted;
   runtime, calibration and data/model admission remain open.
 

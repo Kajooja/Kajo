@@ -156,7 +156,7 @@ frozen predictions are never rewritten to make a challenger appear better.
 [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md) makes the
 shared native serving path, conditional recall and measured readiness concrete
 #336 acceptance consumers of EB-01/02/03/04/06/07/08. Reuse existing native and
-research foundations. BOOK → MOVIE is Kajo guidance, not a domain-specific engine
+research foundations. MOVIE → BOOK is Kajo guidance, not a domain-specific engine
 model. The meter needs genuine outcome/calibration evidence; shared cards or an
 always-insufficient native response do not deliver this capability. ROADMAP owns
 the updated near-term dependency order, while later engine capabilities retain

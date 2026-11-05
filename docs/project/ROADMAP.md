@@ -20,6 +20,14 @@ that legacy Profile fixtures implement session participation or require broad
 social UI before the current engine packet. Dated fixed-group plans below retain
 their history; this refinement and the updated Phase 16 scope govern the target.
 
+## Taste correctness — owner correction 2026-11-05
+
+Fix #428's valid-answer receipt overflow and fresh MOVIE → BOOK order before
+resuming #427's native-only evaluation preflight. Preserve all accepted evidence
+and pending commands; no reset. The bounded phase transition does not close
+Sprint 019's shared-policy/calibrated-readiness requirements. This necessary
+observation repair fits the engine-first order below.
+
 ## Engine V1 first — owner decision 2026-10-25
 
 **Priority clarification — 2026-10-28:** investigate a performance deviation now
@@ -85,7 +93,7 @@ evidence passes. Do not rename old sprint history or repeat accepted source work
 | [016 — personal expected rating](sprints/SPRINT-016.md) | An interpretable outcome predictor that learns preference and individual rating response with sparse-data shrinkage | 015; frozen later-label evaluation against user-mean, supported catalogue and existing ranking controls; improve the declared expected-rating prediction task with honest coverage |
 | [017 — adaptive state and transfer](sprints/SPRINT-017.md) | Working/Short/Long/Belief, dated WorldState and permitted context; useful content, bounded cross-domain and Shared state | 015–016; OFF/STATIC/ORDERED, no-transfer and world-off controls, incremental/rebuild parity, stale/missing/context-scope tests; activate only supported effects |
 | [018 — conditional memory](sprints/SPRINT-018.md) | Numeric-prefix local Scenario/Trajectory recall and assessed, separately admitted cohort/external-prior channels | 015–017; no-useful-match, no-recall controls, prefix-only time/rights/privacy checks; lack of native cohort support yields explicit nonadmission rather than fake neighbors |
-| [019 — readiness and common policy](sprints/SPRINT-019.md) | Calibrated supported uncertainty, shared expected-rating policy and BOOK → MOVIE guided readiness | 016–018; predeclared sequential evaluation/stopping, domain coverage and dependence handling, honest insufficient continuation, old-policy preservation |
+| [019 — readiness and common policy](sprints/SPRINT-019.md) | Calibrated supported uncertainty, shared expected-rating policy and MOVIE → BOOK guided readiness | 016–018; predeclared sequential evaluation/stopping, domain coverage and dependence handling, honest insufficient continuation, old-policy preservation |
 | [020 — operating learning lifecycle](sprints/SPRINT-020.md) | Real replay, evaluated consolidation, bounded challengers and deployable version/rollback lifecycle | 015–019; independent final evaluation, artifact/source deletion, failed-worker recovery, reproducibility and native fallback; synthetic outcomes never validate themselves |
 | [021 — integrated Engine V1 acceptance](sprints/SPRINT-021.md) | Useful BOOK/MOVIE predictions throughout actual owned-Profile Taste/Discovery/Shared operation, with operating evidence and portable boundaries | All required prior slices; fresh end-to-end hosted/device outcomes, temporal and category checks, quality/latency/coverage budgets and explicit owner acceptance of the evidence |
 
@@ -219,7 +227,7 @@ portable reference as an already integrated production core.
    eligible evidence and admission. Aggregate popularity cannot become a synthetic
    cohort; a local A=4/A=9 score change is not proof of other-user predictive quality.
 3. **Shared serving and staged policy:** implement a versioned successor using
-   Discovery's acquisition/scoring for the same inputs. Guide BOOK → MOVIE with
+   Discovery's acquisition/scoring for the same inputs. Guide MOVIE → BOOK with
    one Profile, cross-domain evidence, explicit insufficiency and retained command/
    panel/old-policy preservation. Prove low/high first-answer and same-input parity.
 4. **Measured stopping and UI:** admit the server readiness report and compact

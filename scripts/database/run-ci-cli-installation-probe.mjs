@@ -64,6 +64,7 @@ import { initializePersonalRatingSqlSession, probePersonalRatingSqlSession } fro
 import { verifyNativeSkipPrefilter } from './native-skip-prefilter.mjs';
 import { verifyPersonalSequentialTaste } from './personal-sequential-taste.mjs';
 import { verifyPersonalTastePools, verifyPersonalTastePoolUpgrade } from './personal-taste-pool-native.mjs';
+import { verifyPersonalTasteRecovery } from './personal-taste-recovery.mjs';
 import { verifyContextualSkipConcurrency } from './contextual-skip-concurrency.mjs';
 import { contextualSkipHostedManifest, contextualSkipHostedUpgradeSql } from './contextual-skip-hosted-upgrade.mjs';
 import { loadTasteHostedForwards, tasteHostedUpgradeSql } from './personal-taste-hosted-upgrade.mjs';
@@ -375,6 +376,11 @@ try {
     await resetFromMigrations(files.slice(0, tastePoolIndex));
     const personalTastePoolUpgrade = await verifyPersonalTastePoolUpgrade(execConcurrentSql, files[tastePoolIndex]);
     assert.equal(personalTastePoolUpgrade.status, 'PASS');
+    const tasteRecoveryIndex = files.findIndex(file => file.name.endsWith('_taste_reply_capacity_and_movie_first.sql'));
+    assert.ok(tasteRecoveryIndex > tastePoolIndex);
+    await resetFromMigrations(files.slice(0, tasteRecoveryIndex));
+    const personalTasteRecovery = await verifyPersonalTasteRecovery(execConcurrentSql, files[tasteRecoveryIndex]);
+    assert.equal(personalTasteRecovery.status, 'PASS');
     const firstRuntime = await resetFromMigrations(files);
     const first = await snapshotApplication(exec, candidate, { forward: true });
     assertEmptyApplication(first);
@@ -548,7 +554,7 @@ try {
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
       sharedForecastOutcomes,
-      personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
+      personalSequentialTaste, personalTastePools, personalTastePoolUpgrade, personalTasteRecovery, contextualSkipConcurrency, contextualSkipHostedUpgrade, sequentialTasteHostedUpgrade, sequentialTasteHostedCompactUpgrade,
       personalWorkingReset, personalWorkingResetUpgrade, personalWorkingResetConcurrency,
       personalWorkingPrecisionUpgrade,
       personalWorkingCandidateFeatures, personalWorkingCandidateFeaturesUpgrade,

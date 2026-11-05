@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-05**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, catalogue/admission audit #425 after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, Taste correctness #428 before native-only preflight #427; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,55 +11,42 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — catalogue/admission audit #425
+## Current handoff — Taste answer recovery and domain order #428
 
-**Source dependency:** [PR #424](https://github.com/Kajooja/Kajo/pull/424), final
-source `fa6d497afbfa01de5135e5fa01010cb7fa56c867`, tree
-`e4d960830dbb702036753269e678fbd989d40ccd`, final-source
-[CI #846](https://github.com/Kajooja/Kajo/actions/runs/42064102718). Require all six
-gates and matching source/tested/accepted trees before merging this successor.
-PR #424 owns the final acceptance receipt. The earlier #845 run covered an older
-code-only head; it cannot substitute for final-source verification.
+**Accepted source base:** `c1d48e42a7ba82d8855d6e6adf79eda9c29c4bde`,
+[PR #426](https://github.com/Kajooja/Kajo/pull/426). The catalogue/admission audit
+#425 is integrated; retain its aggregate [result](../../research/reports/catalogue-admission-v1.md)
+and the earlier broad individual-rating [research](../../research/reports/rating-learning-curves-v1.md).
+Neither admits a native model or closes Sprint 016 quality/serving gates.
 
-The [#422 result](../../research/reports/rating-learning-curves-v1.md) retains
-5,007,233 BOOK and 28,445,684 MOVIE individual training observations. Fixed
-400-person confirmations improve macro RMSE 1.898911 → 1.825152 and
-1.656061 → 1.625156. Independent reconstruction checks all eight models and
-663,496 forecast values. All evaluated cohorts are exposed. Keep both rejected
-response-spread challengers and original D2 rejection inactive. Do not repeat
-training or relabel these outcomes as an untouched FINAL.
+**One active packet:** [#428](https://github.com/Kajooja/Kajo/issues/428), branch
+`fix/taste-answer-recovery-and-domain-order`. The owner reports a later Taste
+rating rollback and mixed domains. Complete ordinal reply pairs exceed the old
+32 KiB database constraint before the allowed 48 opportunities; the mobile client
+then shows misleading access/reload copy. The additive migration raises the
+finite complete-reply cap to 512 KiB and versions fresh V4 progression as
+MOVIE → BOOK. [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md#bounded-native-correction--2026-11-05--428)
+owns exact safety bounds and preservation. No accepted answer, pending question,
+frozen pool or cached reply is rewritten. No reset or new model is involved.
 
-**One active packet:** [#425](https://github.com/Kajooja/Kajo/issues/425), branch
-`research/catalogue-admission-425`. Its [audit](../../research/reports/catalogue-admission-v1.md)
-finds 309 exact links among 425 active MOVIE Items; 270 have item support in
-the retained pre-2021 model. Two known alias disagreements are quarantined and
-114 Items have no source alias match. Thirty-six full-release alias collisions
-quarantine 72 external objects before intersection. Independent SQLite joins
-reproduce all 87,585 source-object dispositions. BOOK has no reviewed identity
-bridge for its 416 active Items; actual work/title overlap remains UNKNOWN.
+Source validation is in progress. The regression reproduces the old failure,
+checks rollback, upgrades populated state, retries the same answer, and finishes
+long sessions with exact retries, all 0–10 grades, pause/resume and domain order.
+The native CLI gate runs the same committed-transaction proof. Required final
+source CI, accepted-tree identity, hosted forward and real-phone observation are
+separate gates; the implementation PR/issue owns the final source receipt.
+Hosted rollout is pending. The existing mobile wire remains compatible.
 
-The existing six-concept inspector and native label bounds give structural
-upper bounds of 235 BOOK / 280 MOVIE Items. Fourteen BOOK sources exceed native
-label bounds; none is truncated. This is neither feature-use permission nor
-prospective capture/quality acceptance. The audit has no native writes, imports,
-new fits, migration, account reset or serving activation. Its source CI belongs
-to this packet's PR; all required gates precede merge.
-
-**After #425 source acceptance:** prepare the bounded native-only content-evaluation
-preflight using the accepted private observation route and retained operational
-source pins. Reconcile the current declaration, source-use review, supported
-training/candidate features and complete opportunity coverage before any fresh
-first-answer comparison. If permission or eligible support is missing, retain
-the mean and name that dependency; no new model family or external fit is implied.
-BOOK mapping and eventual external-prior rights/interface work remain conditional,
-separate proposals. Research permission is not production/derived-artifact approval;
-`MVP-ALG-013`, Sprint 016 and Engine V1 quality/serving acceptance stay open.
-
-Preserve every pending/unread target, consumed allocation, existing account and
-native source. Do not backfill a forecast from an old answer, replace a target,
-replay installed migrations or manufacture confidence. Continue any owned
-observation from its authorized private records. No owner input is needed for
-this read-only compatibility audit. Optional #391 remains NOT_ADMITTED.
+**After #428:** [#427](https://github.com/Kajooja/Kajo/issues/427) retains the bounded
+native-only content-evaluation preflight. Reconcile current private continuation,
+source-use permission, current Profile/declaration identity and unexposed windows
+before any fresh comparison. A retired/withdrawn declaration cannot be refilled
+or silently reused after an owner reset; ordinary mobile Taste answers are not
+private numeric FINAL evidence. Preserve installed receipts and current answers.
+If permission or eligible support is missing, retain the supported mean fallback
+and name the dependency. Do not repeat broad training, manufacture confidence,
+activate the rejected challengers or infer external-prior production permission.
+`MVP-ALG-013`, Sprint 016 and Engine V1 quality/serving acceptance remain open.
 
 ## Retained owned numeric DEVELOPMENT route — private continuation
 
