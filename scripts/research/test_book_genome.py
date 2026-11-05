@@ -28,6 +28,30 @@ def fixture(root, raw=None):
 
 
 class BookIntake(unittest.TestCase):
+    def test_two_exact_exclusions_preserve_both_witnesses_and_fail_on_missing_or_changed_bytes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source, plan = fixture(root)
+            plan['cohort']['size'] = 2
+            paths, expected = [], []
+            for users in ([0, 1], [2, 3]):
+                p = root / f'excluded-{users[0]}.jsonl'
+                p.write_bytes(b''.join(bg.canonical({'record': {'user_id': u, 'item_id': i, 'rating': 1}, 'sourceRecordLine': 1}) + b'\n'
+                                      for u in users for i in range(4)))
+                paths.append(p)
+                expected.append({'sha256': bg.file_hash(p), 'subjects': 2, 'ratings': 8})
+            plan['cohort']['excludedCohorts'] = expected
+            with self.assertRaisesRegex(ValueError, 'Exactly'):
+                bg.normalize(source, root / 'new', plan, exclusion_paths=paths[:1])
+            target, receipt, reused = bg.normalize(source, root / 'new', plan, exclusion_paths=paths)
+            self.assertFalse(reused)
+            self.assertEqual({json.loads(x)['record']['user_id'] for x in (target / 'ratings.jsonl').read_text().splitlines()}, {4, 5})
+            self.assertEqual([r['overlapSubjects'] for r in receipt['exclusions']], [0, 0])
+            self.assertTrue(bg.normalize(source, root / 'new', plan, exclusion_paths=paths)[2])
+            (target / 'excluded-1.jsonl').write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError, 'integrity'):
+                bg.normalize(source, root / 'new', plan, exclusion_paths=paths)
+
     def test_disjoint_cohort_requires_verified_exclusion_even_on_cached_reuse(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

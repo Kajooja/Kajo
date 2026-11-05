@@ -1,0 +1,100 @@
+{
+  "version": "rating-response-spread-v1",
+  "declarationIssue": "https://github.com/Kajooja/Kajo/issues/421",
+  "scope": "EXTERNAL_DEVELOPMENT_ONLY",
+  "question": "Does one centered regularized response slope improve equal-subject mean prediction beyond the same shrunk location?",
+  "seed": "kajo-response-spread-20261105-v1",
+  "cohortSubjects": 500,
+  "heldOutSubjects": 100,
+  "book": {
+    "cohort": {
+      "seed": "kajo-book-response-20261105-v1",
+      "size": 500,
+      "candidatePool": 2000,
+      "minUniqueRatings": 20,
+      "selection": "Exclude both exact previous cohorts, then existing complete-history hash selection; no seed search",
+      "excludedCohorts": [
+        {
+          "sha256": "9bd43253223a84c3091d849bea9d0391547dd2aa72156903fc40ffb3ebc20b90",
+          "subjects": 500,
+          "ratings": 31144
+        },
+        {
+          "sha256": "44cbc15a09c677f5de501ed5b5ac0b59ed732bd4d594fd62181b0c94dca1f112",
+          "subjects": 500,
+          "ratings": 33243
+        }
+      ]
+    },
+    "split": "Existing 70/15/15 static item masks and 80/20 cold masks with this new seed; no time inference",
+    "scale": [
+      2,
+      10
+    ]
+  },
+  "movie": {
+    "cohort": {
+      "size": 500,
+      "seed": "kajo-movie-response-20261105-v1",
+      "selection": "Lowest release/seed/subject SHA256 among label-blind temporal-support eligible complete histories",
+      "minimumSourceRatings": 20,
+      "temporalSupport": {
+        "trainBefore": 1609459200,
+        "testFrom": 1640995200,
+        "minimumTrainRatings": 20,
+        "minimumValidationRatings": 5,
+        "minimumTestRatings": 5,
+        "maximumHistoryRatings": 1500
+      }
+    },
+    "split": "Global UTC cutoffs: train before 2021-01-01, validation 2021, test from 2022-01-01. All target outcomes postdate small 2018 snapshot; cross-release people overlap UNKNOWN. Hold out 100 subjects from all shared fit/validation. Regular evidence stays train-only for both validation/test. Cold evidence uses most-recent complete timestamp groups before test; stop at first group that exceeds budget. Fixed test targets for every cold budget.",
+    "scale": [
+      1,
+      10
+    ]
+  },
+  "control": "profile-offset",
+  "challenger": "response-spread",
+  "itemShrinkage": 10,
+  "profileShrinkage": 10,
+  "response": {
+    "spreadShrinkage": 25,
+    "minimumRatings": 10,
+    "minimumBaseVariance": 0.01,
+    "minimumCorrection": -0.75,
+    "maximumCorrection": 1
+  },
+  "objective": "Squared loss sum((y-base-location-correction*(base-center))^2) + 10*location^2 + 25*correction^2; center is mean visible base. Shared base includes own train contribution identically in both variants. Bound correction to [-0.75,1]; clip both forecasts to original mapped source range.",
+  "fallback": "Exact control when sparse, constant source grades, or insufficient base variance; no evidence returns shared base. Keep supported location. No forced anchors or identified psychological scale claim.",
+  "coldEvidenceBudgets": [
+    0,
+    5,
+    10,
+    20
+  ],
+  "bootstrapReplicates": 2000,
+  "bootstrapUnit": "Paired subjects, equal subject weight, percentile 95% interval per domain; no pooled cross-domain claim",
+  "decision": {
+    "primary": "sqrt(mean(per-subject MSE))",
+    "minMacroRmseGain10": 0.02,
+    "maxMacroMaeIncrease10": 0.02,
+    "requireUpperPairedDeltaBelowZero": true,
+    "requiredPredictionCoverage": 1,
+    "maxColdMacroRmseIncrease10": 0.05,
+    "maxColdMacroMaeIncrease10": 0.05,
+    "minimumSupportedRegularSubjects": 25,
+    "minimumSupportedCold20Subjects": 25,
+    "rule": "Per domain: save validation decision before scoring holdout. Retain challenger for further research only if validation AND holdout meet gain/interval/MAE/coverage and all cold guards; require regular and cold20 spread support. Otherwise retain location-only control or record INSUFFICIENT_SUPPORT. No parameter search or replacement cohort after scores.",
+    "rationale": "Fixed small incremental gain margin of 0.02 on mapped ten-point units; not inferred from fresh labels and not a native product threshold."
+  },
+  "budgets": {
+    "maxCohortRows": 500000,
+    "maxPartitionRows": 500000,
+    "maxHistoryRows": 10000,
+    "maxFreezeBytes": 134217728,
+    "maxRunSeconds": 600,
+    "maxRssMiB": 1024
+  },
+  "admission": "NONE; no native rows, serving artifact, or commercial permission",
+  "broadPretraining": "After model selection and source/use admission, a separate pre-release packet scales eligible individual observations with protected tests, learning curves, coverage, resource bounds, reproducible artifact and rollback. This bounded experiment is not full-source pretraining."
+}

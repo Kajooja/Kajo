@@ -35,7 +35,7 @@ async function configuration(experiment) {
     sourceSha256: hash(sourceBytes), protocolSha256: hash(protocolBytes), code, node: process.version } };
 }
 
-function records(bytes, receipt, source) {
+export function records(bytes, receipt, source) {
   assert.equal(hash(bytes), receipt.cohortSha256, 'Cohort integrity');
   assert.equal(bytes.length, receipt.cohortBytes, 'Cohort size');
   assert.equal(bytes.at(-1), 10, 'Incomplete cohort');
@@ -97,7 +97,7 @@ export function partitionBooks(rows, protocol) {
   assert.equal(seen.size, rows.length);
   return parts;
 }
-function partitionSummary(parts) {
+export function partitionSummary(parts) {
   return Object.fromEntries(Object.entries(parts).map(([name, rows]) => [name, {
     rows: rows.length, subjects: new Set(rows.map(r => r.user)).size,
     membershipSha256: hash(JSON.stringify(rows.map(r => [r.user, r.item]))),

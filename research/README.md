@@ -401,3 +401,43 @@ proves temporal book learning or supplies a native FINAL window.
 passes all declared research guards; two built runs and the independent audit
 agree. [Aggregate JSON](reports/book-genome-development-v2.json) preserves losses,
 intervals, counts, coverage and provenance without raw histories or fitted data.
+
+## Centered response spread — #421
+
+The [frozen protocol](manifests/rating-response-spread-v1.json) compares one
+centered, penalized slope with the same train-only item/global base and shrunk
+location. It declares all parameters, source bounds, support, budgets, equal-user
+loss/paired bootstrap and per-domain selection/holdout/cold decision rules.
+Publish code/protocol **before** selecting either new cohort. A losing or
+unsupported candidate retains the control; no serving artifact is admitted.
+
+The third BOOK cohort excludes both exact private witnesses. MovieLens 32M uses
+complete, label-blind longitudinal-support histories and 2021 validation / 2022+
+test outcomes after the small release. Cross-release person overlap is unknown.
+Original source grades and timestamps remain intact; BOOK dates stay unknown.
+
+```bash
+# Source-only preparation/download is separate from cohort selection.
+python3 scripts/research/movielens.py prepare --source 32m
+python3 scripts/research/movielens.py download --source 32m
+# Only after the predeclaration is published:
+python3 scripts/research/movielens.py normalize --source 32m --experiment response --output-dir research-artifacts/response-movie-intake
+python3 scripts/research/book_genome.py normalize --experiment response --member research-data/book-genome-417-verified/ratings.deflate --exclude-cohorts PRIOR_FIRST_RATINGS_JSONL PRIOR_SECOND_RATINGS_JSONL --output-dir research-artifacts/response-book-intake
+npm run build --workspace @kajo/prediction-engine
+node --max-old-space-size=768 scripts/research/evaluate-response.mjs freeze book BOOK_STAGE research-artifacts/response-book-frozen
+node --max-old-space-size=768 scripts/research/evaluate-response.mjs run book research-artifacts/response-book-frozen research-artifacts/response-book-run
+node --max-old-space-size=768 scripts/research/evaluate-response.mjs freeze movie MOVIE_STAGE research-artifacts/response-movie-frozen
+node --max-old-space-size=768 scripts/research/evaluate-response.mjs run movie research-artifacts/response-movie-frozen research-artifacts/response-movie-run
+```
+
+Replace uppercase paths with the observed intake stages / original private
+witnesses, never reconstructed substitute identities. Freeze binds source,
+normalizer, built arithmetic, runner, protocol, runtime, cohort and partitions.
+Repeat `run` into a new output directory; deterministic files must match, with
+variable resource measurements kept separately. Raw rows, witnesses, predictions
+and fitted models remain private/ignored; publish aggregate reports only.
+
+This bounded experiment precedes the owner's broad individual-rating pretraining
+request (`MVP-ALG-013`). Scaling requires a separately frozen eligible-data plan,
+protected evaluation, learning curves, coverage/cost and a reproducible admitted
+artifact with rollback. Noncommercial research permission is not serving approval.

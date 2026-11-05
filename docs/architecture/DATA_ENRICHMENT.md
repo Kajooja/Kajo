@@ -116,11 +116,16 @@ No external subject or rating is inserted into native Kajo storage.
 
 The release contains 32,000,204 ratings from 200,948 users, 87,585 movies and 2,000,072 tag applications. Rating records span 1995-01-09 to 2023-10-12. Selected users have at least twenty ratings. Files are `ratings.csv`, `movies.csv`, `links.csv` and `tags.csv`; ratings use half-star steps from 0.5 to 5. File order is user then movie, not chronological. Timestamps identify rating/tag activity, not viewing time. `links.csv` provides IMDb/TMDb mappings. No demographics are supplied. Research use has conditions; commercial/revenue-bearing use requires permission. [ML32]
 
-The original 32M file service currently fails upstream TLS verification in this
-environment; its source approval remains unresolved. The explicit `--source 32m`
-path is retained but is no longer D1's sole route. GroupLens's [Kaggle 20M][ML20K]
-metadata/listing is also available; its differently packaged files and unresolved
-license label require their own source/terms check before any later substitution.
+On November 5, the publisher HTTPS README and archive checksum became available
+with normal TLS verification. The exact 238,950,008-byte archive now matches its
+publisher MD5 and is pinned by SHA-256, with every allowlisted ZIP member checked.
+[`movielens-32m.json`](../../research/manifests/movielens-32m.json) records the
+updated research-only review. The old September failure is historical; do not
+repeat it as the current blocker. Raw download, cohort normalization, fitting and
+serving admission remain distinct steps. The #421 response experiment declares a
+500-subject population with label-blind support across global 2021/2022 cutoffs;
+complete histories are retained. All validation/test outcomes postdate the small
+2018 snapshot, while cross-release **person overlap remains unknown**.
 
 ### Tag Genome 2021 — optional object-feature enrichment
 
@@ -276,7 +281,7 @@ Use streaming/chunked parsing, bounded memory, atomic stage checkpoints and resu
 D1 now uses `scripts/research/movielens.py` (Python 3.12 standard library), the
 `normalize-movielens.mjs` runner and the separately exported engine MovieLens
 adapter. The active source manifest is `research/manifests/movielens-small-v2.json`;
-`movielens-32m.json` preserves the separate pending larger source.
+`movielens-32m.json` pins the separately verified larger source.
 Raw/archive-normalized/engine-observation stages are distinct, hashed and
 atomically completed. [The research runner](../../research/README.md) owns the
 exact commands, fixed limits, seeded full-history cohort and conflict policy.
@@ -290,7 +295,7 @@ actual first/replay hashes and metrics. Raw partitions and all fitted parameters
 remain ignored. Further source policy changes require withdrawing dependent
 artifacts and a separately authorized rebuild; this runner has no serving path.
 The selected small source has reviewed terms and actual pinned archive/member
-hashes. The original 32M source remains unverified. Both releases keep distinct
+hashes. The 32M source was separately verified on November 5. Both releases keep distinct
 identities and limits; fixture and real-data evidence remain separate.
 
 ## 6. Normalized research contracts
@@ -413,6 +418,27 @@ Use rating MAE/RMSE for observed explicit ratings. Use probability losses/calibr
 Report support, users, objects, coverage, popularity/long-tail slices, cold-start prefix, error distribution, resource cost and uncertainty grouped by subject where appropriate. Include prior off/on, metadata off/on and future memory/dream ablations. Do not optimize clicks or estimated confidence without delayed outcome evidence.
 
 Acceptance means reproducibility, valid comparisons and an honest report. A challenger may lose; rejecting it is a valid result. Serving admission separately requires useful supported gains and guardrails. This external movie test cannot close Kajo's native exposure, Shared, cross-domain, device or first-session product-value gates.
+
+### Broad pre-release training — 2026-11-05
+
+The owner requests pretraining on as broad a suitable set of individual ratings
+as practical before publishing the ready algorithm (`MVP-ALG-013`). After bounded
+model comparisons, scale the selected admitted model with a separately frozen
+training plan: eligible sources and intended-use rights, source-local identities,
+original grades and mappings, duplicate/conflict policy, protected evaluation
+windows, resource limits and checkpoint/restart behavior. Keep the individual
+observation loss even when executing in minibatches. No raw data or trained
+weights enter this public repository.
+
+Measure training-size learning curves and BOOK/MOVIE, item, subject and sparse
+coverage with fixed comparison rules. More rows alone do not establish quality or
+independent people, and popular heavy raters must not hide poor per-user behavior.
+The final artifact records source/partition/code/configuration hashes, fitted
+parameters, costs, quality decision, serving compatibility and rollback. A source
+withdrawal must remove its learned influence by an eligible rebuild/replacement.
+Research-only data is usable in these experiments, but cannot silently train a
+published commercial model. Missing rights or evidence becomes a named task and
+keeps the pre-release gate open, without inventing ratings or native accounts.
 
 ## 9. Admission into Kajo, only after research
 
