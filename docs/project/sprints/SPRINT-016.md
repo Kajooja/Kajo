@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 is active; owned DEVELOPMENT continues from private records; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 is active; owned DEVELOPMENT continues from private records; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -48,6 +48,25 @@ the frozen practical margin. Both runs reproduce, independent source arithmetic
 and paired-bootstrap checks agree, and all cold guards pass. Source/CI acceptance
 remains separate. After it, #422 prepares scalable individual-rating training
 and protected learning curves without reusing these exposed outcomes as FINAL.
+
+## Scalable individual-rating preparation — #422
+
+After #423 source acceptance, reuse the retained location model with disk-backed
+whole-source deduplication, exact train/evaluation membership, resumable integer
+sufficient statistics and fixed-evidence learning curves. The
+[protocol](../../../research/manifests/rating-learning-curves-v1.json) declares
+nested background sizes, new protected people/targets, decisions, budgets and
+failure behavior before fresh selection/fitting. The
+[source-use register](../../../research/manifests/broad-training-source-use-v1.json)
+records research-only permissions and the separate production-use dependency.
+The [source-scale result](../../../research/reports/rating-learning-curves-v1.md)
+retains the larger research baseline in both domains: 5,007,233 BOOK and
+28,445,684 MOVIE observations, with fixed confirmation RMSE gains 0.073759 and
+0.030905 and passing cold guards. Independent raw-source reconstruction checks
+all eight models and 663,496 forecast values. Exact source/CI acceptance remains
+in STATUS/PR; this is not production pretraining or Sprint 016 native quality.
+All evaluated cohorts are now exposed. Catalogue coverage/admission audit follows
+source acceptance; preserve the original control rejections and native fallback.
 
 ## Outcome
 

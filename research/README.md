@@ -447,3 +447,68 @@ the location-only control in both domains. BOOK has 31,152 ratings and MOVIE
 298,690; both complete runs reproduce and independent recomputation verifies
 185,590 prediction values. Original MovieLens D2 rejection remains unchanged.
 These cohorts are exposed development data, not reusable untouched final tests.
+
+## Scalable individual-rating learning curves — #422
+
+`rating-learning-curves-v1.json` owns the single frozen experiment. The selected
+model remains the shrunken global/item mean plus an individual visible-rating
+residual. BOOK is an unordered mask experiment; MOVIE uses global time cutoffs.
+All original observations remain in pinned source bytes. SQLite resolves pairs
+over the whole source, retains first-row/occurrence/conflict provenance and exact
+subject membership, and accumulates integer sums/counts from individual eligible
+training rows. This is algebraically the retained squared-loss baseline; item
+averages do not replace the personal visible observations.
+
+### Estimator inventory and scaling boundary
+
+| Existing estimator | Actual contract and limit | Disposition |
+| --- | --- | --- |
+| `research-static.ts` global/item/profile offset | Undated, complete array and per-pair guard; 100,000 rows, 500 people, 10,000 Items | Reuse equations; verify against built package on fixtures; exact membership moves to disk in this isolated runner |
+| `research.ts` E1 means/state/neighbors/factors/retrieval/trajectory | Dated observations; complete arrays, 100,000 rows/500 people/10,000 Items; latent dimension 16, epochs 30 maximum | Existing D2 rejection preserved; not newly selected or widened |
+| `evaluate-response.mjs` base and centered slope | 500-person cohorts up to 500,000 rows, complete arrays/journals | Both domains retained location; slope stays inactive |
+| Native Personal/content baseline | Canonical native Profile evidence, authorized frozen feature scope | Separate owned observation route; external people/ratings are never native fixtures or accounts |
+
+Publish the source/protocol commit before real-data `partition` or `fit`. Use only
+the already verified publisher inputs and exact exposed-cohort witnesses. Every
+store is one source/release; identities from another release are not joined.
+
+```sh
+python3 scripts/research/scalable_ratings.py expand --domain book --input BOOK_RATINGS_DEFLATE --directory research-artifacts/broad-book
+python3 scripts/research/scalable_ratings.py ingest --domain book --input research-artifacts/broad-book/source-ratings.txt --directory research-artifacts/broad-book --exclude BOOK_FIRST_JSONL BOOK_SECOND_JSONL BOOK_THIRD_JSONL
+# Repeat with commands partition, fit, curve, then confirm, preserving every argument.
+# MOVIE expand reads the verified ml-32m.zip. Its sole witness is the #421 ratings.jsonl.
+```
+
+The directory must be private (0700), files 0600. `ingest` resumes at the last
+committed byte/record; `fit` resumes at a complete background-subject boundary.
+`--stop-after` deliberately pauses those stages for operator checkpoints; it
+does not complete a partial model. Changed source/code/protocol/runtime/exclusion
+bytes, altered partition membership or statistics reject resume. Do not reuse a
+`.partial` extraction as source. A failed attempt stays recorded; investigate
+before manually resuming and never loosen a scored protocol's limits.
+
+Four nested size points hold personal evidence and targets fixed. Development
+selects the smallest sufficiently close-to-best size under cold guards. Its exact
+selection file hash is committed to the store before `confirm` can read the
+independent confirmation people/targets. Confirmation compares only that size
+with the smallest control. It cannot be rerun or retuned in place. All observed
+cohorts become exposed afterward. The private journals support audit; public
+reports contain aggregates only. Source-to-native catalogue mapping remains
+NOT_QUERIED, not implied 100% coverage.
+
+`withdraw` tombstones the source and deletes every fitted model/statistic from
+that store. All later loads fail closed. Rebuild a replacement in a new store
+from a permitted source, then repeat its new protocol/admission gates. Raw-file
+deletion alone does not withdraw learned influence. The existing native fallback
+uses only permitted native evidence or remains unavailable; no external serving
+artifact is admitted here. See `broad-training-source-use-v1.json` for each source,
+derived artifact, attribution and the production permission-or-replacement task.
+
+Local tests run with `npm run build --workspace @kajo/prediction-engine` followed
+by `python3 -m unittest discover -s scripts/research -p 'test_scalable_ratings.py'`.
+The ordinary root check includes them. No real source is downloaded by tests.
+
+The [measured #422 result](reports/rating-learning-curves-v1.md) retains larger
+research baselines in both domains, with independently reconstructed source rows,
+all eight fitted statistics and protected confirmation. It does not admit native
+serving; catalogue/source-use compatibility is the next bounded audit.

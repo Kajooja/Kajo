@@ -449,6 +449,18 @@ keeps the pre-release gate open, without inventing ratings or native accounts.
 
 ## 9. Admission into Kajo, only after research
 
+The #422 [learning-curve protocol](../../research/manifests/rating-learning-curves-v1.json)
+and [source-use register](../../research/manifests/broad-training-source-use-v1.json)
+make the first scale experiment concrete. Whole-source pair conflict resolution
+precedes training eligibility. Exact source-local subject membership excludes all
+exposed and evaluation people from background fitting; personal masks/prefixes
+and target membership do not grow with shared training size. Atomic SQLite
+checkpoints bind source, code, protocol, runtime, partition, consumed byte/record
+boundaries and integer sufficient statistics. Partial fits cannot be evaluated.
+One-source withdrawal invalidates all its models; a replacement requires a new
+permitted source and complete verified run. Native fallback and native serving
+remain separate. This experiment cannot grant itself production data rights.
+
 A candidate artifact progresses through `RESEARCH → VALIDATED → SHADOW_ELIGIBLE → CANARY_ELIGIBLE → ADMITTED`, or is rejected/withdrawn. The registry stores the approved use, rights, quality/coverage evidence, privacy lineage, compatibility, rollback and explicit decision.
 
 Keep native serving active while research runs. Before any runtime integration: map licensed object features through canonical Item IDs; verify feature/encoder/index versions; measure latency and failure behavior; test Personal/Shared isolation; preserve captured slate/prediction origin; show neutral fallback when the artifact is absent, invalid, disallowed or out of domain.
