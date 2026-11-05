@@ -80,6 +80,19 @@ export async function loadPersonalRatingHostedSources() {
   }))));
 }
 
+// This historical two-forward package stops at its reviewed source checkpoint.
+// Later append-only migrations belong to their own upgrade and current-state
+// tests; they must not change this predecessor or enter its guarded wrapper.
+export async function loadPersonalRatingHostedLineage() {
+  const installation = await buildFreshInstallation();
+  const cutoff = personalRatingHostedManifest.sources.at(-1).filename;
+  const files = installation.files.filter(file => file.name <= cutoff);
+  assert.equal(files.length, 56, 'Exact reviewed numeric checkpoint lineage required');
+  assert.equal(files[53].name, personalRatingHostedManifest.omitted);
+  validatePersonalRatingHostedSources(files.slice(54));
+  return files;
+}
+
 // Metadata only; no user rows, migration SQL, pg_proc source bodies or credentials.
 // Extend the existing reviewed query with schema/default ACLs and auth functions.
 export const personalRatingHostedMetadataQuery = `select base.snapshot || jsonb_build_object(
@@ -134,7 +147,7 @@ async function reference() {
         create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
         grant usage on schema public,auth to anon,authenticated,service_role;
         create schema supabase_migrations;create table supabase_migrations.schema_migrations(version text,name text,statements text[]);`);
-      const { files } = await buildFreshInstallation();
+      const files = await loadPersonalRatingHostedLineage();
       assert.equal(files.length, 56, 'Unreviewed canonical lineage length');
       assert.equal(files[53].name, personalRatingHostedManifest.omitted, 'Exact omitted optional forward required');
       validatePersonalRatingHostedSources(files.slice(54));

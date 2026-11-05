@@ -85,7 +85,7 @@ test('owned sequential Taste v2 / full current schema',async t=>{
       await db.exec('rollback;');
     });
     for(const f of files.slice(index))await db.exec(`begin;${f.sql}commit;`);
-    await sub('native question policy matches the portable numeric reference over actual canonical panels',async({start})=>{
+    await sub('movie-first V4 preserves portable canonical ranking within its initial MOVIE phase',async({start})=>{
       let s=await start();
       assert.equal((await state(s.sessionId)).policy,'CANONICAL_FORECAST_POOL_V4');
       const scope={subject:{id:s.profileId,kind:'individual'},actingIdentityRef:owner,sessionRef:s.sessionId,
@@ -116,8 +116,14 @@ test('owned sequential Taste v2 / full current schema',async t=>{
                 artifact:{id:'catalog',version:'1',representationVersion:'binary-tags',availableAt:10,trainedThrough:null,sourceRefs:['catalog'],use:'fixture-only'}}},
               labelSeen:f.labelSeen,forecast:f.status==='AVAILABLE'?{status:'AVAILABLE',score:f.score}:{status:'UNAVAILABLE',reason:f.reason}};
           })}));
-        ref=reference.advanceAdaptiveTaste(ref,{kind:'OFFER',requestId:s.questionId,expectedRevision:ref.revision,at:ref.updatedAt+2,pools}).state;
+        // All nine fresh offers are before the 24-MOVIE safety bound. The
+        // domain-independent reference ranks the declared active domain only;
+        // the native progression contract is exercised separately over all48.
+        ref=reference.advanceAdaptiveTaste(ref,{kind:'OFFER',requestId:s.questionId,expectedRevision:ref.revision,at:ref.updatedAt+2,
+          pools:pools.filter(pool=>pool.domain==='MOVIE')}).state;
         const expected=ref.questions.at(-1),actual=(await state(s.sessionId)).presentations.at(-1);
+        assert.equal(actual.itemType,'MOVIE');
+        assert.equal(actual.selectionTrace.domainProgression.version,'movie-first-v1');
         assert.equal(actual.objectId,expected.objectId);
         for(const key of Object.keys(expected.components))assert.ok(Math.abs(actual.selectionComponents[key]-expected.components[key])<1e-12,key);
         // Recognition-only control uses the same pool and ledger, not another scorer.

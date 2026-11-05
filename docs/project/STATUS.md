@@ -29,13 +29,20 @@ MOVIE → BOOK. [ADR-0011](../architecture/decisions/0011-taste-as-guided-discov
 owns exact safety bounds and preservation. No accepted answer, pending question,
 frozen pool or cached reply is rewritten. No reset or new model is involved.
 
-Source validation is in progress. The regression reproduces the old failure,
+Implementation: [PR #429](https://github.com/Kajooja/Kajo/pull/429). The seven-test
+local regression passes and reproduces the old failure,
 checks rollback, upgrades populated state, retries the same answer, and finishes
 long sessions with exact retries, all 0–10 grades, pause/resume and domain order.
 The native CLI gate runs the same committed-transaction proof. Required final
 source CI, accepted-tree identity, hosted forward and real-phone observation are
-separate gates; the implementation PR/issue owns the final source receipt.
-Hosted rollout is pending. The existing mobile wire remains compatible.
+separate gates. CI #850 exposed historical tests that assumed the total lineage
+was still 56 files and current V4 interleaved domains. The numeric upgrade now
+pins its unchanged 56-file historical checkpoint; current MOVIE-phase ranking
+is compared with the same domain-independent reference under that phase constraint.
+The PR/issue owns the final acceptance and hosted operation receipts. Read those
+before acting: once both are complete, continue #427 without reinstalling/resetting.
+The existing mobile wire remains compatible; physical-phone acceptance stays open
+until the owner's fresh observation.
 
 **After #428:** [#427](https://github.com/Kajooja/Kajo/issues/427) retains the bounded
 native-only content-evaluation preflight. Reconcile current private continuation,
