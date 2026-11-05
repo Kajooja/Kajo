@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-05**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, scalable individual-rating training #422 after accepted response-spread comparison #421 / #423. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, catalogue/admission audit #425 after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,81 +11,55 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — scalable individual-rating training #422
+## Current handoff — catalogue/admission audit #425
 
-[PR #423](https://github.com/Kajooja/Kajo/pull/423) is accepted as main
-`332641523bea1e8335b9a1fdc358b409fd774f8a`, source
-`27d22211ed9b5c1395bd5ccc43556df62c40086b`, tested merge
-`3befbedab8cdbbbcb34d3ee64b06ee9a16d412f1`, common tree
-`d5ba08893d58eff50e026f03896f6021e578dbc4`. All six required
-[CI #843](https://github.com/Kajooja/Kajo/actions/runs/42031114660) gates passed:
-2,524 tests and four configured exports. Exact run/artifact evidence remains in
-PR #423; source acceptance did not admit a research model into serving.
+**Source dependency:** [PR #424](https://github.com/Kajooja/Kajo/pull/424), final
+source `fa6d497afbfa01de5135e5fa01010cb7fa56c867`, tree
+`e4d960830dbb702036753269e678fbd989d40ccd`, final-source
+[CI #846](https://github.com/Kajooja/Kajo/actions/runs/42064102718). Require all six
+gates and matching source/tested/accepted trees before merging this successor.
+PR #424 owns the final acceptance receipt. The earlier #845 run covered an older
+code-only head; it cannot substitute for final-source verification.
 
-The [response-spread result](../../research/reports/rating-response-spread-v1.md)
-retains the location-only control in both domains. BOOK worsened; MOVIE's gain
-was below the fixed 0.02 margin. Preserve these outcomes and original D2 rejection.
-All three BOOK cohorts and the 32M cohort are exposed development evidence.
+The [#422 result](../../research/reports/rating-learning-curves-v1.md) retains
+5,007,233 BOOK and 28,445,684 MOVIE individual training observations. Fixed
+400-person confirmations improve macro RMSE 1.898911 → 1.825152 and
+1.656061 → 1.625156. Independent reconstruction checks all eight models and
+663,496 forecast values. All evaluated cohorts are exposed. Keep both rejected
+response-spread challengers and original D2 rejection inactive. Do not repeat
+training or relabel these outcomes as an untouched FINAL.
 
-**One active packet:** [#422](https://github.com/Kajooja/Kajo/issues/422), branch
-`research/scalable-rating-training-422`, [PR #424](https://github.com/Kajooja/Kajo/pull/424). The
-[protocol](../../research/manifests/rating-learning-curves-v1.json) fixes nested
-background populations (1,000 / 5,000 / 20,000 / all eligible subjects), independent
-400-person development and 400-person confirmation groups per domain, unchanged
-location equations and 0/5/10/20 visible-rating budgets. Publish code and protocol
-before new real-data selection/fitting. The protocol/source were published at `900291d7fe10cced63e080e81ce8ff8459e25e96`
-before selection. A publisher CRLF-header correction was published at
-`3418d006ee1421cbd12a39765fade02fe555275b` before the first MOVIE selection;
-its original zero-record failure remains retained. No experiment rule changed.
+**One active packet:** [#425](https://github.com/Kajooja/Kajo/issues/425), branch
+`research/catalogue-admission-425`. Its [audit](../../research/reports/catalogue-admission-v1.md)
+finds 309 exact links among 425 active MOVIE Items; 270 have item support in
+the retained pre-2021 model. Two known alias disagreements are quarantined and
+114 Items have no source alias match. Thirty-six full-release alias collisions
+quarantine 72 external objects before intersection. Independent SQLite joins
+reproduce all 87,585 source-object dispositions. BOOK has no reviewed identity
+bridge for its 416 active Items; actual work/title overlap remains UNKNOWN.
 
-The [measured result](../../research/reports/rating-learning-curves-v1.md) retains
-the larger research model in both domains: 5,007,233 BOOK / 28,445,684 MOVIE
-training ratings. Separate 400-person confirmation groups improve macro RMSE
-1.898911 → 1.825152 and 1.656061 → 1.625156, with passing fixed paired/MAE/cold
-criteria. Independent raw-source/NumPy reconstruction verifies all eight models,
-source-local membership, 663,496 forecast values and both confirmation intervals.
-BOOK's complete replay is identical conformance on already exposed evidence.
-Twelve new regression tests pass; final source CI/acceptance belongs to the PR.
-Do not merge until all six required gates pass on its final source/tested tree.
-The continuation found PR/CI #845 still pointing to the earlier code-only
-`3418d006ee1421cbd12a39765fade02fe555275b` while the branch already retained
-the result commit `2727ad91c0106bda4d960f5e28b1c9942e62d99b`. Refresh the PR
-source and verify a final-source run; the older run alone cannot accept the
-result documentation or this handoff.
+The existing six-concept inspector and native label bounds give structural
+upper bounds of 235 BOOK / 280 MOVIE Items. Fourteen BOOK sources exceed native
+label bounds; none is truncated. This is neither feature-use permission nor
+prospective capture/quality acceptance. The audit has no native writes, imports,
+new fits, migration, account reset or serving activation. Its source CI belongs
+to this packet's PR; all required gates precede merge.
 
-The disk-backed runner verifies pinned raw source bytes, resolves duplicate and
-conflicting pairs across the entire source, retains exact membership/exclusion
-witnesses, and checkpoints consumed records and integer sufficient statistics.
-All evaluation subjects are absent from shared training; personal evidence and
-targets stay fixed as background training grows. BOOK remains undated. MOVIE uses
-global 2021/2022 rating-entry cutoffs; cross-release person overlap remains unknown.
-Neither source becomes native accounts, Profiles, Events or invented exposure.
+**After #425 source acceptance:** prepare the bounded native-only content-evaluation
+preflight using the accepted private observation route and retained operational
+source pins. Reconcile the current declaration, source-use review, supported
+training/candidate features and complete opportunity coverage before any fresh
+first-answer comparison. If permission or eligible support is missing, retain
+the mean and name that dependency; no new model family or external fit is implied.
+BOOK mapping and eventual external-prior rights/interface work remain conditional,
+separate proposals. Research permission is not production/derived-artifact approval;
+`MVP-ALG-013`, Sprint 016 and Engine V1 quality/serving acceptance stay open.
 
-[Source-use register](../../research/manifests/broad-training-source-use-v1.json)
-keeps current permissions at noncommercial isolated research. Production,
-commercial use and fitted-artifact distribution are not approved. The later
-`MVP-ALG-013` permission-or-compatible-source dependency remains explicit; no
-outreach or serving deployment is included. Checkpoint and resume verification,
-learning curves, costs, protected confirmation and source CI are this packet's
-gates. A failed size comparison or exhausted budget retains its honest outcome.
-
-**After #422 source acceptance:** create the next bounded catalogue/admission
-audit Issue, then measure exact source-object → canonical Item linkage and missing/
-ambiguous coverage with read-only metadata. Inventory the existing native numeric/
-content adapters, permitted uses and fallback before proposing a native-scoped
-comparison. A constant subject offset does not learn individual Item ordering.
-The largest MOVIE fit still has 27.445% source-cold confirmation targets; BOOK has
-0%. Catalogue mapping is NOT_QUERIED. More old data cannot solve a temporal new-Item
-gap. Rights, mapping and native quality remain real prerequisites, with explicit
-native-only disposition when unsupported. Do not start another model family or
-call these exposed cohorts untouched FINAL. No owner input is required for this
-read-only/source audit. GitHub Issue creation returned server errors in this
-session; no successor Issue was confirmed, so create it once from this scope.
-
-Keep the owned private observation route and operational source pins intact.
-Do not replace an unread/pending target, reset accounts, replay migrations or
-manufacture native quality evidence. Optional #391 remains NOT_ADMITTED.
-Sprint 016 and Engine V1 quality/serving admission remain open.
+Preserve every pending/unread target, consumed allocation, existing account and
+native source. Do not backfill a forecast from an old answer, replace a target,
+replay installed migrations or manufacture confidence. Continue any owned
+observation from its authorized private records. No owner input is needed for
+this read-only compatibility audit. Optional #391 remains NOT_ADMITTED.
 
 ## Retained owned numeric DEVELOPMENT route — private continuation
 

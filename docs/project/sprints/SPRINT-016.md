@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 is active; owned DEVELOPMENT continues from private records; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 / #424 is the source dependency; catalogue/admission audit #425 is active; owned DEVELOPMENT continues from private records; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -67,6 +67,20 @@ all eight models and 663,496 forecast values. Exact source/CI acceptance remains
 in STATUS/PR; this is not production pretraining or Sprint 016 native quality.
 All evaluated cohorts are now exposed. Catalogue coverage/admission audit follows
 source acceptance; preserve the original control rejections and native fallback.
+
+## Catalogue/admission compatibility — #425
+
+The [read-only audit](../../../research/reports/catalogue-admission-v1.md) resolves
+the previously unqueried intersection: 309/425 active MOVIE Items map exactly;
+270 have retained training-item support. Two alias disagreements and full-source
+collisions fail closed. All 87,585 source dispositions match independent SQLite
+joins. BOOK has no reviewed source-to-canonical bridge; actual overlap is unknown.
+Structural feature upper bounds are 235/416 BOOK and 280/425 MOVIE under the
+unchanged native source limits. No feature permission, native capture acceptance,
+training or serving admission follows. Source/CI acceptance belongs to this PR.
+After acceptance, reconcile the existing private native content-evaluation
+declaration, reviewed feature use and opportunity/support coverage before a fresh
+first-answer comparison. Preserve old forecasts, pending targets and allocations.
 
 ## Outcome
 

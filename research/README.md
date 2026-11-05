@@ -1,5 +1,30 @@
 # Isolated rating research — movies and books
 
+## Catalogue/admission audit — #425
+
+After #422, measure exact identity and structural support before proposing any
+external native prior. The [audit result](reports/catalogue-admission-v1.md) and
+[manifest](manifests/catalogue-admission-v1.json) retain the explicit nonadmission.
+Generate the one-statement read-only query, execute it through an authorized
+operator, and retain its `audit_input` JSON outside Git. The runner has no network
+or database credentials and never reads native people/ratings.
+
+```sh
+python3 scripts/research/catalogue_admission.py --print-snapshot-sql
+python3 scripts/research/catalogue_admission.py --snapshot AUDIT_INPUT.json --links PINNED_LINKS.csv --movie-store COMPLETED_MOVIE_STORE/ratings.sqlite --out NEW_PRIVATE_DIRECTORY
+node scripts/catalog/inspect-native-feature-support.mjs FEATURE_SNAPSHOT.json
+```
+
+`FEATURE_SNAPSHOT.json` is the unchanged `featureSnapshot` member of that same
+input. The native-support command reuses the existing feature inspector; it
+reports only structural bounds, never feature permission or capture acceptance.
+The Python command verifies complete pinned links and the selected model's
+source/protocol/partition/hash/withdrawal state. Its `coverage.json` is aggregate;
+`mapping-private.json`, original snapshots and source bytes remain private.
+Independent full-release collision checks precede catalogue matching. BOOK has
+no reviewed identity bridge; title/year matches never create one implicitly.
+Root catalogue/research checks include all synthetic conflict/budget regressions.
+
 The [Book Genome extension](#book-genome--undated-static-research-417) adds a separate
 undated book experiment. The existing MovieLens path below remains dated.
 

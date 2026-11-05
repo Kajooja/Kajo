@@ -1,0 +1,18 @@
+{
+  "version": "catalogue-admission-audit-v1",
+  "issue": 425,
+  "purpose": "READ_ONLY_IDENTITY_AND_STRUCTURAL_COVERAGE",
+  "movieSourceManifest": "research/manifests/movielens-32m.json",
+  "trainingProtocol": "research/manifests/rating-learning-curves-v1.json",
+  "movieModelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+  "movieIdentity": "EXACT_NAMESPACED_ALIAS_FULL_RELEASE_CONFLICT_QUARANTINE_AND_CANONICAL_SOURCE_CHECK",
+  "bookIdentity": "NO_REVIEWED_BOOK_GENOME_TO_OPEN_LIBRARY_CROSSWALK",
+  "sourceRights": "EXISTING_NONCOMMERCIAL_RESEARCH_ONLY",
+  "nativeFeatureInspector": "scripts/catalog/inspect-item-features.mjs",
+  "featureUsePermission": "NOT_GRANTED_BY_THIS_AUDIT",
+  "nativeWrites": false,
+  "newFits": false,
+  "historicalFeatureAvailability": "NOT_ESTABLISHED_BY_CURRENT_SNAPSHOT",
+  "qualityAdmission": "NONE",
+  "servingActivation": "NONE"
+}
