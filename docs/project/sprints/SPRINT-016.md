@@ -59,8 +59,14 @@ nested background sizes, new protected people/targets, decisions, budgets and
 failure behavior before fresh selection/fitting. The
 [source-use register](../../../research/manifests/broad-training-source-use-v1.json)
 records research-only permissions and the separate production-use dependency.
-This source checkpoint is synthetic verification, not a completed source-scale
-run, production pretraining or Sprint 016 quality acceptance. STATUS owns execution.
+The [source-scale result](../../../research/reports/rating-learning-curves-v1.md)
+retains the larger research baseline in both domains: 5,007,233 BOOK and
+28,445,684 MOVIE observations, with fixed confirmation RMSE gains 0.073759 and
+0.030905 and passing cold guards. Independent raw-source reconstruction checks
+all eight models and 663,496 forecast values. Exact source/CI acceptance remains
+in STATUS/PR; this is not production pretraining or Sprint 016 native quality.
+All evaluated cohorts are now exposed. Catalogue coverage/admission audit follows
+source acceptance; preserve the original control rejections and native fallback.
 
 ## Outcome
 

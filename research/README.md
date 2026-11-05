@@ -507,3 +507,8 @@ derived artifact, attribution and the production permission-or-replacement task.
 Local tests run with `npm run build --workspace @kajo/prediction-engine` followed
 by `python3 -m unittest discover -s scripts/research -p 'test_scalable_ratings.py'`.
 The ordinary root check includes them. No real source is downloaded by tests.
+
+The [measured #422 result](reports/rating-learning-curves-v1.md) retains larger
+research baselines in both domains, with independently reconstructed source rows,
+all eight fitted statistics and protected confirmation. It does not admit native
+serving; catalogue/source-use compatibility is the next bounded audit.

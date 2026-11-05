@@ -33,8 +33,20 @@ All three BOOK cohorts and the 32M cohort are exposed development evidence.
 background populations (1,000 / 5,000 / 20,000 / all eligible subjects), independent
 400-person development and 400-person confirmation groups per domain, unchanged
 location equations and 0/5/10/20 visible-rating budgets. Publish code and protocol
-before new real-data selection/fitting. The first source checkpoint contains
-synthetic verification only; actual execution/results follow separately.
+before new real-data selection/fitting. The protocol/source were published at `900291d7fe10cced63e080e81ce8ff8459e25e96`
+before selection. A publisher CRLF-header correction was published at
+`3418d006ee1421cbd12a39765fade02fe555275b` before the first MOVIE selection;
+its original zero-record failure remains retained. No experiment rule changed.
+
+The [measured result](../../research/reports/rating-learning-curves-v1.md) retains
+the larger research model in both domains: 5,007,233 BOOK / 28,445,684 MOVIE
+training ratings. Separate 400-person confirmation groups improve macro RMSE
+1.898911 → 1.825152 and 1.656061 → 1.625156, with passing fixed paired/MAE/cold
+criteria. Independent raw-source/NumPy reconstruction verifies all eight models,
+source-local membership, 663,496 forecast values and both confirmation intervals.
+BOOK's complete replay is identical conformance on already exposed evidence.
+Twelve new regression tests pass; final source CI/acceptance belongs to the PR.
+Do not merge until all six required gates pass on its final source/tested tree.
 
 The disk-backed runner verifies pinned raw source bytes, resolves duplicate and
 conflicting pairs across the entire source, retains exact membership/exclusion
@@ -51,6 +63,19 @@ commercial use and fitted-artifact distribution are not approved. The later
 outreach or serving deployment is included. Checkpoint and resume verification,
 learning curves, costs, protected confirmation and source CI are this packet's
 gates. A failed size comparison or exhausted budget retains its honest outcome.
+
+**After #422 source acceptance:** create the next bounded catalogue/admission
+audit Issue, then measure exact source-object → canonical Item linkage and missing/
+ambiguous coverage with read-only metadata. Inventory the existing native numeric/
+content adapters, permitted uses and fallback before proposing a native-scoped
+comparison. A constant subject offset does not learn individual Item ordering.
+The largest MOVIE fit still has 27.445% source-cold confirmation targets; BOOK has
+0%. Catalogue mapping is NOT_QUERIED. More old data cannot solve a temporal new-Item
+gap. Rights, mapping and native quality remain real prerequisites, with explicit
+native-only disposition when unsupported. Do not start another model family or
+call these exposed cohorts untouched FINAL. No owner input is required for this
+read-only/source audit. GitHub Issue creation returned server errors in this
+session; no successor Issue was confirmed, so create it once from this scope.
 
 Keep the owned private observation route and operational source pins intact.
 Do not replace an unread/pending target, reset accounts, replay migrations or

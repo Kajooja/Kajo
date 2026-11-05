@@ -1,0 +1,1255 @@
+{
+  "schema": "broad-individual-rating-learning-curves-v1",
+  "issue": 422,
+  "predeclaredCommit": "900291d7fe10cced63e080e81ce8ff8459e25e96",
+  "movieHeaderCorrectionBeforeSelection": "3418d006ee1421cbd12a39765fade02fe555275b",
+  "admission": "NONE",
+  "nativeCatalogueMapping": "NOT_QUERIED",
+  "domains": {
+    "book": {
+      "source": {
+        "bookParser": "06cda200ade91c13907c7bd65e11122ea904ddc038694e06197def2094be0ead",
+        "bytes": 271599056,
+        "code": "53c19a1f420c5f13c7ccadadd0e071b1f70dd6a0063d68c089f4d81c649260e7",
+        "domain": "book",
+        "exclusions": [
+          {
+            "ratings": 31144,
+            "sha256": "9bd43253223a84c3091d849bea9d0391547dd2aa72156903fc40ffb3ebc20b90",
+            "subjects": 500
+          },
+          {
+            "ratings": 33243,
+            "sha256": "44cbc15a09c677f5de501ed5b5ac0b59ed732bd4d594fd62181b0c94dca1f112",
+            "subjects": 500
+          },
+          {
+            "ratings": 31152,
+            "sha256": "35ccad2d3547c46149d4bef59c1a5521d0b0575a53ce21c7c9815c08ae39f633",
+            "subjects": 500
+          }
+        ],
+        "protocol": "850f5681e21d6ad315e0df24c014d3e4e2ba18a4a6ed2c3a41deefa8502fa03a",
+        "python": "3.12.14",
+        "raw": "1524ea4ad61da974b5f36c6968befcc98163514113f7ee8c06dc0c2b81e37444",
+        "source": "1b2221907ccdbeaac4eacb970655ad5145280c357183ec23a44c17038da0be68",
+        "sqlite": "3.53.1"
+      },
+      "sourceCensus": {
+        "complete": true,
+        "conflictingPairs": 0,
+        "eligiblePairs": 5152656,
+        "histogram": {
+          "10": 1935326,
+          "2": 156250,
+          "4": 359785,
+          "6": 974773,
+          "8": 1726522
+        },
+        "offset": 271599056,
+        "quarantinedRows": 0,
+        "ratedObjects": 9374,
+        "repeatRows": 0,
+        "rows": 5152656,
+        "sourceSubjects": 350332,
+        "uniquePairs": 5152656
+      },
+      "partition": {
+        "backgroundSubjects": 348032,
+        "confirmationSubjects": 400,
+        "developmentSubjects": 400,
+        "evaluationEligible": 59217,
+        "excludedSubjects": 1500,
+        "sha256": "9340906ec621ff22892e6650330602329ed28cafc13013cb651aa74905c2f45e",
+        "sizes": [
+          1000,
+          5000,
+          20000,
+          348032
+        ]
+      },
+      "training": {
+        "complete": true,
+        "rows": 5007233,
+        "statsSha256": "c1fd103df8000e408cc55dae96135f589ad9a491f37055b531457cfb936ee5d6",
+        "subjects": 348032,
+        "sum": 39629778
+      },
+      "development": {
+        "identity": {
+          "domain": "book",
+          "source": "1b2221907ccdbeaac4eacb970655ad5145280c357183ec23a44c17038da0be68",
+          "raw": "1524ea4ad61da974b5f36c6968befcc98163514113f7ee8c06dc0c2b81e37444",
+          "bytes": 271599056,
+          "protocol": "850f5681e21d6ad315e0df24c014d3e4e2ba18a4a6ed2c3a41deefa8502fa03a",
+          "code": "53c19a1f420c5f13c7ccadadd0e071b1f70dd6a0063d68c089f4d81c649260e7",
+          "bookParser": "06cda200ade91c13907c7bd65e11122ea904ddc038694e06197def2094be0ead",
+          "python": "3.12.14",
+          "sqlite": "3.53.1",
+          "exclusions": [
+            {
+              "sha256": "9bd43253223a84c3091d849bea9d0391547dd2aa72156903fc40ffb3ebc20b90",
+              "subjects": 500,
+              "ratings": 31144
+            },
+            {
+              "sha256": "44cbc15a09c677f5de501ed5b5ac0b59ed732bd4d594fd62181b0c94dca1f112",
+              "subjects": 500,
+              "ratings": 33243
+            },
+            {
+              "sha256": "35ccad2d3547c46149d4bef59c1a5521d0b0575a53ce21c7c9815c08ae39f633",
+              "subjects": 500,
+              "ratings": 31152
+            }
+          ]
+        },
+        "partition": {
+          "backgroundSubjects": 348032,
+          "confirmationSubjects": 400,
+          "developmentSubjects": 400,
+          "evaluationEligible": 59217,
+          "excludedSubjects": 1500,
+          "sha256": "9340906ec621ff22892e6650330602329ed28cafc13013cb651aa74905c2f45e",
+          "sizes": [
+            1000,
+            5000,
+            20000,
+            348032
+          ]
+        },
+        "results": {
+          "1000": {
+            "0": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 2.079316329210909,
+              "mae": 1.6337010826823657,
+              "bias": 0.09455188483121832,
+              "itemOnlyRmse": 2.079316329210909,
+              "coldItemFraction": 0.1872746553552492,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "476efb2b14e6627cc0c1460a27ecf6c95d60f1268083d842c302d08caefb760c",
+              "trainingRows": 14636,
+              "trainingSubjects": 1000
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 2.0101192564332795,
+              "mae": 1.5913048873437594,
+              "bias": 0.09482501842991303,
+              "itemOnlyRmse": 2.079316329210909,
+              "coldItemFraction": 0.1872746553552492,
+              "visibleMean": 5.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "476efb2b14e6627cc0c1460a27ecf6c95d60f1268083d842c302d08caefb760c",
+              "trainingRows": 14636,
+              "trainingSubjects": 1000
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.9771336902100343,
+              "mae": 1.5648170374730583,
+              "bias": 0.08629160546850943,
+              "itemOnlyRmse": 2.079316329210909,
+              "coldItemFraction": 0.1872746553552492,
+              "visibleMean": 10.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "476efb2b14e6627cc0c1460a27ecf6c95d60f1268083d842c302d08caefb760c",
+              "trainingRows": 14636,
+              "trainingSubjects": 1000
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.9468216789345398,
+              "mae": 1.5408570438708051,
+              "bias": 0.06295160785996391,
+              "itemOnlyRmse": 2.079316329210909,
+              "coldItemFraction": 0.1872746553552492,
+              "visibleMean": 19.6375,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "476efb2b14e6627cc0c1460a27ecf6c95d60f1268083d842c302d08caefb760c",
+              "trainingRows": 14636,
+              "trainingSubjects": 1000
+            }
+          },
+          "5000": {
+            "0": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 2.036770516744892,
+              "mae": 1.610002568886904,
+              "bias": 0.08782692829315755,
+              "itemOnlyRmse": 2.036770516744892,
+              "coldItemFraction": 0.012301166489925769,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "08f95528a3a6d9700cc5255c0d3f01639d50c721aee13b831c6bd917c1b598c1",
+              "trainingRows": 71295,
+              "trainingSubjects": 5000
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.9708935324962558,
+              "mae": 1.5580276673318354,
+              "bias": 0.094700824204102,
+              "itemOnlyRmse": 2.036770516744892,
+              "coldItemFraction": 0.012301166489925769,
+              "visibleMean": 5.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "08f95528a3a6d9700cc5255c0d3f01639d50c721aee13b831c6bd917c1b598c1",
+              "trainingRows": 71295,
+              "trainingSubjects": 5000
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.9399155551608493,
+              "mae": 1.5306495554651147,
+              "bias": 0.08392663430529768,
+              "itemOnlyRmse": 2.036770516744892,
+              "coldItemFraction": 0.012301166489925769,
+              "visibleMean": 10.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "08f95528a3a6d9700cc5255c0d3f01639d50c721aee13b831c6bd917c1b598c1",
+              "trainingRows": 71295,
+              "trainingSubjects": 5000
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.9101333084287833,
+              "mae": 1.5052112175879793,
+              "bias": 0.066149652275978,
+              "itemOnlyRmse": 2.036770516744892,
+              "coldItemFraction": 0.012301166489925769,
+              "visibleMean": 19.6375,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "08f95528a3a6d9700cc5255c0d3f01639d50c721aee13b831c6bd917c1b598c1",
+              "trainingRows": 71295,
+              "trainingSubjects": 5000
+            }
+          },
+          "20000": {
+            "0": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 2.0081333451110877,
+              "mae": 1.5830874735676213,
+              "bias": 0.10661214782825564,
+              "itemOnlyRmse": 2.0081333451110877,
+              "coldItemFraction": 0.00021208907741251324,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "f471ad08675a8d11b0498ee9113e250fd03d9db0b134ae0a63a10b2ee2cef06e",
+              "trainingRows": 280803,
+              "trainingSubjects": 20000
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.940667655432632,
+              "mae": 1.5253247726824617,
+              "bias": 0.10547386405705574,
+              "itemOnlyRmse": 2.0081333451110877,
+              "coldItemFraction": 0.00021208907741251324,
+              "visibleMean": 5.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "f471ad08675a8d11b0498ee9113e250fd03d9db0b134ae0a63a10b2ee2cef06e",
+              "trainingRows": 280803,
+              "trainingSubjects": 20000
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.9142354357922222,
+              "mae": 1.4995970517668875,
+              "bias": 0.09318391961483301,
+              "itemOnlyRmse": 2.0081333451110877,
+              "coldItemFraction": 0.00021208907741251324,
+              "visibleMean": 10.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "f471ad08675a8d11b0498ee9113e250fd03d9db0b134ae0a63a10b2ee2cef06e",
+              "trainingRows": 280803,
+              "trainingSubjects": 20000
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.8842560631204104,
+              "mae": 1.4731699971288226,
+              "bias": 0.07241369148105699,
+              "itemOnlyRmse": 2.0081333451110877,
+              "coldItemFraction": 0.00021208907741251324,
+              "visibleMean": 19.6375,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "f471ad08675a8d11b0498ee9113e250fd03d9db0b134ae0a63a10b2ee2cef06e",
+              "trainingRows": 280803,
+              "trainingSubjects": 20000
+            }
+          },
+          "348032": {
+            "0": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.9852040397546917,
+              "mae": 1.569510425676267,
+              "bias": 0.08404608613326069,
+              "itemOnlyRmse": 1.9852040397546917,
+              "coldItemFraction": 0.0,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "6bbb6c168c867851f70618d79f6811185ee79db284d1cb4d3e5af5e19e82b1e9",
+              "trainingRows": 5007233,
+              "trainingSubjects": 348032
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.9186415594917956,
+              "mae": 1.5068632234005088,
+              "bias": 0.09548641294954631,
+              "itemOnlyRmse": 1.9852040397546917,
+              "coldItemFraction": 0.0,
+              "visibleMean": 5.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "6bbb6c168c867851f70618d79f6811185ee79db284d1cb4d3e5af5e19e82b1e9",
+              "trainingRows": 5007233,
+              "trainingSubjects": 348032
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.8913745793030299,
+              "mae": 1.4806504137699266,
+              "bias": 0.08766744438069293,
+              "itemOnlyRmse": 1.9852040397546917,
+              "coldItemFraction": 0.0,
+              "visibleMean": 10.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "6bbb6c168c867851f70618d79f6811185ee79db284d1cb4d3e5af5e19e82b1e9",
+              "trainingRows": 5007233,
+              "trainingSubjects": 348032
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 4715,
+              "coverage": 1,
+              "rmse": 1.8620880266387005,
+              "mae": 1.4554155238115971,
+              "bias": 0.06995825356225292,
+              "itemOnlyRmse": 1.9852040397546917,
+              "coldItemFraction": 0.0,
+              "visibleMean": 19.6375,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "43abd62d3fb366bb86f854f9ceb60767a36d5cd815441b34bdf846555863afa7",
+              "modelSha256": "6bbb6c168c867851f70618d79f6811185ee79db284d1cb4d3e5af5e19e82b1e9",
+              "trainingRows": 5007233,
+              "trainingSubjects": 348032
+            }
+          }
+        },
+        "selection": {
+          "selected": 348032,
+          "bestDevelopmentRmse": 1.8620880266387005,
+          "rule": "SMALLEST_NEAR_BEST_WITH_COLD_GUARDS",
+          "confirmationRead": false,
+          "pairedDevelopment": {
+            "rmseDelta": -0.08473365229583929,
+            "interval95": [
+              -0.10469931035391578,
+              -0.0650625478064919
+            ],
+            "subjects": 400
+          }
+        },
+        "resources": {
+          "curve": {
+            "maxRssKiB": 115384,
+            "seconds": 3.277777891998994,
+            "storeBytes": 801854928
+          },
+          "fit": {
+            "maxRssKiB": 115384,
+            "seconds": 12.727985770998202,
+            "storeBytes": 801818904
+          },
+          "ingest": {
+            "maxRssKiB": 58156,
+            "seconds": 74.30763353400107,
+            "storeBytes": 793676104
+          },
+          "partition": {
+            "maxRssKiB": 166944,
+            "seconds": 4.160499780999089,
+            "storeBytes": 783075320
+          }
+        },
+        "admission": "NONE"
+      },
+      "confirmation": {
+        "identity": {
+          "domain": "book",
+          "source": "1b2221907ccdbeaac4eacb970655ad5145280c357183ec23a44c17038da0be68",
+          "raw": "1524ea4ad61da974b5f36c6968befcc98163514113f7ee8c06dc0c2b81e37444",
+          "bytes": 271599056,
+          "protocol": "850f5681e21d6ad315e0df24c014d3e4e2ba18a4a6ed2c3a41deefa8502fa03a",
+          "code": "53c19a1f420c5f13c7ccadadd0e071b1f70dd6a0063d68c089f4d81c649260e7",
+          "bookParser": "06cda200ade91c13907c7bd65e11122ea904ddc038694e06197def2094be0ead",
+          "python": "3.12.14",
+          "sqlite": "3.53.1",
+          "exclusions": [
+            {
+              "sha256": "9bd43253223a84c3091d849bea9d0391547dd2aa72156903fc40ffb3ebc20b90",
+              "subjects": 500,
+              "ratings": 31144
+            },
+            {
+              "sha256": "44cbc15a09c677f5de501ed5b5ac0b59ed732bd4d594fd62181b0c94dca1f112",
+              "subjects": 500,
+              "ratings": 33243
+            },
+            {
+              "sha256": "35ccad2d3547c46149d4bef59c1a5521d0b0575a53ce21c7c9815c08ae39f633",
+              "subjects": 500,
+              "ratings": 31152
+            }
+          ]
+        },
+        "selectionSha256": "e94484518ba7e240be6340f448ebf385100793c50b41e221ccf2fc9175f5e7b1",
+        "results": {
+          "1000": {
+            "0": {
+              "subjects": 400,
+              "targets": 4959,
+              "coverage": 1,
+              "rmse": 2.0409174966891293,
+              "mae": 1.6160832504989862,
+              "bias": -0.011444780259505573,
+              "itemOnlyRmse": 2.0409174966891293,
+              "coldItemFraction": 0.18874773139745918,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "f6dd9bda85f83a6b5dd0470b8a58a2e3ad021d29b5575eec7ca11dd07b7e5013",
+              "modelSha256": "476efb2b14e6627cc0c1460a27ecf6c95d60f1268083d842c302d08caefb760c",
+              "trainingRows": 14636,
+              "trainingSubjects": 1000
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 4959,
+              "coverage": 1,
+              "rmse": 1.968620943034556,
+              "mae": 1.5697575274834592,
+              "bias": -0.006028390492150534,
+              "itemOnlyRmse": 2.0409174966891293,
+              "coldItemFraction": 0.18874773139745918,
+              "visibleMean": 5.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "f6dd9bda85f83a6b5dd0470b8a58a2e3ad021d29b5575eec7ca11dd07b7e5013",
+              "modelSha256": "476efb2b14e6627cc0c1460a27ecf6c95d60f1268083d842c302d08caefb760c",
+              "trainingRows": 14636,
+              "trainingSubjects": 1000
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 4959,
+              "coverage": 1,
+              "rmse": 1.9215425833760726,
+              "mae": 1.5367094013459042,
+              "bias": 0.0039175619474967754,
+              "itemOnlyRmse": 2.0409174966891293,
+              "coldItemFraction": 0.18874773139745918,
+              "visibleMean": 10.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "f6dd9bda85f83a6b5dd0470b8a58a2e3ad021d29b5575eec7ca11dd07b7e5013",
+              "modelSha256": "476efb2b14e6627cc0c1460a27ecf6c95d60f1268083d842c302d08caefb760c",
+              "trainingRows": 14636,
+              "trainingSubjects": 1000
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 4959,
+              "coverage": 1,
+              "rmse": 1.8989111384104178,
+              "mae": 1.5141611563674722,
+              "bias": -0.006692784884232664,
+              "itemOnlyRmse": 2.0409174966891293,
+              "coldItemFraction": 0.18874773139745918,
+              "visibleMean": 19.5775,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "f6dd9bda85f83a6b5dd0470b8a58a2e3ad021d29b5575eec7ca11dd07b7e5013",
+              "modelSha256": "476efb2b14e6627cc0c1460a27ecf6c95d60f1268083d842c302d08caefb760c",
+              "trainingRows": 14636,
+              "trainingSubjects": 1000
+            }
+          },
+          "348032": {
+            "0": {
+              "subjects": 400,
+              "targets": 4959,
+              "coverage": 1,
+              "rmse": 1.964185711992592,
+              "mae": 1.5740971616633908,
+              "bias": -0.0050826910359235665,
+              "itemOnlyRmse": 1.964185711992592,
+              "coldItemFraction": 0.0,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "f6dd9bda85f83a6b5dd0470b8a58a2e3ad021d29b5575eec7ca11dd07b7e5013",
+              "modelSha256": "6bbb6c168c867851f70618d79f6811185ee79db284d1cb4d3e5af5e19e82b1e9",
+              "trainingRows": 5007233,
+              "trainingSubjects": 348032
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 4959,
+              "coverage": 1,
+              "rmse": 1.8901895139626759,
+              "mae": 1.506286182243795,
+              "bias": 0.0067072433462268335,
+              "itemOnlyRmse": 1.964185711992592,
+              "coldItemFraction": 0.0,
+              "visibleMean": 5.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "f6dd9bda85f83a6b5dd0470b8a58a2e3ad021d29b5575eec7ca11dd07b7e5013",
+              "modelSha256": "6bbb6c168c867851f70618d79f6811185ee79db284d1cb4d3e5af5e19e82b1e9",
+              "trainingRows": 5007233,
+              "trainingSubjects": 348032
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 4959,
+              "coverage": 1,
+              "rmse": 1.8488411188904912,
+              "mae": 1.4724091837722983,
+              "bias": 0.014803758578783875,
+              "itemOnlyRmse": 1.964185711992592,
+              "coldItemFraction": 0.0,
+              "visibleMean": 10.0,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "f6dd9bda85f83a6b5dd0470b8a58a2e3ad021d29b5575eec7ca11dd07b7e5013",
+              "modelSha256": "6bbb6c168c867851f70618d79f6811185ee79db284d1cb4d3e5af5e19e82b1e9",
+              "trainingRows": 5007233,
+              "trainingSubjects": 348032
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 4959,
+              "coverage": 1,
+              "rmse": 1.8251522738391688,
+              "mae": 1.4463382720967257,
+              "bias": -0.00023221444478432375,
+              "itemOnlyRmse": 1.964185711992592,
+              "coldItemFraction": 0.0,
+              "visibleMean": 19.5775,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "f6dd9bda85f83a6b5dd0470b8a58a2e3ad021d29b5575eec7ca11dd07b7e5013",
+              "modelSha256": "6bbb6c168c867851f70618d79f6811185ee79db284d1cb4d3e5af5e19e82b1e9",
+              "trainingRows": 5007233,
+              "trainingSubjects": 348032
+            }
+          }
+        },
+        "comparison": {
+          "rmseDelta": -0.07375886457124903,
+          "interval95": [
+            -0.09678144133953981,
+            -0.0503450290823666
+          ],
+          "subjects": 400
+        },
+        "coldGuardsPassed": true,
+        "disposition": "RETAIN_LARGER_RESEARCH_MODEL",
+        "resources": {
+          "confirmation": {
+            "maxRssKiB": 115380,
+            "seconds": 2.1124152379998122,
+            "storeBytes": 803482907
+          },
+          "curve": {
+            "maxRssKiB": 115384,
+            "seconds": 3.277777891998994,
+            "storeBytes": 801854928
+          },
+          "fit": {
+            "maxRssKiB": 115384,
+            "seconds": 12.727985770998202,
+            "storeBytes": 801818904
+          },
+          "ingest": {
+            "maxRssKiB": 58156,
+            "seconds": 74.30763353400107,
+            "storeBytes": 793676104
+          },
+          "partition": {
+            "maxRssKiB": 166944,
+            "seconds": 4.160499780999089,
+            "storeBytes": 783075320
+          }
+        },
+        "admission": "NONE",
+        "nativeCatalogueMapping": "NOT_QUERIED"
+      },
+      "independentAudit": {
+        "domain": "book",
+        "status": "PASS",
+        "sourceRowsIndependentlyRead": 5152656,
+        "modelsVerified": 4,
+        "forecastValuesRecomputed": 115112,
+        "maxNumericalError": 2.220446049250313e-16,
+        "independentMembershipSelection": true,
+        "pairedConfirmationIntervalVerified": true,
+        "seconds": 20.890081170000485
+      },
+      "finalDatabaseBytes": 148049920,
+      "sourceBytes": 271599056
+    },
+    "movie": {
+      "source": {
+        "bookParser": "06cda200ade91c13907c7bd65e11122ea904ddc038694e06197def2094be0ead",
+        "bytes": 877076222,
+        "code": "53c19a1f420c5f13c7ccadadd0e071b1f70dd6a0063d68c089f4d81c649260e7",
+        "domain": "movie",
+        "exclusions": [
+          {
+            "ratings": 298690,
+            "sha256": "96cb1e6469d0aaf2bb3484247d21d264d5edbafaf24d1f8d9bc081cd299bbb4f",
+            "subjects": 500
+          }
+        ],
+        "protocol": "850f5681e21d6ad315e0df24c014d3e4e2ba18a4a6ed2c3a41deefa8502fa03a",
+        "python": "3.12.14",
+        "raw": "91159850e41ee59c86231165a688709647e2726cab2e7ba9faf04001bd5261ee",
+        "source": "57ecbab7986f1ae9fa66efbd87444d1f7023c50cb9780f866175808ae9036ddc",
+        "sqlite": "3.53.1"
+      },
+      "sourceCensus": {
+        "complete": true,
+        "conflictingPairs": 0,
+        "eligiblePairs": 32000204,
+        "histogram": {
+          "1": 525132,
+          "10": 4596577,
+          "2": 946675,
+          "3": 531063,
+          "4": 2028622,
+          "5": 1685386,
+          "6": 6054990,
+          "7": 4290105,
+          "8": 8367654,
+          "9": 2974000
+        },
+        "offset": 877076222,
+        "quarantinedRows": 0,
+        "ratedObjects": 84432,
+        "repeatRows": 0,
+        "rows": 32000204,
+        "sourceSubjects": 200948,
+        "uniquePairs": 32000204
+      },
+      "partition": {
+        "backgroundSubjects": 186650,
+        "confirmationSubjects": 400,
+        "developmentSubjects": 400,
+        "evaluationEligible": 2172,
+        "excludedSubjects": 500,
+        "sha256": "311cc842e07a5c77a3c07f9b47c119920fce484a6578a7ebff291668bab6d0a5",
+        "sizes": [
+          1000,
+          5000,
+          20000,
+          186650
+        ]
+      },
+      "training": {
+        "complete": true,
+        "rows": 28445684,
+        "statsSha256": "70e53be99cae60c43eafa4f9048a910ee2bde49ee1f97149c2c922edbd3f1d44",
+        "subjects": 186650,
+        "sum": 201368893
+      },
+      "development": {
+        "identity": {
+          "domain": "movie",
+          "source": "57ecbab7986f1ae9fa66efbd87444d1f7023c50cb9780f866175808ae9036ddc",
+          "raw": "91159850e41ee59c86231165a688709647e2726cab2e7ba9faf04001bd5261ee",
+          "bytes": 877076222,
+          "protocol": "850f5681e21d6ad315e0df24c014d3e4e2ba18a4a6ed2c3a41deefa8502fa03a",
+          "code": "53c19a1f420c5f13c7ccadadd0e071b1f70dd6a0063d68c089f4d81c649260e7",
+          "bookParser": "06cda200ade91c13907c7bd65e11122ea904ddc038694e06197def2094be0ead",
+          "python": "3.12.14",
+          "sqlite": "3.53.1",
+          "exclusions": [
+            {
+              "sha256": "96cb1e6469d0aaf2bb3484247d21d264d5edbafaf24d1f8d9bc081cd299bbb4f",
+              "subjects": 500,
+              "ratings": 298690
+            }
+          ]
+        },
+        "partition": {
+          "backgroundSubjects": 186650,
+          "confirmationSubjects": 400,
+          "developmentSubjects": 400,
+          "evaluationEligible": 2172,
+          "excludedSubjects": 500,
+          "sha256": "311cc842e07a5c77a3c07f9b47c119920fce484a6578a7ebff291668bab6d0a5",
+          "sizes": [
+            1000,
+            5000,
+            20000,
+            186650
+          ]
+        },
+        "results": {
+          "1000": {
+            "0": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.8451890213165878,
+              "mae": 1.4035165826692657,
+              "bias": -6.572205617114944e-05,
+              "itemOnlyRmse": 1.8451890213165878,
+              "coldItemFraction": 0.21485543369890328,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "0feec0058d4d468105be0d237b837946b7dad329b38d8ffbe41452969a994776",
+              "trainingRows": 145133,
+              "trainingSubjects": 1000
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.7673314561848896,
+              "mae": 1.337036545439249,
+              "bias": 0.01209598969503443,
+              "itemOnlyRmse": 1.8451890213165878,
+              "coldItemFraction": 0.21485543369890328,
+              "visibleMean": 4.9525,
+              "zeroVisibleSubjects": 3,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "0feec0058d4d468105be0d237b837946b7dad329b38d8ffbe41452969a994776",
+              "trainingRows": 145133,
+              "trainingSubjects": 1000
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.735434719602232,
+              "mae": 1.3115474774666611,
+              "bias": 0.0049374476940707325,
+              "itemOnlyRmse": 1.8451890213165878,
+              "coldItemFraction": 0.21485543369890328,
+              "visibleMean": 9.935,
+              "zeroVisibleSubjects": 1,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "0feec0058d4d468105be0d237b837946b7dad329b38d8ffbe41452969a994776",
+              "trainingRows": 145133,
+              "trainingSubjects": 1000
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.6985136700372074,
+              "mae": 1.2816572755553977,
+              "bias": -0.0034591275015254195,
+              "itemOnlyRmse": 1.8451890213165878,
+              "coldItemFraction": 0.21485543369890328,
+              "visibleMean": 19.9575,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "0feec0058d4d468105be0d237b837946b7dad329b38d8ffbe41452969a994776",
+              "trainingRows": 145133,
+              "trainingSubjects": 1000
+            }
+          },
+          "5000": {
+            "0": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.8212137295052075,
+              "mae": 1.3814409310245133,
+              "bias": 0.033059215673212655,
+              "itemOnlyRmse": 1.8212137295052075,
+              "coldItemFraction": 0.16029185171757454,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "d2cf63c249ce68dfe0a258215b5bdffafa024d905c9736c7f17927bdc2c16089",
+              "trainingRows": 738985,
+              "trainingSubjects": 5000
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.7430353594429362,
+              "mae": 1.3147767515967974,
+              "bias": 0.037217900038445745,
+              "itemOnlyRmse": 1.8212137295052075,
+              "coldItemFraction": 0.16029185171757454,
+              "visibleMean": 4.9525,
+              "zeroVisibleSubjects": 3,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "d2cf63c249ce68dfe0a258215b5bdffafa024d905c9736c7f17927bdc2c16089",
+              "trainingRows": 738985,
+              "trainingSubjects": 5000
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.7113736163411126,
+              "mae": 1.2874993492027147,
+              "bias": 0.02814425813281153,
+              "itemOnlyRmse": 1.8212137295052075,
+              "coldItemFraction": 0.16029185171757454,
+              "visibleMean": 9.935,
+              "zeroVisibleSubjects": 1,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "d2cf63c249ce68dfe0a258215b5bdffafa024d905c9736c7f17927bdc2c16089",
+              "trainingRows": 738985,
+              "trainingSubjects": 5000
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.673817729409713,
+              "mae": 1.2564952461325685,
+              "bias": 0.018620257170890008,
+              "itemOnlyRmse": 1.8212137295052075,
+              "coldItemFraction": 0.16029185171757454,
+              "visibleMean": 19.9575,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "d2cf63c249ce68dfe0a258215b5bdffafa024d905c9736c7f17927bdc2c16089",
+              "trainingRows": 738985,
+              "trainingSubjects": 5000
+            }
+          },
+          "20000": {
+            "0": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.8074649096075475,
+              "mae": 1.368965394287845,
+              "bias": 0.02589837911168096,
+              "itemOnlyRmse": 1.8074649096075475,
+              "coldItemFraction": 0.11674068702981963,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "46ac51657b8f03c2642a9907d6b60b9bb9548946184722de0c856d2a1c94a5e9",
+              "trainingRows": 3057924,
+              "trainingSubjects": 20000
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.7301946242700728,
+              "mae": 1.3011395533715104,
+              "bias": 0.03583690966745579,
+              "itemOnlyRmse": 1.8074649096075475,
+              "coldItemFraction": 0.11674068702981963,
+              "visibleMean": 4.9525,
+              "zeroVisibleSubjects": 3,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "46ac51657b8f03c2642a9907d6b60b9bb9548946184722de0c856d2a1c94a5e9",
+              "trainingRows": 3057924,
+              "trainingSubjects": 20000
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.6982102988341412,
+              "mae": 1.2733039475299706,
+              "bias": 0.030008151141671963,
+              "itemOnlyRmse": 1.8074649096075475,
+              "coldItemFraction": 0.11674068702981963,
+              "visibleMean": 9.935,
+              "zeroVisibleSubjects": 1,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "46ac51657b8f03c2642a9907d6b60b9bb9548946184722de0c856d2a1c94a5e9",
+              "trainingRows": 3057924,
+              "trainingSubjects": 20000
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.6614686052393606,
+              "mae": 1.242063754274057,
+              "bias": 0.023345020068971597,
+              "itemOnlyRmse": 1.8074649096075475,
+              "coldItemFraction": 0.11674068702981963,
+              "visibleMean": 19.9575,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "46ac51657b8f03c2642a9907d6b60b9bb9548946184722de0c856d2a1c94a5e9",
+              "trainingRows": 3057924,
+              "trainingSubjects": 20000
+            }
+          },
+          "186650": {
+            "0": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.7951041831474062,
+              "mae": 1.362025115645737,
+              "bias": -0.03785454811576955,
+              "itemOnlyRmse": 1.7951041831474062,
+              "coldItemFraction": 0.0926311973171395,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+              "trainingRows": 28445684,
+              "trainingSubjects": 186650
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.7171122793867044,
+              "mae": 1.2900009954945804,
+              "bias": 0.0003843910877901913,
+              "itemOnlyRmse": 1.7951041831474062,
+              "coldItemFraction": 0.0926311973171395,
+              "visibleMean": 4.9525,
+              "zeroVisibleSubjects": 3,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+              "trainingRows": 28445684,
+              "trainingSubjects": 186650
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.685094003002655,
+              "mae": 1.2611998499686985,
+              "bias": 0.0058920928042072275,
+              "itemOnlyRmse": 1.7951041831474062,
+              "coldItemFraction": 0.0926311973171395,
+              "visibleMean": 9.935,
+              "zeroVisibleSubjects": 1,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+              "trainingRows": 28445684,
+              "trainingSubjects": 186650
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 22066,
+              "coverage": 1,
+              "rmse": 1.6493555437751815,
+              "mae": 1.229853133788235,
+              "bias": 0.009597022387421345,
+              "itemOnlyRmse": 1.7951041831474062,
+              "coldItemFraction": 0.0926311973171395,
+              "visibleMean": 19.9575,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "ff601c2a801dc9414cc6d4ce960dd9fe600c7cb4d5a05cadfe414588202600b6",
+              "modelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+              "trainingRows": 28445684,
+              "trainingSubjects": 186650
+            }
+          }
+        },
+        "selection": {
+          "selected": 186650,
+          "bestDevelopmentRmse": 1.6493555437751815,
+          "rule": "SMALLEST_NEAR_BEST_WITH_COLD_GUARDS",
+          "confirmationRead": false,
+          "pairedDevelopment": {
+            "rmseDelta": -0.04915812626202598,
+            "interval95": [
+              -0.06332315164829505,
+              -0.03587951783088017
+            ],
+            "subjects": 400
+          }
+        },
+        "resources": {
+          "curve": {
+            "maxRssKiB": 85872,
+            "seconds": 22.622664463000547,
+            "storeBytes": 5017300734
+          },
+          "fit": {
+            "maxRssKiB": 75728,
+            "seconds": 30.119198497999605,
+            "storeBytes": 4524721990
+          },
+          "ingest": {
+            "maxRssKiB": 59068,
+            "seconds": 142.25012047400014,
+            "storeBytes": 3376341294
+          },
+          "partition": {
+            "maxRssKiB": 112640,
+            "seconds": 6.5719130030011,
+            "storeBytes": 3652116774
+          }
+        },
+        "admission": "NONE"
+      },
+      "confirmation": {
+        "identity": {
+          "domain": "movie",
+          "source": "57ecbab7986f1ae9fa66efbd87444d1f7023c50cb9780f866175808ae9036ddc",
+          "raw": "91159850e41ee59c86231165a688709647e2726cab2e7ba9faf04001bd5261ee",
+          "bytes": 877076222,
+          "protocol": "850f5681e21d6ad315e0df24c014d3e4e2ba18a4a6ed2c3a41deefa8502fa03a",
+          "code": "53c19a1f420c5f13c7ccadadd0e071b1f70dd6a0063d68c089f4d81c649260e7",
+          "bookParser": "06cda200ade91c13907c7bd65e11122ea904ddc038694e06197def2094be0ead",
+          "python": "3.12.14",
+          "sqlite": "3.53.1",
+          "exclusions": [
+            {
+              "sha256": "96cb1e6469d0aaf2bb3484247d21d264d5edbafaf24d1f8d9bc081cd299bbb4f",
+              "subjects": 500,
+              "ratings": 298690
+            }
+          ]
+        },
+        "selectionSha256": "0a9b3bd056adfd95531b3aadd7a96355e91e60144ee9921e55bcb28a702ceca1",
+        "results": {
+          "1000": {
+            "0": {
+              "subjects": 400,
+              "targets": 24416,
+              "coverage": 1,
+              "rmse": 1.7742516936062618,
+              "mae": 1.3630822593546637,
+              "bias": 0.004715763821194423,
+              "itemOnlyRmse": 1.7742516936062618,
+              "coldItemFraction": 0.37893184796854523,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "404f6227703ceab7f8a8ecf2d1cc7ed14845aee2c6dbf1c652ac9255ad1c1260",
+              "modelSha256": "0feec0058d4d468105be0d237b837946b7dad329b38d8ffbe41452969a994776",
+              "trainingRows": 145133,
+              "trainingSubjects": 1000
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 24416,
+              "coverage": 1,
+              "rmse": 1.6872572768912772,
+              "mae": 1.3014657980216162,
+              "bias": -0.03443163610777854,
+              "itemOnlyRmse": 1.7742516936062618,
+              "coldItemFraction": 0.37893184796854523,
+              "visibleMean": 4.9825,
+              "zeroVisibleSubjects": 1,
+              "targetSha256": "404f6227703ceab7f8a8ecf2d1cc7ed14845aee2c6dbf1c652ac9255ad1c1260",
+              "modelSha256": "0feec0058d4d468105be0d237b837946b7dad329b38d8ffbe41452969a994776",
+              "trainingRows": 145133,
+              "trainingSubjects": 1000
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 24416,
+              "coverage": 1,
+              "rmse": 1.6681508485174688,
+              "mae": 1.280195298986794,
+              "bias": -0.034393466515112096,
+              "itemOnlyRmse": 1.7742516936062618,
+              "coldItemFraction": 0.37893184796854523,
+              "visibleMean": 9.965,
+              "zeroVisibleSubjects": 1,
+              "targetSha256": "404f6227703ceab7f8a8ecf2d1cc7ed14845aee2c6dbf1c652ac9255ad1c1260",
+              "modelSha256": "0feec0058d4d468105be0d237b837946b7dad329b38d8ffbe41452969a994776",
+              "trainingRows": 145133,
+              "trainingSubjects": 1000
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 24416,
+              "coverage": 1,
+              "rmse": 1.6560607806614414,
+              "mae": 1.2659194766148425,
+              "bias": -0.07237745967772483,
+              "itemOnlyRmse": 1.7742516936062618,
+              "coldItemFraction": 0.37893184796854523,
+              "visibleMean": 19.99,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "404f6227703ceab7f8a8ecf2d1cc7ed14845aee2c6dbf1c652ac9255ad1c1260",
+              "modelSha256": "0feec0058d4d468105be0d237b837946b7dad329b38d8ffbe41452969a994776",
+              "trainingRows": 145133,
+              "trainingSubjects": 1000
+            }
+          },
+          "186650": {
+            "0": {
+              "subjects": 400,
+              "targets": 24416,
+              "coverage": 1,
+              "rmse": 1.7444728848862465,
+              "mae": 1.3417788225871885,
+              "bias": -0.018443978645610436,
+              "itemOnlyRmse": 1.7444728848862465,
+              "coldItemFraction": 0.2744511795543906,
+              "visibleMean": 0.0,
+              "zeroVisibleSubjects": 400,
+              "targetSha256": "404f6227703ceab7f8a8ecf2d1cc7ed14845aee2c6dbf1c652ac9255ad1c1260",
+              "modelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+              "trainingRows": 28445684,
+              "trainingSubjects": 186650
+            },
+            "5": {
+              "subjects": 400,
+              "targets": 24416,
+              "coverage": 1,
+              "rmse": 1.6536206858118099,
+              "mae": 1.2702039191424226,
+              "bias": -0.03208270678505362,
+              "itemOnlyRmse": 1.7444728848862465,
+              "coldItemFraction": 0.2744511795543906,
+              "visibleMean": 4.9825,
+              "zeroVisibleSubjects": 1,
+              "targetSha256": "404f6227703ceab7f8a8ecf2d1cc7ed14845aee2c6dbf1c652ac9255ad1c1260",
+              "modelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+              "trainingRows": 28445684,
+              "trainingSubjects": 186650
+            },
+            "10": {
+              "subjects": 400,
+              "targets": 24416,
+              "coverage": 1,
+              "rmse": 1.6338330103525571,
+              "mae": 1.2490942433978074,
+              "bias": -0.020262714789250746,
+              "itemOnlyRmse": 1.7444728848862465,
+              "coldItemFraction": 0.2744511795543906,
+              "visibleMean": 9.965,
+              "zeroVisibleSubjects": 1,
+              "targetSha256": "404f6227703ceab7f8a8ecf2d1cc7ed14845aee2c6dbf1c652ac9255ad1c1260",
+              "modelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+              "trainingRows": 28445684,
+              "trainingSubjects": 186650
+            },
+            "20": {
+              "subjects": 400,
+              "targets": 24416,
+              "coverage": 1,
+              "rmse": 1.625156106818672,
+              "mae": 1.2357708662126117,
+              "bias": -0.03750711781702454,
+              "itemOnlyRmse": 1.7444728848862465,
+              "coldItemFraction": 0.2744511795543906,
+              "visibleMean": 19.99,
+              "zeroVisibleSubjects": 0,
+              "targetSha256": "404f6227703ceab7f8a8ecf2d1cc7ed14845aee2c6dbf1c652ac9255ad1c1260",
+              "modelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+              "trainingRows": 28445684,
+              "trainingSubjects": 186650
+            }
+          }
+        },
+        "comparison": {
+          "rmseDelta": -0.030904673842769403,
+          "interval95": [
+            -0.04259926308041728,
+            -0.020118092162735524
+          ],
+          "subjects": 400
+        },
+        "coldGuardsPassed": true,
+        "disposition": "RETAIN_LARGER_RESEARCH_MODEL",
+        "resources": {
+          "confirmation": {
+            "maxRssKiB": 83540,
+            "seconds": 10.88690982800108,
+            "storeBytes": 5489223841
+          },
+          "curve": {
+            "maxRssKiB": 85872,
+            "seconds": 22.622664463000547,
+            "storeBytes": 5017300734
+          },
+          "fit": {
+            "maxRssKiB": 75728,
+            "seconds": 30.119198497999605,
+            "storeBytes": 4524721990
+          },
+          "ingest": {
+            "maxRssKiB": 59068,
+            "seconds": 142.25012047400014,
+            "storeBytes": 3376341294
+          },
+          "partition": {
+            "maxRssKiB": 112640,
+            "seconds": 6.5719130030011,
+            "storeBytes": 3652116774
+          }
+        },
+        "admission": "NONE",
+        "nativeCatalogueMapping": "NOT_QUERIED"
+      },
+      "independentAudit": {
+        "domain": "movie",
+        "status": "PASS",
+        "sourceRowsIndependentlyRead": 32000204,
+        "modelsVerified": 4,
+        "forecastValuesRecomputed": 548384,
+        "maxNumericalError": 4.440892098500626e-16,
+        "independentMembershipSelection": true,
+        "pairedConfirmationIntervalVerified": true,
+        "seconds": 96.19112374500037
+      },
+      "finalDatabaseBytes": 920047616,
+      "sourceBytes": 877076222
+    }
+  },
+  "bookReplay": "Original first protected confirmation under 900291d; exact model statistics, membership, all metrics and decision reproduced under CRLF-only correction 3418d. Replay is exposed conformance, not a second untouched confirmation.",
+  "failedAttempt": "MOVIE initial ingest rejected the publisher CRLF header at zero rows, before partition/fit/scoring. Original failure retained; LF/CRLF acceptance and regression published before the first new MOVIE selection. No protocol or numeric rule changed."
+}
