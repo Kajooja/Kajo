@@ -28,7 +28,7 @@ was below the fixed 0.02 margin. Preserve these outcomes and original D2 rejecti
 All three BOOK cohorts and the 32M cohort are exposed development evidence.
 
 **One active packet:** [#422](https://github.com/Kajooja/Kajo/issues/422), branch
-`research/scalable-rating-training-422`. The
+`research/scalable-rating-training-422`, [PR #424](https://github.com/Kajooja/Kajo/pull/424). The
 [protocol](../../research/manifests/rating-learning-curves-v1.json) fixes nested
 background populations (1,000 / 5,000 / 20,000 / all eligible subjects), independent
 400-person development and 400-person confirmation groups per domain, unchanged
@@ -47,6 +47,11 @@ source-local membership, 663,496 forecast values and both confirmation intervals
 BOOK's complete replay is identical conformance on already exposed evidence.
 Twelve new regression tests pass; final source CI/acceptance belongs to the PR.
 Do not merge until all six required gates pass on its final source/tested tree.
+The continuation found PR/CI #845 still pointing to the earlier code-only
+`3418d006ee1421cbd12a39765fade02fe555275b` while the branch already retained
+the result commit `2727ad91c0106bda4d960f5e28b1c9942e62d99b`. Refresh the PR
+source and verify a final-source run; the older run alone cannot accept the
+result documentation or this handoff.
 
 The disk-backed runner verifies pinned raw source bytes, resolves duplicate and
 conflicting pairs across the entire source, retains exact membership/exclusion
