@@ -1,0 +1,134 @@
+{
+  "version": "catalogue-admission-evidence-v1",
+  "issue": 425,
+  "mapping": {
+    "sourceLinkRows": 87585,
+    "sourceObjects": 87585,
+    "sourceAliasConflicts": 36,
+    "sourceDisposition": {
+      "CROSS_ALIAS_DISAGREEMENT": 2,
+      "MATCHED": 309,
+      "SOURCE_ALIAS_CONFLICT": 72,
+      "UNMAPPED": 87202
+    },
+    "activeMovieItems": 425,
+    "exactMappedMovieItems": 309,
+    "activeMoviesWithoutVerifiedMapping": 116,
+    "activeMovieDisposition": {
+      "CROSS_ALIAS_DISAGREEMENT": 2,
+      "MATCHED": 309,
+      "NO_SOURCE_ALIAS_MATCH": 114
+    },
+    "mappedMovieItemsWithTrainingSupport": 270,
+    "mappedMovieItemsWithoutTrainingSupport": 39,
+    "sourceObjectsWithTrainingSupport": 65959,
+    "book": {
+      "activeItems": 416,
+      "verifiedMappings": 0,
+      "disposition": "NO_REVIEWED_BOOK_GENOME_TO_OPEN_LIBRARY_CROSSWALK",
+      "actualOverlap": "UNKNOWN"
+    },
+    "nativeAliasNamespaces": {
+      "imdb_title": 425,
+      "kajo_curated_slug": 60,
+      "kajo_mock_slug": 24,
+      "open_library_work": 386,
+      "tmdb_movie": 425
+    },
+    "admission": "NONE",
+    "fallback": "EXISTING_NATIVE_ONLY",
+    "version": "catalogue-admission-audit-v1",
+    "checkedAt": "2026-11-05T16:23:22.264783+00:00",
+    "inputSha256": "7cf4d55217694aab8d7a639abe048d5cbf4dccc53b4e5ee95977d2b52dd302dd",
+    "linksSha256": "ef17da7710be76f7d510d5768d1b61826e3af4bf57812b9ca377e4c912123b22",
+    "planSha256": "f1907dfe891bfe6d94c15e8e3069d599d6a907a59a8545fdaa4a3c5430b79ccb",
+    "codeSha256": "18540930b5accf126fb96031b87db45c73bd3d9351bccfd7d44ca111053c6e24",
+    "snapshotSqlSha256": "a23879650a2ad264143e8bbb18780b639434a8c72f822ac8caa290456aa5305c",
+    "modelSha256": "b9a84dece49917462560473590b2db2071d107cef730bc761f023a69939996b9",
+    "privateDecisionsSha256": "abc79b431b233a17ef6460529cae06254abdd1ea11ca6e82b79ce019ab67da02"
+  },
+  "structuralFeatures": {
+    "version": "native-content-structural-support-v1",
+    "checkedAt": "2026-11-05T16:23:22.264783+00:00",
+    "snapshotSha256": "0c813d5768effb748606a3b641c13b1ad7888b4dbc8a3f451d0224730255ee63",
+    "mappingSha256": "b4319f2554c8627b35f4d77428ff91a576e66ef7ab58fbb1d35f6f64d66f1642",
+    "coverage": {
+      "BOOK": {
+        "WITHIN_LABEL_BUDGET_WITH_ASSERTIONS": 235,
+        "NO_SUPPORTED_SOURCE": 30,
+        "NO_MAPPED_CONCEPT": 137,
+        "NATIVE_LABEL_BUDGET_EXCEEDED": 14
+      },
+      "MOVIE": {
+        "NO_MAPPED_CONCEPT": 145,
+        "WITHIN_LABEL_BUDGET_WITH_ASSERTIONS": 280
+      }
+    },
+    "broadInspectorCoverage": {
+      "BOOK": {
+        "items": 416,
+        "itemsWithAssertions": 244,
+        "itemsWithoutAssertions": 172,
+        "itemsWithoutSupportedSource": 30,
+        "itemsWithIdentityMismatch": 0,
+        "sourceRows": 416,
+        "unsupportedSourceRows": 30,
+        "identityMismatchSourceRows": 0,
+        "missingLabelSourceRows": 0,
+        "emptyLabelSourceRows": 0,
+        "observedLabelOccurrences": 19977,
+        "matchedLabelOccurrences": 780,
+        "unmatchedLabelOccurrences": 19197,
+        "matchedLabelsAbsentFromItemTags": 575,
+        "itemsWithAssertionsAbsentFromItemTags": 171,
+        "assertionsAbsentFromItemTags": 231,
+        "conceptItems": {
+          "fantasy": 92,
+          "horror": 60,
+          "mystery": 75,
+          "romance": 65,
+          "science-fiction": 61,
+          "thriller": 52
+        }
+      },
+      "MOVIE": {
+        "items": 425,
+        "itemsWithAssertions": 280,
+        "itemsWithoutAssertions": 145,
+        "itemsWithoutSupportedSource": 0,
+        "itemsWithIdentityMismatch": 0,
+        "sourceRows": 455,
+        "unsupportedSourceRows": 30,
+        "identityMismatchSourceRows": 0,
+        "missingLabelSourceRows": 0,
+        "emptyLabelSourceRows": 0,
+        "observedLabelOccurrences": 1135,
+        "matchedLabelOccurrences": 388,
+        "unmatchedLabelOccurrences": 747,
+        "matchedLabelsAbsentFromItemTags": 0,
+        "itemsWithAssertionsAbsentFromItemTags": 0,
+        "assertionsAbsentFromItemTags": 0,
+        "conceptItems": {
+          "fantasy": 70,
+          "horror": 59,
+          "mystery": 35,
+          "romance": 44,
+          "science-fiction": 77,
+          "thriller": 103
+        }
+      }
+    },
+    "semantics": "STRUCTURAL_UPPER_BOUND_NOT_PERMISSION_OR_NATIVE_CAPTURE_ACCEPTANCE",
+    "missing": "UNAVAILABLE_NOT_NEGATIVE",
+    "featurePermission": "NOT_GRANTED_BY_AUDIT",
+    "qualityAdmission": "NONE",
+    "servingActivation": "NONE"
+  },
+  "independentVerification": {
+    "method": "independent SQLite full-release joins; no production audit code imported",
+    "verifiedSourceObjectDecisions": 87585,
+    "allDecisionsEqual": true,
+    "sourceAliasConflicts": 36,
+    "querySha256": "bdf39014be501982885a7ac93809003b0d4ae7abd835671e026aaa7d97f9cf02"
+  }
+}

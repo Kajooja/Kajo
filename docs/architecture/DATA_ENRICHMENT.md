@@ -449,6 +449,18 @@ keeps the pre-release gate open, without inventing ratings or native accounts.
 
 ## 9. Admission into Kajo, only after research
 
+The [#425 catalogue audit](../../research/reports/catalogue-admission-v1.md)
+separates exact identity mapping, trained-item support and structural native
+feature coverage from rights and predictive admission. Full-release alias
+collisions, cross-provider disagreement and many-to-one canonical targets are
+quarantined before using a mapped research statistic. A current metadata snapshot
+does not establish historical feature availability. Book Genome dataset IDs,
+Goodreads URLs and Open Library Works/Editions require a reviewed identity bridge;
+title similarity never creates one automatically. The native content projection's
+label bounds remain unchanged; missing/oversized/unpermitted sources retain the
+native mean/unavailable fallback. The existing domain-prior API is not an external
+item-prior import interface. The dated report owns counts, not this contract.
+
 The #422 [learning-curve protocol](../../research/manifests/rating-learning-curves-v1.json)
 and [source-use register](../../research/manifests/broad-training-source-use-v1.json)
 make the first scale experiment concrete. Whole-source pair conflict resolution

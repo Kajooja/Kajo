@@ -928,6 +928,18 @@ the independent core's established bounded APIs. The exact SQLite membership
 witness replaces their in-memory pair guards only inside this isolated runner.
 Raw data, fitted sufficient statistics and personal evaluation records stay private.
 
+## Research catalogue/admission audit — #425
+
+| Responsibility | Implementation |
+| --- | --- |
+| Read-only catalogue acquisition | `scripts/research/catalogue_admission.py --print-snapshot-sql` composes the existing feature projection and canonical aliases in one statement; no native people or observations |
+| Exact external identity and trained-item coverage | Same Python runner; pinned full-release links, collision/disagreement quarantine, one-to-one canonical target, read-only completed-model lineage and explicit native-only disposition |
+| Structural native feature bounds | `scripts/catalog/inspect-native-feature-support.mjs` reuses `item-features.mjs`, retaining 128-label/256-code-point limits without truncation or permission claims |
+| Evidence and verification | `research/manifests/catalogue-admission-v1.json`, `research/reports/catalogue-admission-v1.{json,md}`, `scripts/research/test_catalogue_admission.py`, `scripts/catalog/inspect-native-feature-support.test.mjs` |
+
+Private per-Item decisions/snapshots stay outside Git. This audit neither exports
+an external serving model nor changes the native numeric/content adapters.
+
 ## Centered response research — #421
 
 | Area | Source | Scope |
