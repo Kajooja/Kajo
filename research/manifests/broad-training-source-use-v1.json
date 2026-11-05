@@ -1,0 +1,111 @@
+{
+  "version": "broad-training-source-use-register-v1",
+  "status": "EXISTING_RESEARCH_PERMISSIONS_ONLY",
+  "issue": 422,
+  "sourceHead": "332641523bea1e8335b9a1fdc358b409fd774f8a",
+  "entries": [
+    {
+      "domain": "BOOK",
+      "sourceManifest": "research/manifests/book-genome-2021.json",
+      "sourceManifestSha256": "c94a5f0429f6e97098770f96b6c4eaa5c929d6d089b3e340d2ce40bdbda2e41e",
+      "sourceId": "grouplens-book-genome",
+      "releaseId": "2021-12-30",
+      "publisherLandingUrl": "https://grouplens.org/datasets/book-genome/",
+      "rightsEvidenceUrl": "https://files.grouplens.org/datasets/book-genome/book-genome-readme.txt",
+      "sourceUseReview": {
+        "license": "CC BY-NC 3.0",
+        "purpose": "NONCOMMERCIAL_RESEARCH_ONLY",
+        "reviewedAt": "2026-11-05",
+        "evidence": "Publisher README Usage License and acknowledgement of permission to publish this specific Goodreads subset.",
+        "rawRedistribution": "not-approved-for-this-project",
+        "fittedArtifactRedistribution": "not-approved-for-this-project",
+        "commercialUse": "not-approved",
+        "productionServing": "not-approved",
+        "nativeImport": false,
+        "attribution": "Kotkov, Denis; Medlar, Alan; Maslov, Alexandr; Satyal, Umesh Raj; Neovius, Mats; Glowacka, Dorota (2022). The Tag Genome Dataset for Books. CHIIR 2022. https://doi.org/10.1145/3498366.3505833"
+      },
+      "verifiedRawCounts": {
+        "ratings": 5152656,
+        "subjects": 350332,
+        "objects": 9374
+      },
+      "eligibleTrainingRows": "NOT_YET_ESTABLISHED_FOR_BROAD_FIT",
+      "sourceTimeContract": "NOT_PROVIDED",
+      "sourceIdentityBoundary": "SOURCE_AND_RELEASE_LOCAL_NO_CROSS_SOURCE_USER_JOIN",
+      "artifacts": {
+        "originalDownloadedSource": "PRIVATE_RESEARCH_INPUT",
+        "normalizedIndividualRatings": "PRIVATE_RESEARCH_INPUT_WITH_PROVENANCE",
+        "fittedStatisticsAndPersonalParameters": "PRIVATE_RESEARCH_ONLY_NO_PRODUCTION_OR_REDISTRIBUTION_APPROVAL",
+        "aggregateReportsAndAuthoredCode": "PUBLIC_WITH_SOURCE_ATTRIBUTION_AND_NON_IDENTIFYING_CONTENT"
+      },
+      "publicationGate": {
+        "currentlyApproved": false,
+        "neededBeforeProduction": "Document permission covering the intended training and derived-model production/commercial use, including any distribution, or select a source with verified compatible rights. Existing research use does not imply that permission.",
+        "outreachPerformed": false,
+        "trackedBy": "MVP-ALG-013; intended-use permission or compatible replacement is required before any production training/serving proposal"
+      },
+      "sourceWithdrawalAndRebuild": {
+        "implementation": "scripts/research/scalable_ratings.py withdraw",
+        "scope": "One source/release per store; tombstone denies loading every fitted model and deletes its statistics. A different permitted source requires a new complete run with new source/partition identity. Deleting raw files alone is insufficient.",
+        "fallback": "No external model is exported to native serving. Existing native fallback remains; absent/disallowed/withdrawn models fail closed and separately supplied native grades retain their mean, including zero, or unavailable."
+      }
+    },
+    {
+      "domain": "MOVIE",
+      "sourceManifest": "research/manifests/movielens-32m.json",
+      "sourceManifestSha256": "463188e435ab97234d3b50326c443549c4750fbbfadc313316eebbd16e97cf65",
+      "sourceId": "movielens",
+      "releaseId": "ml-32m",
+      "publisherLandingUrl": "https://grouplens.org/datasets/movielens/32m/",
+      "rightsEvidenceUrl": "https://files.grouplens.org/datasets/movielens/ml-32m-README.html",
+      "sourceUseReview": {
+        "purpose": "NONCOMMERCIAL_RESEARCH_ONLY",
+        "research": "approved-for-noncommercial-research",
+        "reviewedBy": "Kajo research source review",
+        "reviewedAt": "2026-11-05",
+        "rawRedistribution": "not-approved",
+        "fittedArtifactRedistribution": "not-approved",
+        "commercialUse": "not-approved",
+        "productionServing": "not-approved",
+        "publication": [
+          "authored-code",
+          "schemas",
+          "non-identifying-manifests",
+          "aggregate-reports",
+          "attribution"
+        ]
+      },
+      "verifiedRawCounts": {
+        "ratings": 32000204,
+        "subjects": 200948,
+        "movies": 87585,
+        "tags": 2000072
+      },
+      "eligibleTrainingRows": "NOT_YET_ESTABLISHED_FOR_BROAD_FIT",
+      "sourceTimeContract": "rating-record-seconds-since-unix-epoch-utc",
+      "sourceIdentityBoundary": "SOURCE_AND_RELEASE_LOCAL_NO_CROSS_SOURCE_USER_JOIN",
+      "artifacts": {
+        "originalDownloadedSource": "PRIVATE_RESEARCH_INPUT",
+        "normalizedIndividualRatings": "PRIVATE_RESEARCH_INPUT_WITH_PROVENANCE",
+        "fittedStatisticsAndPersonalParameters": "PRIVATE_RESEARCH_ONLY_NO_PRODUCTION_OR_REDISTRIBUTION_APPROVAL",
+        "aggregateReportsAndAuthoredCode": "PUBLIC_WITH_SOURCE_ATTRIBUTION_AND_NON_IDENTIFYING_CONTENT"
+      },
+      "publicationGate": {
+        "currentlyApproved": false,
+        "neededBeforeProduction": "Document permission covering the intended training and derived-model production/commercial use, including any distribution, or select a source with verified compatible rights. Existing research use does not imply that permission.",
+        "outreachPerformed": false,
+        "trackedBy": "MVP-ALG-013; intended-use permission or compatible replacement is required before any production training/serving proposal"
+      },
+      "sourceWithdrawalAndRebuild": {
+        "implementation": "scripts/research/scalable_ratings.py withdraw",
+        "scope": "One source/release per store; tombstone denies loading every fitted model and deletes its statistics. A different permitted source requires a new complete run with new source/partition identity. Deleting raw files alone is insufficient.",
+        "fallback": "No external model is exported to native serving. Existing native fallback remains; absent/disallowed/withdrawn models fail closed and separately supplied native grades retain their mean, including zero, or unavailable."
+      }
+    }
+  ],
+  "nativeOwnerPilot": "SEPARATE_EXISTING_PRIVATE_OBSERVATION_ROUTE_NOT_AN_EXTERNAL_TRAINING_SOURCE",
+  "newSourceSelected": false,
+  "newFitExecuted": false,
+  "productionAdmission": "NONE",
+  "ownerInputRequiredNow": false
+}

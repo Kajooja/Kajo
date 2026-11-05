@@ -1,0 +1,65 @@
+{
+  "version": "rating-learning-curves-v1",
+  "issue": "https://github.com/Kajooja/Kajo/issues/422",
+  "scope": "NONCOMMERCIAL_ISOLATED_RESEARCH_ONLY",
+  "seed": "kajo-broad-ratings-20261105-v1",
+  "question": "How much does broader background item support help the retained individual-rating location model at fixed personal evidence?",
+  "model": {"itemShrinkage": 10, "subjectShrinkage": 10, "multiplier": 2},
+  "trainingSubjects": [1000, 5000, 20000, "ALL"],
+  "developmentSubjects": 400,
+  "confirmationSubjects": 400,
+  "coldBudgets": [0, 5, 10, 20],
+  "primaryBudget": 20,
+  "book": {
+    "sourceManifest": "book-genome-2021.json",
+    "minimumRatings": 20,
+    "maximumRatings": 10000,
+    "targetFraction": 0.2,
+    "exclusions": [
+      {"sha256": "9bd43253223a84c3091d849bea9d0391547dd2aa72156903fc40ffb3ebc20b90", "subjects": 500, "ratings": 31144},
+      {"sha256": "44cbc15a09c677f5de501ed5b5ac0b59ed732bd4d594fd62181b0c94dca1f112", "subjects": 500, "ratings": 33243},
+      {"sha256": "35ccad2d3547c46149d4bef59c1a5521d0b0575a53ce21c7c9815c08ae39f633", "subjects": 500, "ratings": 31152}
+    ],
+    "time": "UNDATED_MASK_ONLY"
+  },
+  "movie": {
+    "sourceManifest": "movielens-32m.json",
+    "trainBefore": 1609459200,
+    "testFrom": 1640995200,
+    "minimumTrain": 20,
+    "minimumValidation": 5,
+    "minimumTest": 5,
+    "maximumRatings": 1500,
+    "exclusions": [
+      {"sha256": "96cb1e6469d0aaf2bb3484247d21d264d5edbafaf24d1f8d9bc081cd299bbb4f", "subjects": 500, "ratings": 298690}
+    ],
+    "time": "GLOBAL_CUTOFF_RATING_ENTRY_TIME_NOT_VIEW_TIME",
+    "crossReleasePersonOverlap": "UNKNOWN"
+  },
+  "partition": "After whole-source pair deduplication/quarantine, exclude all witnessed exposed subjects entirely. Rank eligible evaluation subjects by SHA256(seed:domain:evaluation:source-local-user). First 400 are development, next 400 protected confirmation. Every other nonexposed subject with permitted training rows is background, ranked independently by SHA256(seed:domain:background:user). Nested sizes include complete permitted histories. Neither evaluation group's visible or target ratings enter the shared fit.",
+  "targets": "BOOK: hash-rank each evaluation subject's unique Items, first floor(0.2*n) are fixed targets; remaining mask supplies first 0/5/10/20 visible ratings. MOVIE: development targets in 2021 and confirmation targets from 2022; visible ratings strictly before 2021, latest complete timestamp groups, stop at first oversized group. Entire confirmation subjects are excluded from development. No label-based eligibility, seed search, refill or target changes.",
+  "duplicates": "Whole source: identical (subject,item,grade,time) repeats collapse; any grade/time conflict permanently quarantines every occurrence of that pair, including across checkpoints. Keep original source bytes and first-line/occurrence provenance. Raw counts are not eligible counts.",
+  "decision": {
+    "nearBestRmse": 0.01,
+    "minimumGain": 0.02,
+    "maximumMaeIncrease": 0.02,
+    "maximumColdRmseIncrease": 0.05,
+    "requiredCoverage": 1,
+    "bootstrapReplicates": 2000,
+    "rule": "Run all four bounded development sizes once. Choose the smallest size within 0.01 RMSE of the best primary-budget result, with full coverage, MAE no more than 0.02 worse and every cold-budget RMSE no more than 0.05 worse than size 1000. Otherwise retain size 1000. Persist selection before confirmation. On previously untouched confirmation people/targets compare only selected versus size 1000: require gain >=0.02, paired-subject 95% upper delta <0, MAE and all cold guards. Failure retains the small research control. No retuning or further size expansion in this experiment.",
+    "meaning": "Equal-subject sqrt(mean MSE) in mapped ten-point units. Exploratory development curves and one protected research confirmation, not native quality admission or causal recommendation uplift. A later experiment cannot call these exposed cohorts untouched."
+  },
+  "budgets": {
+    "checkpointRows": 25000,
+    "fitCheckpointSubjects": 500,
+    "maxStageSeconds": 3600,
+    "maxRssMiB": 1024,
+    "maxDiskBytes": 8589934592,
+    "maxLineBytes": 4096,
+    "maxEvaluationRows": 2000000,
+    "failure": "Stop, preserve last committed checkpoint and the failed attempt; do not label partial output a complete model or loosen budgets after scoring. Resume only exact source/code/protocol/runtime/partition identities. No automatic retry or cohort replacement."
+  },
+  "coverage": "Report subjects/rows, original histogram, whole-source conflicts/duplicates, fixed target hashes, actual visible support, cold-item fraction, unknown catalogue mapping, per-domain subject-macro RMSE/MAE/bias, resource counters and same-target paired intervals. No cross-domain pooling or person joins.",
+  "admission": "NONE",
+  "publication": "Only authored code, protocol, source-use register and non-identifying aggregate evidence. Histories, memberships, per-person forecasts, checkpoints and fitted weights remain private. Production pretraining/serving requires separate compatible rights, quality, native compatibility and rollback acceptance."
+}

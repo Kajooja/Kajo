@@ -913,6 +913,21 @@ serving; the generic computation root does not import this external adapter.
 | Disjoint development comparison | `research/manifests/book-genome-development-v2.json`; `scripts/research/rating-macro-comparison.mjs` | Prior-cohort exclusion witness, fixed item/profile comparison, equal-reader paired bootstrap, validation-before-holdout selection, mandatory cold guards and explicit research-only disposition |
 | Verification and results | `test/research-static.test.ts`; `scripts/research/test_book_genome.py`, `evaluate-books.test.mjs`, `rating-macro-comparison.test.mjs`; `research/reports/book-genome-static-v1.json` | Artificial offline integrity/leakage/media/non-media fixtures in root checks plus aggregate real-data arithmetic conformance; no real download in CI or native quality/serving admission |
 
+## Scalable individual-rating research — #422
+
+| Responsibility | Implementation |
+| --- | --- |
+| Frozen size/evaluation protocol | `research/manifests/rating-learning-curves-v1.json`; nested background histories, fixed personal masks/prefixes, protected subjects and decision/resource rules |
+| Source and derivative rights | `research/manifests/broad-training-source-use-v1.json`; existing reviewed research permission, explicit production/redistribution hold and replacement task |
+| Disk-backed exact research store | `scripts/research/scalable_ratings.py`; whole-source pair quarantine, atomic record/byte checkpoints, exact subject membership and train-only integer statistics |
+| Development and protected confirmation | Same runner, `curve` then locked `confirm`; unchanged global/item/location equations, subject-macro metrics, paired intervals and cold/item coverage |
+| Verification | `scripts/research/test_scalable_ratings.py`; offline BOOK/MOVIE fixtures, cross-check with built `research-static`, interruption/conflict/withdrawal/identity/leakage/budget tests; included by root `test:research` |
+
+This standard-library research runner does not export a serving model or modify
+the independent core's established bounded APIs. The exact SQLite membership
+witness replaces their in-memory pair guards only inside this isolated runner.
+Raw data, fitted sufficient statistics and personal evaluation records stay private.
+
 ## Centered response research — #421
 
 | Area | Source | Scope |
