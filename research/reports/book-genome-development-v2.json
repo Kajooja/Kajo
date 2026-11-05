@@ -1,0 +1,581 @@
+{
+  "schema": "book-genome-disjoint-development-v2",
+  "role": "DISJOINT_DEVELOPMENT_COMPARISON",
+  "freezeSha256": "278647df51c25736c1edfba734184ba5ab80f8148af949998a229bf44f4aa7fb",
+  "lineage": {
+    "sourceSha256": "c94a5f0429f6e97098770f96b6c4eaa5c929d6d089b3e340d2ce40bdbda2e41e",
+    "protocolSha256": "4d9f34967d3d7ba2c8b9eac881c041fd3d593b3ced3d5d02400bac0badd0cd6c",
+    "code": {
+      "scripts/research/book_genome.py": "d6159d3ba9d97c1ac9ce859cb34bd072aca15636fa3af31bbeed2b4ca68299dc",
+      "scripts/research/evaluate-books.mjs": "5484b08d8ad7d83da0347ea9f6be9f38c8bd2353080bf0881b0466a6e4d7094b",
+      "scripts/research/rating-macro-comparison.mjs": "cf68c7c7b27950fd5ed99d32072c709d7c18389f80de71caf9f55d831f95b655",
+      "packages/prediction-engine/dist/research-static.js": "1e92174f783655f8c1c33a3596ea610e7c94cd568f6c1236e79e27ce7aecd8e8",
+      "packages/prediction-engine/dist/rating-location.js": "76fea4b0e1347234b8ef1cd6df7ee240e580cd68fd6e3b7b5f0185d7ba1b3ad1",
+      "packages/prediction-engine/dist/adapters/book-genome.js": "a6fea6ed1c85ae0351eb7bd6ee41b4b6c89f595033287a1bd1a7a62d131abd8a"
+    },
+    "node": "v24.22.1"
+  },
+  "sourceCounts": {
+    "ratings": 5152656,
+    "subjects": 350332,
+    "objects": 9374
+  },
+  "cohort": {
+    "subjects": 500,
+    "ratings": 33243,
+    "minHistory": 20,
+    "maxHistory": 814
+  },
+  "cohortSha256": "44cbc15a09c677f5de501ed5b5ac0b59ed732bd4d594fd62181b0c94dca1f112",
+  "quarantine": {
+    "scope": "bounded candidate pool",
+    "candidateRows": 123712,
+    "identicalDuplicates": 0,
+    "conflictingPairs": 0
+  },
+  "partitions": {
+    "train": {
+      "rows": 17915,
+      "subjects": 400,
+      "membershipSha256": "a8083307148fd7d9c976be535c5a156045b0363ab8e1509116cba38b0727b267"
+    },
+    "validation": {
+      "rows": 3860,
+      "subjects": 400,
+      "membershipSha256": "ee8a667b4995fd5d87cf53da47ffadf121e37dfe198f8cdfe738a45dbaf40198"
+    },
+    "test": {
+      "rows": 4078,
+      "subjects": 400,
+      "membershipSha256": "04c0047099fd46ab5e441efb164ab21c9011f3d394179d263b10a4def8b588a7"
+    },
+    "coldVisible": {
+      "rows": 5873,
+      "subjects": 100,
+      "membershipSha256": "ee21f229a474845b20bfae6ea1a627b8f5c08f7e9e96370dc31e5f6dc98300f3"
+    },
+    "coldTargets": {
+      "rows": 1517,
+      "subjects": 100,
+      "membershipSha256": "a029c25d17a679b926bf9f04c1675e546a400eae9b623671687c56d41b269824"
+    }
+  },
+  "selection": {
+    "selected": "profile-offset",
+    "validation": {
+      "global-mean": {
+        "rows": 3860,
+        "subjects": 400,
+        "mae10": 1.5883108056322377,
+        "rmse10": 2.049517626920704,
+        "subjectMacroMae10": 1.6489033424277155,
+        "predictionCoverage": 1,
+        "fittedItemCoverage": 0.8344559585492228
+      },
+      "item-mean": {
+        "rows": 3860,
+        "subjects": 400,
+        "mae10": 1.5710443821543465,
+        "rmse10": 1.997090981123001,
+        "subjectMacroMae10": 1.6263559609740668,
+        "predictionCoverage": 1,
+        "fittedItemCoverage": 0.8344559585492228
+      },
+      "profile-offset": {
+        "rows": 3860,
+        "subjects": 400,
+        "mae10": 1.4768830321317088,
+        "rmse10": 1.8585039611800673,
+        "subjectMacroMae10": 1.5086525893632594,
+        "predictionCoverage": 1,
+        "fittedItemCoverage": 0.8344559585492228
+      }
+    },
+    "modelSha256": "a4534b6435ac20b97dcefcfa6245850fefe4a6c00743da949d3d00e7ccc35c23",
+    "testLabelsUsedForFitOrSelection": false,
+    "comparison": {
+      "control": "item-mean",
+      "challenger": "profile-offset",
+      "subjects": 400,
+      "ratings": 3860,
+      "losses": {
+        "control": {
+          "macroRmse10": 2.053515060640566,
+          "macroMae10": 1.6263559609740668
+        },
+        "challenger": {
+          "macroRmse10": 1.9030412760726738,
+          "macroMae10": 1.5086525893632594
+        }
+      },
+      "macroRmseDelta10": -0.15047378456789207,
+      "macroMaeDelta10": -0.11770337161080735,
+      "pairedRmseDelta95": [
+        -0.1813116819225281,
+        -0.12021024959874713
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-book-static-disjoint-20261105-v2:validation",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE"
+    },
+    "eligibility": {
+      "passed": true,
+      "checks": {
+        "usefulGain": true,
+        "pairedInterval": true,
+        "maeNoninferiority": true,
+        "coverage": true
+      }
+    },
+    "role": "FROZEN_DISJOINT_DEVELOPMENT_SELECTION"
+  },
+  "test": {
+    "global-mean": {
+      "rows": 4078,
+      "subjects": 400,
+      "mae10": 1.6171369158238247,
+      "rmse10": 2.0961033472102057,
+      "subjectMacroMae10": 1.6844876559818962,
+      "predictionCoverage": 1,
+      "fittedItemCoverage": 0.8452672878862187
+    },
+    "item-mean": {
+      "rows": 4078,
+      "subjects": 400,
+      "mae10": 1.6057654378965156,
+      "rmse10": 2.052350106157222,
+      "subjectMacroMae10": 1.6632761654224442,
+      "predictionCoverage": 1,
+      "fittedItemCoverage": 0.8452672878862187
+    },
+    "profile-offset": {
+      "rows": 4078,
+      "subjects": 400,
+      "mae10": 1.5228792818400467,
+      "rmse10": 1.9326608732322421,
+      "subjectMacroMae10": 1.565322526800284,
+      "predictionCoverage": 1,
+      "fittedItemCoverage": 0.8452672878862187
+    }
+  },
+  "coldEvidenceMasks": {
+    "0": {
+      "evidenceBudget": 0,
+      "actualVisibleRatings": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "targetMembershipSha256": "a029c25d17a679b926bf9f04c1675e546a400eae9b623671687c56d41b269824",
+      "metrics": {
+        "global-mean": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.6429315096871235,
+          "rmse10": 2.108026918992936,
+          "subjectMacroMae10": 1.5931346817236953,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        },
+        "item-mean": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.6314179183469502,
+          "rmse10": 2.067566152488867,
+          "subjectMacroMae10": 1.5951598294305782,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        },
+        "profile-offset": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.6314179183469502,
+          "rmse10": 2.067566152488867,
+          "subjectMacroMae10": 1.5951598294305782,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        }
+      }
+    },
+    "5": {
+      "evidenceBudget": 5,
+      "actualVisibleRatings": {
+        "minimum": 5,
+        "maximum": 5
+      },
+      "targetMembershipSha256": "a029c25d17a679b926bf9f04c1675e546a400eae9b623671687c56d41b269824",
+      "metrics": {
+        "global-mean": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.6429315096871235,
+          "rmse10": 2.108026918992936,
+          "subjectMacroMae10": 1.5931346817236953,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        },
+        "item-mean": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.6314179183469502,
+          "rmse10": 2.067566152488867,
+          "subjectMacroMae10": 1.5951598294305782,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        },
+        "profile-offset": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.5753397181760014,
+          "rmse10": 1.971037670522136,
+          "subjectMacroMae10": 1.5584378588588432,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        }
+      }
+    },
+    "10": {
+      "evidenceBudget": 10,
+      "actualVisibleRatings": {
+        "minimum": 10,
+        "maximum": 10
+      },
+      "targetMembershipSha256": "a029c25d17a679b926bf9f04c1675e546a400eae9b623671687c56d41b269824",
+      "metrics": {
+        "global-mean": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.6429315096871235,
+          "rmse10": 2.108026918992936,
+          "subjectMacroMae10": 1.5931346817236953,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        },
+        "item-mean": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.6314179183469502,
+          "rmse10": 2.067566152488867,
+          "subjectMacroMae10": 1.5951598294305782,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        },
+        "profile-offset": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.5221960315317895,
+          "rmse10": 1.9102830376706386,
+          "subjectMacroMae10": 1.5156359519114089,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        }
+      }
+    },
+    "20": {
+      "evidenceBudget": 20,
+      "actualVisibleRatings": {
+        "minimum": 16,
+        "maximum": 20
+      },
+      "targetMembershipSha256": "a029c25d17a679b926bf9f04c1675e546a400eae9b623671687c56d41b269824",
+      "metrics": {
+        "global-mean": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.6429315096871235,
+          "rmse10": 2.108026918992936,
+          "subjectMacroMae10": 1.5931346817236953,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        },
+        "item-mean": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.6314179183469502,
+          "rmse10": 2.067566152488867,
+          "subjectMacroMae10": 1.5951598294305782,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        },
+        "profile-offset": {
+          "rows": 1517,
+          "subjects": 100,
+          "mae10": 1.4884935685151073,
+          "rmse10": 1.8858755075903773,
+          "subjectMacroMae10": 1.4959198059436165,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8299274884640738
+        }
+      }
+    }
+  },
+  "exclusion": {
+    "sha256": "9bd43253223a84c3091d849bea9d0391547dd2aa72156903fc40ffb3ebc20b90",
+    "subjects": 500,
+    "ratings": 31144,
+    "overlapSubjects": 0
+  },
+  "holdoutComparison": {
+    "control": "item-mean",
+    "challenger": "profile-offset",
+    "subjects": 400,
+    "ratings": 4078,
+    "losses": {
+      "control": {
+        "macroRmse10": 2.117010108744018,
+        "macroMae10": 1.6632761654224442
+      },
+      "challenger": {
+        "macroRmse10": 1.9941627059779226,
+        "macroMae10": 1.565322526800284
+      }
+    },
+    "macroRmseDelta10": -0.12284740276609529,
+    "macroMaeDelta10": -0.09795363862216022,
+    "pairedRmseDelta95": [
+      -0.14894046276602912,
+      -0.09731763614105733
+    ],
+    "predictionCoverage": 1,
+    "bootstrapReplicates": 2000,
+    "bootstrapSeed": "kajo-book-static-disjoint-20261105-v2:holdout",
+    "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE"
+  },
+  "coldComparisons": {
+    "0": {
+      "control": "item-mean",
+      "challenger": "profile-offset",
+      "subjects": 100,
+      "ratings": 1517,
+      "losses": {
+        "control": {
+          "macroRmse10": 2.03420632299852,
+          "macroMae10": 1.5951598294305782
+        },
+        "challenger": {
+          "macroRmse10": 2.03420632299852,
+          "macroMae10": 1.5951598294305782
+        }
+      },
+      "macroRmseDelta10": 0,
+      "macroMaeDelta10": 0,
+      "pairedRmseDelta95": [
+        0,
+        0
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-book-static-disjoint-20261105-v2:cold-0",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "equalControlEveryTarget": true
+    },
+    "5": {
+      "control": "item-mean",
+      "challenger": "profile-offset",
+      "subjects": 100,
+      "ratings": 1517,
+      "losses": {
+        "control": {
+          "macroRmse10": 2.03420632299852,
+          "macroMae10": 1.5951598294305782
+        },
+        "challenger": {
+          "macroRmse10": 1.9529765194576143,
+          "macroMae10": 1.5584378588588432
+        }
+      },
+      "macroRmseDelta10": -0.08122980354090581,
+      "macroMaeDelta10": -0.036721970571734985,
+      "pairedRmseDelta95": [
+        -0.11574520533821506,
+        -0.04693402805506348
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-book-static-disjoint-20261105-v2:cold-5",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "equalControlEveryTarget": false
+    },
+    "10": {
+      "control": "item-mean",
+      "challenger": "profile-offset",
+      "subjects": 100,
+      "ratings": 1517,
+      "losses": {
+        "control": {
+          "macroRmse10": 2.03420632299852,
+          "macroMae10": 1.5951598294305782
+        },
+        "challenger": {
+          "macroRmse10": 1.9071514032979466,
+          "macroMae10": 1.5156359519114089
+        }
+      },
+      "macroRmseDelta10": -0.12705491970057348,
+      "macroMaeDelta10": -0.07952387751916934,
+      "pairedRmseDelta95": [
+        -0.17512561756935105,
+        -0.08377733769108286
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-book-static-disjoint-20261105-v2:cold-10",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "equalControlEveryTarget": false
+    },
+    "20": {
+      "control": "item-mean",
+      "challenger": "profile-offset",
+      "subjects": 100,
+      "ratings": 1517,
+      "losses": {
+        "control": {
+          "macroRmse10": 2.03420632299852,
+          "macroMae10": 1.5951598294305782
+        },
+        "challenger": {
+          "macroRmse10": 1.8931947750776033,
+          "macroMae10": 1.4959198059436165
+        }
+      },
+      "macroRmseDelta10": -0.14101154792091686,
+      "macroMaeDelta10": -0.0992400234869617,
+      "pairedRmseDelta95": [
+        -0.20119224664624105,
+        -0.08984742089829072
+      ],
+      "predictionCoverage": 1,
+      "bootstrapReplicates": 2000,
+      "bootstrapSeed": "kajo-book-static-disjoint-20261105-v2:cold-20",
+      "interpretation": "EQUAL_SUBJECT_PAIRED_DEVELOPMENT_COMPARISON_NOT_CALIBRATED_PERSONAL_CONFIDENCE",
+      "equalControlEveryTarget": false
+    }
+  },
+  "decision": {
+    "disposition": "RETAIN_PROFILE_OFFSET_FOR_RESEARCH",
+    "validationEligible": true,
+    "holdout": {
+      "passed": true,
+      "checks": {
+        "usefulGain": true,
+        "pairedInterval": true,
+        "maeNoninferiority": true,
+        "coverage": true
+      }
+    },
+    "cold": {
+      "0": {
+        "passed": true,
+        "macroRmseDelta10": 0,
+        "macroMaeDelta10": 0
+      },
+      "5": {
+        "passed": true,
+        "macroRmseDelta10": -0.08122980354090581,
+        "macroMaeDelta10": -0.036721970571734985
+      },
+      "10": {
+        "passed": true,
+        "macroRmseDelta10": -0.12705491970057348,
+        "macroMaeDelta10": -0.07952387751916934
+      },
+      "20": {
+        "passed": true,
+        "macroRmseDelta10": -0.14101154792091686,
+        "macroMaeDelta10": -0.0992400234869617
+      }
+    },
+    "qualityAdmission": "NONE",
+    "servingActivation": "NONE"
+  },
+  "qualityAdmission": "NONE",
+  "servingActivation": "NONE",
+  "nativeRowsWritten": 0,
+  "limitations": [
+    "Disjoint subjects from the exposed pilot; external development holdout only, never native FINAL or product acceptance.",
+    "Unknown dates; hash masks do not establish temporal learning or causal recommendation benefit.",
+    "Observed 1\u20135 source grades map to 2/4/6/8/10; platform scale equivalence is unproven. Native 0\u201310 is unchanged.",
+    "Selected readers with at least 20 ratings; missing and not-read are never negative labels.",
+    "No cross-dataset user joins, native integration, production admission, or calibrated uncertainty."
+  ],
+  "attribution": "Kotkov, Denis; Medlar, Alan; Maslov, Alexandr; Satyal, Umesh Raj; Neovius, Mats; Glowacka, Dorota (2022). The Tag Genome Dataset for Books. CHIIR 2022. https://doi.org/10.1145/3498366.3505833",
+  "executionEvidence": {
+    "preScoreSource": "b99cf819b23fcd2701a3d1d0826a95b0b0e882f8",
+    "declarationIssue": "https://github.com/Kajooja/Kajo/issues/419",
+    "frozenBeforeFitAtUtc": "2026-11-05T11:23:39.387274+00:00",
+    "independentAudit": {
+      "status": "PASS",
+      "method": "Independent SQLite training aggregates, Python predictions and paired subject bootstrap; no import of Node evaluators",
+      "cohortSubjects": 500,
+      "cohortRatings": 33243,
+      "overlapSubjects": 0,
+      "predictionValuesCompared": 42018,
+      "macroMetricsAndIntervalEndpointsCompared": 36,
+      "maximumAbsoluteDifference": 1.7763568394002505e-15,
+      "tolerance": 1e-11,
+      "independentIntake": "BYTE_IDENTICAL",
+      "builtReplays": "ALL_FILES_BYTE_IDENTICAL",
+      "qualityAdmission": "NONE",
+      "auditorSha256": "1364b2012f1e6f203f658d3ce3210e66f5528edbecde9ef009bb9a4f255ea73a"
+    },
+    "resources": {
+      "scope": "Wall time per Node child; ru_maxrss is the cumulative maximum child RSS across these two executions; build/intake excluded.",
+      "runs": [
+        {
+          "run": "run",
+          "elapsedSeconds": 1.2153220000000147,
+          "cumulativeChildPeakRssKiB": 152532,
+          "nodeHeapLimitMiB": 512
+        },
+        {
+          "run": "replay",
+          "elapsedSeconds": 1.024075241999526,
+          "cumulativeChildPeakRssKiB": 170492,
+          "nodeHeapLimitMiB": 512
+        }
+      ]
+    },
+    "artifacts": {
+      "cold-0-predictions.jsonl": {
+        "bytes": 437694,
+        "sha256": "33955d486b183ab77e422230656864940ae1c82d5ddb16eaf4c1dd6e8c8f6e89"
+      },
+      "cold-10-predictions.jsonl": {
+        "bytes": 439258,
+        "sha256": "d3122379cac73eceff971c663279d33a6ec8671f4c8ba88b653fc637b159958e"
+      },
+      "cold-20-predictions.jsonl": {
+        "bytes": 439220,
+        "sha256": "250b70fe422dd09fd1af7e7f0a94005c5354899c110a1c4cba25a30653f58921"
+      },
+      "cold-5-predictions.jsonl": {
+        "bytes": 437745,
+        "sha256": "7d956a9e7f2471a1032e1018a12715316c88625ad0eb937c0ffdd5a9f20722eb"
+      },
+      "model.json": {
+        "bytes": 2600079,
+        "sha256": "bb022793d3ab043e929122bf1cc82ab75a64164871f33af0cc0a1a7b5c9f7736"
+      },
+      "report.json": {
+        "bytes": 16302,
+        "sha256": "2fbdfd8021e5d167d71c7de558638df6d59a796fb1f33ebe96a2b7e7dd5f49e4"
+      },
+      "run.json": {
+        "bytes": 134,
+        "sha256": "200483088ddd6462d849905dfe93672f82a90928eecb9d5cc4b1f947c6f02285"
+      },
+      "selection-before-test.json": {
+        "bytes": 2009,
+        "sha256": "921eaeba758466de67da476870c2eb2f1e29ee706249efa87f5e18c6bbe6befc"
+      },
+      "test-predictions.jsonl": {
+        "bytes": 1181408,
+        "sha256": "5e04d96ad4409cb0a64c0830f76a8fcef586532279e89078891dd3cc88c7e083"
+      },
+      "validation-predictions.jsonl": {
+        "bytes": 1118325,
+        "sha256": "f932c055a682b6a284d43ba38beb2d90fee91087af4c48ae6402a66a60416e58"
+      }
+    }
+  }
+}

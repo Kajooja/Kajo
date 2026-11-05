@@ -5,11 +5,12 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { interpretBookGenomeRating, bookGenomeStaticSpec } from '@kajo/prediction-engine/adapters/book-genome';
 import { fitStaticRatings, predictStaticRatings, staticRatingVariants } from '@kajo/prediction-engine/research-static';
+import { compareRatingSubjects, checkRatingComparison, decideBookDevelopment } from './rating-macro-comparison.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const sourcePath = join(root, 'research/manifests/book-genome-2021.json');
-const protocolPath = join(root, 'research/manifests/book-genome-static-v1.json');
 const codePaths = ['scripts/research/book_genome.py', 'scripts/research/evaluate-books.mjs',
+  'scripts/research/rating-macro-comparison.mjs',
   'packages/prediction-engine/dist/research-static.js', 'packages/prediction-engine/dist/rating-location.js',
   'packages/prediction-engine/dist/adapters/book-genome.js'];
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -22,11 +23,15 @@ async function bounded(path, bytes) {
   assert.ok(data.length <= bytes, 'File changed beyond budget');
   return data;
 }
-async function configuration() {
+async function configuration(experiment) {
+  assert.ok(['replay', 'development'].includes(experiment), 'Unknown experiment');
+  const protocolPath = join(root, `research/manifests/book-genome-${experiment === 'development' ? 'development-v2' : 'static-v1'}.json`);
   const sourceBytes = await bounded(sourcePath, 65536), protocolBytes = await bounded(protocolPath, 65536);
+  const source = JSON.parse(sourceBytes), protocol = JSON.parse(protocolBytes);
+  if (experiment === 'development') source.cohort = protocol.cohort;
   const code = {};
   for (const p of codePaths) code[p] = hash(await bounded(join(root, p), 1024 * 1024));
-  return { source: JSON.parse(sourceBytes), protocol: JSON.parse(protocolBytes), lineage: {
+  return { source, protocol, experiment, role: experiment === 'development' ? 'DISJOINT_DEVELOPMENT_COMPARISON' : 'EXPOSED_DEVELOPMENT_REPLAY', lineage: {
     sourceSha256: hash(sourceBytes), protocolSha256: hash(protocolBytes), code, node: process.version } };
 }
 
@@ -99,8 +104,23 @@ function partitionSummary(parts) {
   }]));
 }
 
-export async function freezeBooks(inputDirectory, outputDirectory) {
-  const config = await configuration();
+export function verifyBookExclusion(bytes, expected, rows) {
+  assert.ok(bytes.length <= 32 * 1024 * 1024 && bytes.at(-1) === 10, 'Exclusion size');
+  assert.equal(hash(bytes), expected.sha256, 'Exclusion integrity');
+  const lines = bytes.toString('utf8').trimEnd().split('\n'), excluded = new Set();
+  assert.equal(lines.length, expected.ratings, 'Exclusion row count');
+  for (const line of lines) {
+    assert.ok(line.length <= 4096, 'Exclusion line budget');
+    const user = JSON.parse(line).record.user_id;
+    assert.ok(Number.isSafeInteger(user) && user >= 0, 'Exclusion subject'); excluded.add(user);
+  }
+  assert.equal(excluded.size, expected.subjects, 'Exclusion subject count');
+  assert.ok(rows.every(r => !excluded.has(r.user)), 'Prior cohort subject overlap');
+  return { ...expected, overlapSubjects: 0 };
+}
+
+export async function freezeBooks(inputDirectory, outputDirectory, experiment = 'replay') {
+  const config = await configuration(experiment);
   const receiptBytes = await bounded(join(inputDirectory, 'manifest.json'), 1024 * 1024);
   const receipt = JSON.parse(receiptBytes);
   assert.equal(receipt.schema, 'book-genome-normalized-v1');
@@ -110,8 +130,12 @@ export async function freezeBooks(inputDirectory, outputDirectory) {
   assert.equal(receipt.lineage.compressedSha256, config.source.member.compressedSha256);
   assert.deepEqual(receipt.sourceCounts, config.source.expectedCounts);
   const cohort = await bounded(join(inputDirectory, 'ratings.jsonl'), 32 * 1024 * 1024);
-  const parts = partitionBooks(records(cohort, receipt, config.source), config.protocol);
-  const freeze = { schema: 'book-genome-static-freeze-v1', role: 'EXPOSED_DEVELOPMENT_REPLAY',
+  const rows = records(cohort, receipt, config.source), parts = partitionBooks(rows, config.protocol);
+  const excluded = experiment === 'development' ? await bounded(join(inputDirectory, 'excluded-ratings.jsonl'), 32 * 1024 * 1024) : null;
+  const exclusion = excluded ? verifyBookExclusion(excluded, config.source.cohort.excludedCohort, rows) : null;
+  if (excluded) assert.deepEqual(exclusion, receipt.exclusion);
+  const freeze = { schema: 'book-genome-static-freeze-v1', role: config.role,
+    ...(exclusion ? { exclusion } : {}),
     lineage: config.lineage, protocol: config.protocol, receiptSha256: hash(receiptBytes),
     cohortSha256: hash(cohort), partitions: partitionSummary(parts),
     time: 'UNKNOWN_STATIC_MASKS_ONLY', qualityAdmission: 'NONE', servingActivation: 'NONE' };
@@ -120,6 +144,7 @@ export async function freezeBooks(inputDirectory, outputDirectory) {
   try {
     await writeFile(join(temporary, 'ratings.jsonl'), cohort, { flag: 'wx', mode: 0o600 });
     await writeFile(join(temporary, 'intake.json'), receiptBytes, { flag: 'wx', mode: 0o600 });
+    if (excluded) await writeFile(join(temporary, 'excluded-ratings.jsonl'), excluded, { flag: 'wx', mode: 0o600 });
     await save(join(temporary, 'freeze.json'), freeze);
     // Existing outputs, including empty directories, are never silently reused.
     await mkdir(outputDirectory, { mode: 0o700 });
@@ -162,11 +187,11 @@ export function scoreBooks(model, targets, visible) {
   return { metrics, journal };
 }
 
-export async function runBooks(frozenDirectory, outputDirectory) {
-  const config = await configuration(), freezeBytes = await bounded(join(frozenDirectory, 'freeze.json'), 1024 * 1024);
+export async function runBooks(frozenDirectory, outputDirectory, experiment = 'replay') {
+  const config = await configuration(experiment), freezeBytes = await bounded(join(frozenDirectory, 'freeze.json'), 1024 * 1024);
   const freeze = JSON.parse(freezeBytes);
   assert.equal(freeze.schema, 'book-genome-static-freeze-v1');
-  assert.equal(freeze.role, 'EXPOSED_DEVELOPMENT_REPLAY');
+  assert.equal(freeze.role, config.role);
   assert.deepEqual(freeze.lineage, config.lineage, 'Code, protocol, source or runtime changed: freeze again');
   assert.deepEqual(freeze.protocol, config.protocol);
   const receiptBytes = await bounded(join(frozenDirectory, 'intake.json'), 1024 * 1024);
@@ -175,7 +200,12 @@ export async function runBooks(frozenDirectory, outputDirectory) {
   assert.deepEqual(receipt.source, config.source);
   const cohort = await bounded(join(frozenDirectory, 'ratings.jsonl'), 32 * 1024 * 1024);
   assert.equal(hash(cohort), freeze.cohortSha256, 'Frozen cohort integrity');
-  const parts = partitionBooks(records(cohort, receipt, config.source), config.protocol);
+  const rows = records(cohort, receipt, config.source), parts = partitionBooks(rows, config.protocol);
+  if (experiment === 'development') {
+    const excluded = await bounded(join(frozenDirectory, 'excluded-ratings.jsonl'), 32 * 1024 * 1024);
+    const exclusion = verifyBookExclusion(excluded, config.source.cohort.excludedCohort, rows);
+    assert.deepEqual(exclusion, freeze.exclusion); assert.deepEqual(exclusion, receipt.exclusion);
+  }
   assert.deepEqual(partitionSummary(parts), freeze.partitions);
   assert.equal(config.protocol.itemShrinkage, bookGenomeStaticSpec.itemShrinkage);
   assert.equal(config.protocol.profileShrinkage, bookGenomeStaticSpec.subjectShrinkage);
@@ -184,29 +214,48 @@ export async function runBooks(frozenDirectory, outputDirectory) {
   const model = fitStaticRatings(parts.train.map(r => r.value), bookGenomeStaticSpec);
   await save(join(outputDirectory, 'model.json'), model);
   const modelSha256 = hash(JSON.stringify(model));
-  const validation = scoreBooks(model, parts.validation, parts.train).metrics;
-  const selected = staticRatingVariants.reduce((a, b) => validation[b].rmse10 < validation[a].rmse10 ? b : a);
+  const compare = (journal, name) => compareRatingSubjects(journal, { ...config.protocol, seed: `${config.protocol.seed}:${name}` });
+  const saveJournal = (name, journal) => writeFile(join(outputDirectory, `${name}-predictions.jsonl`),
+    journal.map(r => JSON.stringify(r)).join('\n') + '\n', { flag: 'wx', mode: 0o600 });
+  const validationScored = scoreBooks(model, parts.validation, parts.train), validation = validationScored.metrics;
+  const development = experiment === 'development';
+  const validationComparison = development ? compare(validationScored.journal, 'validation') : null;
+  const eligibility = development ? checkRatingComparison(validationComparison, config.protocol.decision) : null;
+  const selected = development ? (eligibility.passed ? config.protocol.challenger : config.protocol.control)
+    : staticRatingVariants.reduce((a, b) => validation[b].rmse10 < validation[a].rmse10 ? b : a);
   const selection = { selected, validation, modelSha256, testLabelsUsedForFitOrSelection: false,
-    role: 'REPLAY_OF_EXPOSED_DEVELOPMENT_SELECTION' };
+    ...(development ? { comparison: validationComparison, eligibility } : {}),
+    role: development ? 'FROZEN_DISJOINT_DEVELOPMENT_SELECTION' : 'REPLAY_OF_EXPOSED_DEVELOPMENT_SELECTION' };
+  if (development) await saveJournal('validation', validationScored.journal);
   await save(join(outputDirectory, 'selection-before-test.json'), selection);
   const test = scoreBooks(model, parts.test, parts.train);
-  await writeFile(join(outputDirectory, 'test-predictions.jsonl'),
-    test.journal.map(r => JSON.stringify(r)).join('\n') + '\n', { flag: 'wx', mode: 0o600 });
+  await saveJournal('test', test.journal);
   const coldEvidenceMasks = {};
+  const coldComparisons = {};
   for (const budget of config.protocol.coldEvidenceBudgets) {
     const visible = [...grouped(parts.coldVisible).values()].map(rs => rs.slice(0, budget));
+    const scored = scoreBooks(model, parts.coldTargets, visible.flat());
     coldEvidenceMasks[budget] = { evidenceBudget: budget,
       actualVisibleRatings: { minimum: Math.min(...visible.map(rs => rs.length)), maximum: Math.max(...visible.map(rs => rs.length)) },
       targetMembershipSha256: freeze.partitions.coldTargets.membershipSha256,
-      metrics: scoreBooks(model, parts.coldTargets, visible.flat()).metrics };
+      metrics: scored.metrics };
+    if (development) {
+      coldComparisons[budget] = { ...compare(scored.journal, `cold-${budget}`),
+        equalControlEveryTarget: scored.journal.every(r => r.prediction.values[config.protocol.control] === r.prediction.values[config.protocol.challenger]) };
+      await saveJournal(`cold-${budget}`, scored.journal);
+    }
   }
   assert.equal(hash(JSON.stringify(model)), modelSha256, 'Frozen model changed');
-  const report = { schema: 'book-genome-engine-static-replay-v1', role: freeze.role,
+  const holdoutComparison = development ? compare(test.journal, 'holdout') : null;
+  const report = { schema: development ? 'book-genome-disjoint-development-v2' : 'book-genome-engine-static-replay-v1', role: freeze.role,
     freezeSha256: hash(freezeBytes), lineage: freeze.lineage, sourceCounts: receipt.sourceCounts,
     cohort: receipt.cohort, cohortSha256: receipt.cohortSha256, quarantine: receipt.quarantine,
     partitions: freeze.partitions, selection, test: test.metrics, coldEvidenceMasks,
+    ...(development ? { exclusion: freeze.exclusion, holdoutComparison, coldComparisons,
+      decision: decideBookDevelopment(selection, holdoutComparison, coldComparisons, config.protocol) } : {}),
     qualityAdmission: 'NONE', servingActivation: 'NONE', nativeRowsWritten: 0,
-    limitations: ['Already exposed development cohort: integration/conformance only, no fresh holdout.',
+    limitations: [development ? 'Disjoint subjects from the exposed pilot; external development holdout only, never native FINAL or product acceptance.'
+      : 'Already exposed development cohort: integration/conformance only, no fresh holdout.',
       'Unknown dates; hash masks do not establish temporal learning or causal recommendation benefit.',
       'Observed 1–5 source grades map to 2/4/6/8/10; platform scale equivalence is unproven. Native 0–10 is unchanged.',
       'Selected readers with at least 20 ratings; missing and not-read are never negative labels.',
@@ -219,15 +268,17 @@ export async function runBooks(frozenDirectory, outputDirectory) {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
     const [command, ...args] = process.argv.slice(2), options = {};
-    assert.equal(args.length, 4, 'Usage: freeze|run --input-dir DIR --out DIR');
+    assert.ok([4, 6].includes(args.length), 'Usage: freeze|run --input-dir DIR --out DIR [--experiment replay|development]');
     for (let i = 0; i < args.length; i += 2) {
-      assert.ok(['--input-dir', '--out'].includes(args[i]) && !options[args[i]], 'Unknown or duplicate flag');
-      options[args[i]] = resolve(args[i + 1]);
+      assert.ok(['--input-dir', '--out', '--experiment'].includes(args[i]) && !options[args[i]], 'Unknown or duplicate flag');
+      options[args[i]] = args[i] === '--experiment' ? args[i + 1] : resolve(args[i + 1]);
     }
     assert.ok(options['--input-dir'] && options['--out']);
-    const result = command === 'freeze' ? await freezeBooks(options['--input-dir'], options['--out'])
-      : command === 'run' ? await runBooks(options['--input-dir'], options['--out']) : assert.fail('Unknown command');
+    const experiment = options['--experiment'] ?? 'replay';
+    const result = command === 'freeze' ? await freezeBooks(options['--input-dir'], options['--out'], experiment)
+      : command === 'run' ? await runBooks(options['--input-dir'], options['--out'], experiment) : assert.fail('Unknown command');
     console.log(JSON.stringify({ status: 'PASS', schema: result.schema, partitions: result.partitions,
-      selected: result.selection?.selected, test: result.test, qualityAdmission: 'NONE' }, null, 2));
+      selected: result.selection?.selected, test: result.test, decision: result.decision,
+      holdoutComparison: result.holdoutComparison, qualityAdmission: 'NONE' }, null, 2));
   } catch (error) { console.error(`Book research stopped: ${error.message}`); process.exitCode = 1; }
 }

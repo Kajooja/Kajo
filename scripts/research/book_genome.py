@@ -14,6 +14,7 @@ import zlib
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN = ROOT / 'research/manifests/book-genome-2021.json'
+DEVELOPMENT = ROOT / 'research/manifests/book-genome-development-v2.json'
 
 
 def sha(data):
@@ -174,7 +175,34 @@ def download(directory, plan, transport=fetch):
     return target
 
 
-def normalize(path, output, plan):
+def excluded_subjects(path, expected):
+    if path is None or path.stat().st_size > 32 * 1024 * 1024:
+        raise ValueError('Bounded exclusion witness required')
+    data = path.read_bytes()
+    if len(data) > 32 * 1024 * 1024 or sha(data) != expected['sha256'] or not data.endswith(b'\n'):
+        raise ValueError('Exclusion witness integrity')
+    subjects = set()
+    lines = data.splitlines()
+    if len(lines) != expected['ratings']:
+        raise ValueError('Exclusion row count')
+    for line in lines:
+        if len(line) > 4096:
+            raise ValueError('Exclusion line budget')
+        record = json.loads(line.decode('utf-8'), object_pairs_hook=unique_keys)['record']
+        user = record['user_id']
+        if type(user) is not int or not 0 <= user <= 2**53 - 1:
+            raise ValueError('Exclusion subject identity')
+        subjects.add(user)
+    if len(subjects) != expected['subjects']:
+        raise ValueError('Exclusion subject count')
+    return subjects, data
+
+
+def normalize(path, output, plan, exclusion_path=None):
+    expected_exclusion = plan['cohort'].get('excludedCohort')
+    excluded, exclusion_bytes = excluded_subjects(exclusion_path, expected_exclusion) if expected_exclusion else (set(), None)
+    if exclusion_path is not None and expected_exclusion is None:
+        raise ValueError('Undeclared exclusion witness')
     lineage = {'planSha256': sha(canonical(plan)), 'codeSha256': file_hash(Path(__file__)),
                'compressedSha256': plan['member']['compressedSha256']}
     run_id = sha(canonical(lineage))
@@ -184,6 +212,9 @@ def normalize(path, output, plan):
         if (receipt['lineage'] != lineage or file_hash(path) != lineage['compressedSha256']
                 or file_hash(target / 'ratings.jsonl') != receipt['cohortSha256']):
             raise ValueError('Cached stage integrity mismatch')
+        if expected_exclusion and ((target / 'excluded-ratings.jsonl').read_bytes() != exclusion_bytes
+                                   or receipt.get('exclusion') != {**expected_exclusion, 'overlapSubjects': 0}):
+            raise ValueError('Cached exclusion integrity mismatch')
         return target, receipt, True
     started = time.monotonic()
     counts, histogram, objects = collections.Counter(), collections.Counter(), set()
@@ -199,7 +230,7 @@ def normalize(path, output, plan):
         raise ValueError('Source counts mismatch')
     c = plan['cohort']
     rank = lambda u: (sha(f'{c["seed"]}:{u}'.encode()), u)
-    potential = sorted((u for u, n in counts.items() if n >= c['minUniqueRatings']), key=rank)[:c['candidatePool']]
+    potential = sorted((u for u, n in counts.items() if n >= c['minUniqueRatings'] and u not in excluded), key=rank)[:c['candidatePool']]
     histories = {u: {} for u in potential}
     conflicts, duplicates, candidate_rows = set(), 0, 0
     for line, u, i, grade in rows(path, plan):
@@ -229,6 +260,8 @@ def normalize(path, output, plan):
     output.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix='.book-stage-', dir=output))
     try:
+        if exclusion_bytes is not None:
+            (temporary / 'excluded-ratings.jsonl').write_bytes(exclusion_bytes)
         with (temporary / 'ratings.jsonl').open('xb') as f:
             for u in sorted(selected):
                 for i, (grade, line) in sorted(histories[u].items()):
@@ -244,6 +277,10 @@ def normalize(path, output, plan):
                    'quarantine': {'scope': 'bounded candidate pool', 'candidateRows': candidate_rows,
                                   'identicalDuplicates': duplicates, 'conflictingPairs': len(conflicts)},
                    'sourceOccurredAt': None, 'qualityAdmission': 'NONE', 'servingActivation': 'NONE'}
+        if expected_exclusion:
+            if set(selected) & excluded:
+                raise ValueError('Excluded subject entered cohort')
+            receipt['exclusion'] = {**expected_exclusion, 'overlapSubjects': 0}
         save(temporary / 'manifest.json', receipt)
         temporary.rename(target)
         return target, receipt, False
@@ -258,8 +295,16 @@ def main():
     parser.add_argument('--data-dir', type=Path, default=ROOT / 'research-data/book-genome-2021')
     parser.add_argument('--member', type=Path)
     parser.add_argument('--output-dir', type=Path, default=ROOT / 'research-artifacts/book-genome-intake')
+    parser.add_argument('--experiment', choices=['replay', 'development'], default='replay')
+    parser.add_argument('--exclude-cohort', type=Path)
     args = parser.parse_args()
     plan = json.loads(PLAN.read_text())
+    if args.experiment == 'development':
+        if args.command != 'normalize':
+            raise ValueError('Development selection applies only to normalize')
+        plan['cohort'] = json.loads(DEVELOPMENT.read_text())['cohort']
+    elif args.exclude_cohort is not None:
+        raise ValueError('Exclusions require declared development experiment')
     if args.command == 'prepare':
         data = fetch(plan)
         if sha(data) != plan['readmeSha256']:
@@ -273,7 +318,7 @@ def main():
     elif args.command == 'download':
         print(json.dumps({'path': str(download(args.data_dir, plan))}))
     else:
-        path, receipt, reused = normalize(args.member or args.data_dir / 'ratings.deflate', args.output_dir, plan)
+        path, receipt, reused = normalize(args.member or args.data_dir / 'ratings.deflate', args.output_dir, plan, args.exclude_cohort)
         print(json.dumps({'path': str(path), 'cohort': receipt['cohort'],
                           'cohortSha256': receipt['cohortSha256'], 'reused': reused}))
 

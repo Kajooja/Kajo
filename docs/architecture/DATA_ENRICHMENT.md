@@ -174,6 +174,15 @@ usefulness. A separate untouched cohort/protocol is required for new selection
 claims. [Commands and aggregate evidence](../../research/README.md#book-genome--undated-static-research-417)
 retain these restrictions; source completion does not admit a serving artifact.
 
+The #419 development protocol uses a new deterministic cohort and verifies zero
+subject overlap with that exposed cohort. Its private exclusion bytes are bound
+by a declared hash, copied into the frozen stage and checked again at use.
+Equal-subject MSE/MAE and paired subject-bootstrap intervals compare the existing
+item mean and profile offset. Selection is saved before development-holdout
+scoring, with fixed cold masks and explicit control retention on failure. The
+[protocol](../../research/manifests/book-genome-development-v2.json) owns numerical
+rules. A disjoint development cohort is not native FINAL or cross-domain evidence.
+
 ### Goodreads and Amazon Reviews — optional candidates, rights unresolved
 
 [UCSD Goodreads][GOODREADS] offers shelves, ratings and book metadata, but specifies academic use only and no redistribution. The current independent non-commercial project has not established that it qualifies. [Amazon Reviews 2023][AMAZON] could support object/category experiments; its [maintainer states][AMAZON-RIGHTS] that the lab is not in a position to assign the dataset a license or dictate its usage terms.

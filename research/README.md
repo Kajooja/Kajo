@@ -20,6 +20,19 @@ Latest Small a **development dataset**, unsuitable for shared benchmark claims.
 Freezing version 2 and hashes makes this internal development run reproducible;
 it does not change that scope or prove Kajo product usefulness.
 
+## Movie and book paths
+
+| Research path | Source ratings | Source scale → comparison scale | Time support |
+| --- | ---: | --- | --- |
+| MovieLens Latest Small, Kaggle v2 | 100,836; accepted cohort 84,849 / 500 users | 0.5–5 ×2 → 1–10; D2 retains original-scale metrics | Rating-entry timestamps; complete equal-time groups |
+| Book Genome, 2021-12-30 | 5,152,656; exposed cohort 31,144 / 500 readers | 1–5 ×2 → 2/4/6/8/10 | Unknown; static masks only |
+
+Both preserve original grades, unknown missingness, separate source identities
+and all native Kajo integer 0–10 values. MovieLens already includes a complete
+intake, eight-model comparison, cold-start masks and reproducible replay; its
+rejected recent-state challenger remains rejected. New native quality or
+book-to-movie transfer needs separate evidence.
+
 ## Selected source and alternatives
 
 | Source | Decision |
@@ -348,3 +361,43 @@ raw rows and private owner evidence are not published. Quality admission and
 serving activation remain **NONE**. A new model-selection question needs a
 separate frozen, disjoint cohort/protocol; MovieLens's already exposed final
 results likewise remain development/replay evidence.
+
+## Disjoint book development comparison — #419
+
+The [declared protocol](manifests/book-genome-development-v2.json) compares the
+existing item-mean control with profile offset on 500 different readers. The
+previous cohort is excluded by exact file hash and subject ID before selection;
+its private ratings file is an exclusion witness, never new training data.
+The new seed and numerical decision are fixed before the new scores are read.
+No ratings from MovieLens are joined to these readers.
+
+From a verified ratings member and the prior cohort file, normalize and then
+freeze **before** fitting. Use the exact new stage path printed by normalize:
+
+```sh
+npm run research:books:normalize -- --experiment development \
+  --member research-data/book-genome-2021/ratings.deflate \
+  --exclude-cohort /path/to/prior-stage/ratings.jsonl \
+  --output-dir research-artifacts/book-development-v2-intake
+npm run research:books:evaluate -- freeze --experiment development \
+  --input-dir /path/to/new-stage --out research-artifacts/book-development-v2-frozen
+npm run research:books:evaluate -- run --experiment development \
+  --input-dir research-artifacts/book-development-v2-frozen --out research-artifacts/book-development-v2-run
+npm run research:books:evaluate -- run --experiment development \
+  --input-dir research-artifacts/book-development-v2-frozen --out research-artifacts/book-development-v2-replay
+```
+
+The runner rechecks the source, code/runtime/protocol, exclusion bytes and every
+partition identity. Prediction journals and fitted artifacts stay private.
+Each reader receives equal weight in primary RMSE and MAE; 2,000 deterministic
+paired reader-bootstrap samples describe the development comparison. Failure
+of validation, holdout or any cold guard retains item mean. Zero visible ratings
+must produce identical control/challenger forecasts. The existing replay command
+remains explicitly exposed-data conformance. Neither mode activates serving,
+proves temporal book learning or supplies a native FINAL window.
+
+[The measured #419 result](reports/book-genome-development-v2.md) retains a new
+500-reader/33,243-rating cohort with zero prior-reader overlap. Profile offset
+passes all declared research guards; two built runs and the independent audit
+agree. [Aggregate JSON](reports/book-genome-development-v2.json) preserves losses,
+intervals, counts, coverage and provenance without raw histories or fitted data.

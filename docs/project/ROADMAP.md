@@ -979,6 +979,12 @@ exposed-cohort conformance replay extend the same independent package without
 inventing temporal prefixes, linking MovieLens users, importing native Events or
 admitting an external prior. Subsequent research must declare a disjoint cohort
 and model question before scoring; Sprint 016/native gates remain unchanged.
+Accepted #418 supplies that foundation. **#419** is the next bounded comparison:
+exclude the exposed reader cohort, fix item mean versus profile offset, use
+equal-reader errors and retain the predeclared holdout/cold-start decision.
+MovieLens already has a chronological equivalent; preserve its rejected
+challenger and separate source identities instead of treating its replay as a
+new untouched experiment.
 
 D2’s [actual development report](../../research/reports/movielens-small-d2.md) records
 46,410 training rows, fixed temporal/held-out-subject tests, two matching executions

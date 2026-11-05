@@ -1,0 +1,47 @@
+{
+  "version": "book-genome-disjoint-development-v2",
+  "scope": "DISJOINT_DEVELOPMENT_COMPARISON",
+  "question": "Does the fixed shrunk profile offset improve equal-reader rating prediction over the fixed shrunk item mean on different readers?",
+  "declarationIssue": "https://github.com/Kajooja/Kajo/issues/419",
+  "seed": "kajo-book-static-disjoint-20261105-v2",
+  "cohortSubjects": 500,
+  "heldOutSubjects": 100,
+  "cohort": {
+    "seed": "kajo-book-genome-disjoint-20261105-v2",
+    "size": 500,
+    "candidatePool": 2000,
+    "minUniqueRatings": 20,
+    "selection": "Exclude all prior cohort subjects first; rank remaining eligible subjects by SHA256(seed + colon + numeric ID), deduplicate the first 2000 candidates, then retain first 500 complete eligible histories. Never search seeds after scores.",
+    "excludedCohort": {
+      "sha256": "9bd43253223a84c3091d849bea9d0391547dd2aa72156903fc40ffb3ebc20b90",
+      "subjects": 500,
+      "ratings": 31144
+    }
+  },
+  "split": "Label-blind subject/item hash masks: 100 subjects excluded from every global fit and validation; regular histories 70/15/15 train/validation/development holdout; cold histories 80/20 visible evidence/fixed targets. No temporal interpretation.",
+  "sourceScale": [1, 5],
+  "evaluationScale": [2, 10],
+  "scaleTransform": "twice preserved original rating; no observed zeros",
+  "models": ["global-mean", "item-mean", "profile-offset"],
+  "control": "item-mean",
+  "challenger": "profile-offset",
+  "itemShrinkage": 10,
+  "profileShrinkage": 10,
+  "coldEvidenceBudgets": [0, 5, 10, 20],
+  "coldEvidenceMeaning": "Number of visible ratings, never an allowed-grade list; fixed targets at every budget",
+  "bootstrapReplicates": 2000,
+  "bootstrapUnit": "paired subjects; equal subject weight; percentile 95% interval",
+  "decision": {
+    "primary": "sqrt(mean(per-subject MSE)) on mapped 0–10 units",
+    "minMacroRmseGain10": 0.05,
+    "maxMacroMaeIncrease10": 0.02,
+    "requireUpperPairedDeltaBelowZero": true,
+    "requiredPredictionCoverage": 1,
+    "maxColdMacroRmseIncrease10": 0.05,
+    "maxColdMacroMaeIncrease10": 0.05,
+    "rationale": "Conservative DEVELOPMENT margins fixed before the disjoint cohort, informed by the exposed pilot's ~0.18 row-RMSE gain and ~0.12–0.27 grouped gain interval. Not a native product-value threshold.",
+    "rule": "Select challenger only if validation passes all primary/MAE/interval/coverage checks. Save selection before holdout scoring. Continue it as an offline research baseline only if the same holdout checks and every cold guard pass; otherwise retain control. No serving admission."
+  },
+  "admission": "NONE; external development comparison, never native FINAL, causal recommendation benefit or calibrated confidence",
+  "excludedClaims": ["temporal learning", "book/movie user linkage", "native usefulness", "full 0–10 source coverage", "commercial or serving permission"]
+}
