@@ -25,6 +25,12 @@ selection and development-holdout disposition. The
 numerical rules before scoring. This does not identify preference versus rating
 personality, admit a native prior or constitute a native FINAL window.
 
+The [measured result](../../../research/reports/book-genome-development-v2.md)
+retains 500 disjoint readers/33,243 ratings, a 0.122847 equal-reader held-out RMSE
+improvement and passing cold guards. Every built output is reproduced; independent
+SQL/Python checks match 42,018 forecast values. This retains a research baseline,
+not source/CI acceptance, native quality or a completed Sprint 016.
+
 ## Outcome
 
 Produce a supported post-experience expected rating on the user's own scale and

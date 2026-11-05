@@ -32,8 +32,12 @@ the fixed profile-offset challenger against item mean on 500 different readers.
 The [frozen protocol](../../research/manifests/book-genome-development-v2.json)
 excludes every previous cohort subject by a hash-bound private witness. It fixes
 selection, resource bounds, equal-reader losses, paired uncertainty, holdout and
-cold-start guards before fitting. Source/result acceptance belongs to its PR;
-no result or new native admission is claimed by this preparation.
+cold-start guards before fitting. The [development result](../../research/reports/book-genome-development-v2.md)
+contains 33,243 ratings and zero reader overlap. Held-out equal-reader RMSE
+improves from 2.117010 to 1.994163; validation, holdout and cold guards pass.
+Two built runs and an independent SQL/Python audit agree. Source/CI acceptance
+belongs to its PR; this keeps profile offset as an offline research baseline,
+without native quality or serving admission.
 
 MovieLens already supplies the equivalent movie path: 500 source users and
 84,849 ratings, with actual rating-entry timestamps and eight tested variants.
@@ -43,8 +47,9 @@ Book hashes remain static masks because their source has no dates. Neither path
 joins people across datasets or writes external ratings as native Events.
 Native ratings retain every integer 0–10; evidence budgets count records.
 
-After #419, use its retained outcome to choose one bounded next model question;
-reserve new selection/final evidence before any tuning. Continue owned observation
+After #419, predeclare a regularized response-spread versus location-only
+comparison and fresh selection/holdout evidence for BOOK/MOVIE before fitting.
+The reported cohorts are now exposed development evidence. Continue owned observation
 only from private records: never replace a pending target, refill a capped
 attempt, manufacture a grade for an unread book or backdate an old forecast.
 Quality admission, serving activation and Sprint 016/Engine V1 acceptance remain open.

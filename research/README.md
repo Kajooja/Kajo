@@ -395,3 +395,9 @@ of validation, holdout or any cold guard retains item mean. Zero visible ratings
 must produce identical control/challenger forecasts. The existing replay command
 remains explicitly exposed-data conformance. Neither mode activates serving,
 proves temporal book learning or supplies a native FINAL window.
+
+[The measured #419 result](reports/book-genome-development-v2.md) retains a new
+500-reader/33,243-rating cohort with zero prior-reader overlap. Profile offset
+passes all declared research guards; two built runs and the independent audit
+agree. [Aggregate JSON](reports/book-genome-development-v2.json) preserves losses,
+intervals, counts, coverage and provenance without raw histories or fitted data.
