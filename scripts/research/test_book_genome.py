@@ -28,6 +28,56 @@ def fixture(root, raw=None):
 
 
 class BookIntake(unittest.TestCase):
+    def test_disjoint_cohort_requires_verified_exclusion_even_on_cached_reuse(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source, plan = fixture(root)
+            old, receipt, _ = bg.normalize(source, root / 'old', plan)
+            witness = old / 'ratings.jsonl'
+            original = witness.read_bytes()
+            plan['cohort'].update(seed='artificial-disjoint', excludedCohort={
+                'sha256': receipt['cohortSha256'], 'subjects': 3, 'ratings': 12})
+            with self.assertRaisesRegex(ValueError, 'witness required'):
+                bg.normalize(source, root / 'new', plan)
+            new, result, _ = bg.normalize(source, root / 'new', plan, witness)
+            other, second, _ = bg.normalize(source, root / 'replay', plan, witness)
+            users = lambda p: {json.loads(line)['record']['user_id'] for line in p.read_text().splitlines()}
+            self.assertFalse(users(witness) & users(new / 'ratings.jsonl'))
+            self.assertEqual(result['cohort']['ratings'], 12)
+            self.assertEqual(result['exclusion']['overlapSubjects'], 0)
+            self.assertEqual(result, second)
+            self.assertEqual((new / 'ratings.jsonl').read_bytes(), (other / 'ratings.jsonl').read_bytes())
+            self.assertTrue(bg.normalize(source, root / 'new', plan, witness)[2])
+            witness.write_bytes(original + b'\n')
+            with self.assertRaisesRegex(ValueError, 'integrity'):
+                bg.normalize(source, root / 'new', plan, witness)
+            witness.write_bytes(original)
+            (new / 'excluded-ratings.jsonl').write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError, 'exclusion integrity'):
+                bg.normalize(source, root / 'new', plan, witness)
+
+    def test_exclusions_never_refill_an_insufficient_pool_or_accept_invalid_identities(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source, plan = fixture(root)
+            witness = root / 'excluded.jsonl'
+            data = b''.join(bg.canonical({'record': {'user_id': u}}) + b'\n' for u in range(6))
+            witness.write_bytes(data)
+            expected = {'sha256': bg.sha(data), 'subjects': 6, 'ratings': 6}
+            plan['cohort']['excludedCohort'] = expected
+            with self.assertRaisesRegex(ValueError, 'Insufficient'):
+                bg.normalize(source, root / 'new', plan, witness)
+            self.assertFalse((root / 'new').exists())
+            with self.assertRaisesRegex(ValueError, 'subject count'):
+                bg.excluded_subjects(witness, {**expected, 'subjects': 7})
+            with self.assertRaisesRegex(ValueError, 'row count'):
+                bg.excluded_subjects(witness, {**expected, 'ratings': 7})
+            for user in [True, -1, 9007199254740992, None]:
+                data = bg.canonical({'record': {'user_id': user}}) + b'\n'
+                witness.write_bytes(data)
+                with self.assertRaisesRegex(ValueError, 'identity'):
+                    bg.excluded_subjects(witness, {'sha256': bg.sha(data), 'subjects': 1, 'ratings': 1})
+
     def test_complete_deterministic_histories_and_integrity_checked_reuse(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

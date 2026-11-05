@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-05**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, isolated BOOK/MOVIE numeric research integration #417 after accepted diagnostics #413 / #414. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, disjoint book rating-style development comparison #419 after accepted integration #417 / #418. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,31 +11,43 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — Book Genome static research integration #417
+## Current handoff — disjoint book development comparison #419
 
-[Issue #417](https://github.com/Kajooja/Kajo/issues/417) integrates the explicitly
-reviewed GroupLens Book Genome ratings subset into the existing independent
-engine package. Exact source/CI acceptance belongs to its implementation PR.
-The [aggregate conformance report](../../research/reports/book-genome-static-v1.json)
-records a 500-reader, 31,144-rating cohort and 3,669 test predictions matching the
-prior independent arithmetic audit within 1e-11. This is a replay of already
-exposed DEVELOPMENT data, not a new final holdout or native quality acceptance.
+[PR #418](https://github.com/Kajooja/Kajo/pull/418) is accepted as main
+`93beaec6e3f0d9b7234e907c4672a20d4e2f5cdd`, source
+`bd0d329342075f1aed9db132246dcd1b708f9449`, tested merge
+`20d4a15e9ccc6606174defe627775e5a29363782`, common tree
+`3ea9de429b7933268bc308c694a25f9cda0799ef`. All six required
+[CI #839](https://github.com/Kajooja/Kajo/actions/runs/42008283121) gates pass:
+2,503 tests and four configured exports. One clean-installation startup failed
+before application assertions; its unchanged-source retry passed. The original
+failure is retained in the PR. Optional #391 remains NOT_ADMITTED.
 
-The book source has no dates. Its separate undated research contract uses static
-hash masks, original 1–5 grades and explicit ×2 conversion (2/4/6/8/10). Native
-ratings still support every integer 0–10. The fixed 0/5/10/20 experiment budgets
-count visible ratings; they do not restrict allowed grades. MovieLens's existing
-chronological research path remains separate and reusable; no source identities
-join across domains and no external ratings become native Events.
+The [exposed conformance report](../../research/reports/book-genome-static-v1.json)
+retains 500 readers, 31,144 ratings and 3,669 predictions matching the independent
+arithmetic audit. It is not reused as a fresh selection/final test.
 
-After this source packet passes required checks and merges, the next bounded
-research packet is a frozen, disjoint book development cohort and declared
-baseline/challenger comparison, with no reuse of this exposed test as fresh
-selection/final evidence. Select the model question, resource bound and decision
-rule before scoring that new cohort. Cross-domain/native admission remains open.
-The original owned observation continues only from its retained private records:
-do not replace a pending target, refill a capped attempt, manufacture a rating
-for an unread book, or backdate a newly supplied grade into a frozen forecast.
+**One active packet:** [#419](https://github.com/Kajooja/Kajo/issues/419) evaluates
+the fixed profile-offset challenger against item mean on 500 different readers.
+The [frozen protocol](../../research/manifests/book-genome-development-v2.json)
+excludes every previous cohort subject by a hash-bound private witness. It fixes
+selection, resource bounds, equal-reader losses, paired uncertainty, holdout and
+cold-start guards before fitting. Source/result acceptance belongs to its PR;
+no result or new native admission is claimed by this preparation.
+
+MovieLens already supplies the equivalent movie path: 500 source users and
+84,849 ratings, with actual rating-entry timestamps and eight tested variants.
+Its [D2 report](../../research/reports/movielens-small-d2.md) retains the rejected
+challenger; a losing model is not a reason to rebuild the accepted intake.
+Book hashes remain static masks because their source has no dates. Neither path
+joins people across datasets or writes external ratings as native Events.
+Native ratings retain every integer 0–10; evidence budgets count records.
+
+After #419, use its retained outcome to choose one bounded next model question;
+reserve new selection/final evidence before any tuning. Continue owned observation
+only from private records: never replace a pending target, refill a capped
+attempt, manufacture a grade for an unread book or backdate an old forecast.
+Quality admission, serving activation and Sprint 016/Engine V1 acceptance remain open.
 
 ## Retained owned numeric DEVELOPMENT route — private continuation
 
@@ -70,7 +82,7 @@ operational execution from source acceptance. All eleven integer ratings **0–1
 remain supported. Operational records stay private; source/CI evidence does not
 establish observed prediction usefulness or close Sprint 016/Engine V1.
 
-**One next dependency:** prepare the first bounded, authorized owned-Profile
+**Retained private dependency:** prepare the first bounded, authorized owned-Profile
 DEVELOPMENT observation using these existing seams. [Issue #415](https://github.com/Kajooja/Kajo/issues/415)
 reconciles this documentation handoff; it adds no runtime or observation collector.
 Verify the privately retained connection result against an accepted source
