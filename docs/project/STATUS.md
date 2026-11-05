@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-05**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, owned numeric evaluation preparation after accepted diagnostics #413 / #414. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, isolated BOOK/MOVIE numeric research integration #417 after accepted diagnostics #413 / #414. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,7 +11,33 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — owned numeric DEVELOPMENT preparation
+## Current handoff — Book Genome static research integration #417
+
+[Issue #417](https://github.com/Kajooja/Kajo/issues/417) integrates the explicitly
+reviewed GroupLens Book Genome ratings subset into the existing independent
+engine package. Exact source/CI acceptance belongs to its implementation PR.
+The [aggregate conformance report](../../research/reports/book-genome-static-v1.json)
+records a 500-reader, 31,144-rating cohort and 3,669 test predictions matching the
+prior independent arithmetic audit within 1e-11. This is a replay of already
+exposed DEVELOPMENT data, not a new final holdout or native quality acceptance.
+
+The book source has no dates. Its separate undated research contract uses static
+hash masks, original 1–5 grades and explicit ×2 conversion (2/4/6/8/10). Native
+ratings still support every integer 0–10. The fixed 0/5/10/20 experiment budgets
+count visible ratings; they do not restrict allowed grades. MovieLens's existing
+chronological research path remains separate and reusable; no source identities
+join across domains and no external ratings become native Events.
+
+After this source packet passes required checks and merges, the next bounded
+research packet is a frozen, disjoint book development cohort and declared
+baseline/challenger comparison, with no reuse of this exposed test as fresh
+selection/final evidence. Select the model question, resource bound and decision
+rule before scoring that new cohort. Cross-domain/native admission remains open.
+The original owned observation continues only from its retained private records:
+do not replace a pending target, refill a capped attempt, manufacture a rating
+for an unread book, or backdate a newly supplied grade into a frozen forecast.
+
+## Retained owned numeric DEVELOPMENT route — private continuation
 
 [PR #414](https://github.com/Kajooja/Kajo/pull/414) is accepted as main
 `50c5904e40cd36313ff88da9e1e24ee7f006e8ca`, source

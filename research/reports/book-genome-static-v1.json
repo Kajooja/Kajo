@@ -1,0 +1,305 @@
+{
+  "schema": "book-genome-engine-static-replay-v1",
+  "role": "EXPOSED_DEVELOPMENT_REPLAY",
+  "freezeSha256": "d66a9cc0816e648cae04ae2749aae4755f9498097e02912dcfb7fe31f89f5039",
+  "lineage": {
+    "sourceSha256": "c94a5f0429f6e97098770f96b6c4eaa5c929d6d089b3e340d2ce40bdbda2e41e",
+    "protocolSha256": "c5370c7d92ba55fd1ac6f91d940a9482576b3415bf781372f54db3269563e765",
+    "code": {
+      "scripts/research/book_genome.py": "abd38cc93392685acd9cbae992813113ab26d8291b9a8d5115119421c53dcf44",
+      "scripts/research/evaluate-books.mjs": "a9056fa4255803a02304aa59b3b72cf92f2a21655370375ad0fd633253b1002a",
+      "packages/prediction-engine/dist/research-static.js": "1e92174f783655f8c1c33a3596ea610e7c94cd568f6c1236e79e27ce7aecd8e8",
+      "packages/prediction-engine/dist/rating-location.js": "76fea4b0e1347234b8ef1cd6df7ee240e580cd68fd6e3b7b5f0185d7ba1b3ad1",
+      "packages/prediction-engine/dist/adapters/book-genome.js": "a6fea6ed1c85ae0351eb7bd6ee41b4b6c89f595033287a1bd1a7a62d131abd8a"
+    },
+    "node": "v24.22.1"
+  },
+  "sourceCounts": {
+    "ratings": 5152656,
+    "subjects": 350332,
+    "objects": 9374
+  },
+  "cohort": {
+    "subjects": 500,
+    "ratings": 31144,
+    "minHistory": 20,
+    "maxHistory": 965
+  },
+  "cohortSha256": "9bd43253223a84c3091d849bea9d0391547dd2aa72156903fc40ffb3ebc20b90",
+  "quarantine": {
+    "scope": "bounded candidate pool",
+    "candidateRows": 126244,
+    "identicalDuplicates": 0,
+    "conflictingPairs": 0
+  },
+  "partitions": {
+    "train": {
+      "rows": 16064,
+      "subjects": 400,
+      "membershipSha256": "88f7c8965f1e6f8db0d10dd0e213e634e13f968901b1dd86fa70892cd69c0bf0"
+    },
+    "validation": {
+      "rows": 3461,
+      "subjects": 400,
+      "membershipSha256": "435e0765be3ebbc151f16a589e618593a3818b6166af096f7fca4b7f81e13cb5"
+    },
+    "test": {
+      "rows": 3669,
+      "subjects": 400,
+      "membershipSha256": "fa8f4b43cd78cab702e5f587d70f2d67dc1115c328b0bca8e722c525b711aeb5"
+    },
+    "coldVisible": {
+      "rows": 6318,
+      "subjects": 100,
+      "membershipSha256": "455028f54208f41cf7b36cc8c048d4d88ba3e2dd7ccedbbaa61ea3271f43cf31"
+    },
+    "coldTargets": {
+      "rows": 1632,
+      "subjects": 100,
+      "membershipSha256": "8400e43895de84c1f6d4c4df1906db5732764a6d118d38df3fe2d4525dc53fee"
+    }
+  },
+  "selection": {
+    "selected": "profile-offset",
+    "validation": {
+      "global-mean": {
+        "rows": 3461,
+        "subjects": 400,
+        "mae10": 1.6923786003055108,
+        "rmse10": 2.141562267191473,
+        "subjectMacroMae10": 1.6958679739113085,
+        "predictionCoverage": 1,
+        "fittedItemCoverage": 0.8162380814793412
+      },
+      "item-mean": {
+        "rows": 3461,
+        "subjects": 400,
+        "mae10": 1.6539179630568286,
+        "rmse10": 2.097026678053901,
+        "subjectMacroMae10": 1.6465504210045112,
+        "predictionCoverage": 1,
+        "fittedItemCoverage": 0.8162380814793412
+      },
+      "profile-offset": {
+        "rows": 3461,
+        "subjects": 400,
+        "mae10": 1.5486685759313592,
+        "rmse10": 1.9277426101559114,
+        "subjectMacroMae10": 1.563292457120663,
+        "predictionCoverage": 1,
+        "fittedItemCoverage": 0.8162380814793412
+      }
+    },
+    "modelSha256": "5a903d1b4d21e30e8926925aa69496dbcbe92e8df33a662a5c161b6361a7cc15",
+    "testLabelsUsedForFitOrSelection": false,
+    "role": "REPLAY_OF_EXPOSED_DEVELOPMENT_SELECTION"
+  },
+  "test": {
+    "global-mean": {
+      "rows": 3669,
+      "subjects": 400,
+      "mae10": 1.689240415009356,
+      "rmse10": 2.1468897302079952,
+      "subjectMacroMae10": 1.7045937125750141,
+      "predictionCoverage": 1,
+      "fittedItemCoverage": 0.8247478877078223
+    },
+    "item-mean": {
+      "rows": 3669,
+      "subjects": 400,
+      "mae10": 1.6677152449985964,
+      "rmse10": 2.1184999008227923,
+      "subjectMacroMae10": 1.6777435152051223,
+      "predictionCoverage": 1,
+      "fittedItemCoverage": 0.8247478877078223
+    },
+    "profile-offset": {
+      "rows": 3669,
+      "subjects": 400,
+      "mae10": 1.5377120552834664,
+      "rmse10": 1.938469008187581,
+      "subjectMacroMae10": 1.5586360136920063,
+      "predictionCoverage": 1,
+      "fittedItemCoverage": 0.8247478877078223
+    }
+  },
+  "coldEvidenceMasks": {
+    "0": {
+      "evidenceBudget": 0,
+      "actualVisibleRatings": {
+        "minimum": 0,
+        "maximum": 0
+      },
+      "targetMembershipSha256": "8400e43895de84c1f6d4c4df1906db5732764a6d118d38df3fe2d4525dc53fee",
+      "metrics": {
+        "global-mean": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.5413296263475513,
+          "rmse10": 1.984792938484171,
+          "subjectMacroMae10": 1.642920648937909,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        },
+        "item-mean": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.5235604555026183,
+          "rmse10": 1.9473162867009444,
+          "subjectMacroMae10": 1.6210369447459012,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        },
+        "profile-offset": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.5235604555026183,
+          "rmse10": 1.9473162867009444,
+          "subjectMacroMae10": 1.6210369447459012,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        }
+      }
+    },
+    "5": {
+      "evidenceBudget": 5,
+      "actualVisibleRatings": {
+        "minimum": 5,
+        "maximum": 5
+      },
+      "targetMembershipSha256": "8400e43895de84c1f6d4c4df1906db5732764a6d118d38df3fe2d4525dc53fee",
+      "metrics": {
+        "global-mean": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.5413296263475513,
+          "rmse10": 1.984792938484171,
+          "subjectMacroMae10": 1.642920648937909,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        },
+        "item-mean": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.5235604555026183,
+          "rmse10": 1.9473162867009444,
+          "subjectMacroMae10": 1.6210369447459012,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        },
+        "profile-offset": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.4919522806021006,
+          "rmse10": 1.8983240082862918,
+          "subjectMacroMae10": 1.5617035883663337,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        }
+      }
+    },
+    "10": {
+      "evidenceBudget": 10,
+      "actualVisibleRatings": {
+        "minimum": 10,
+        "maximum": 10
+      },
+      "targetMembershipSha256": "8400e43895de84c1f6d4c4df1906db5732764a6d118d38df3fe2d4525dc53fee",
+      "metrics": {
+        "global-mean": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.5413296263475513,
+          "rmse10": 1.984792938484171,
+          "subjectMacroMae10": 1.642920648937909,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        },
+        "item-mean": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.5235604555026183,
+          "rmse10": 1.9473162867009444,
+          "subjectMacroMae10": 1.6210369447459012,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        },
+        "profile-offset": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.484373180244319,
+          "rmse10": 1.8787586907008351,
+          "subjectMacroMae10": 1.5441885895593728,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        }
+      }
+    },
+    "20": {
+      "evidenceBudget": 20,
+      "actualVisibleRatings": {
+        "minimum": 16,
+        "maximum": 20
+      },
+      "targetMembershipSha256": "8400e43895de84c1f6d4c4df1906db5732764a6d118d38df3fe2d4525dc53fee",
+      "metrics": {
+        "global-mean": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.5413296263475513,
+          "rmse10": 1.984792938484171,
+          "subjectMacroMae10": 1.642920648937909,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        },
+        "item-mean": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.5235604555026183,
+          "rmse10": 1.9473162867009444,
+          "subjectMacroMae10": 1.6210369447459012,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        },
+        "profile-offset": {
+          "rows": 1632,
+          "subjects": 100,
+          "mae10": 1.464328274912392,
+          "rmse10": 1.844527535297574,
+          "subjectMacroMae10": 1.5223275482755527,
+          "predictionCoverage": 1,
+          "fittedItemCoverage": 0.8143382352941176
+        }
+      }
+    }
+  },
+  "qualityAdmission": "NONE",
+  "servingActivation": "NONE",
+  "nativeRowsWritten": 0,
+  "limitations": [
+    "Already exposed development cohort: integration/conformance only, no fresh holdout.",
+    "Unknown dates; hash masks do not establish temporal learning or causal recommendation benefit.",
+    "Observed 1\u20135 source grades map to 2/4/6/8/10; platform scale equivalence is unproven. Native 0\u201310 is unchanged.",
+    "Selected readers with at least 20 ratings; missing and not-read are never negative labels.",
+    "No cross-dataset user joins, native integration, production admission, or calibrated uncertainty."
+  ],
+  "attribution": "Kotkov, Denis; Medlar, Alan; Maslov, Alexandr; Satyal, Umesh Raj; Neovius, Mats; Glowacka, Dorota (2022). The Tag Genome Dataset for Books. CHIIR 2022. https://doi.org/10.1145/3498366.3505833",
+  "conformance": {
+    "status": "PASS",
+    "kind": "PRIOR_PYTHON_AND_SQLITE_AUDIT_VS_BUILT_TYPESCRIPT_REPLAY",
+    "cohortRowsCompared": 31144,
+    "testPredictionsCompared": 3669,
+    "aggregateComparisons": 54,
+    "maximumAbsoluteMetricDifference": 3.1086244689504383e-15,
+    "tolerance": 1e-11,
+    "selected": "profile-offset",
+    "freshHoldout": false,
+    "qualityAdmission": "NONE"
+  },
+  "replay": {
+    "identicalBuiltRuns": 2,
+    "reportSha256": "007a3500b7eceea4220d3c2f4210b3ec166b7bdaf2adf48ae1a38a2b34ab7f95",
+    "modelSha256": "5a903d1b4d21e30e8926925aa69496dbcbe92e8df33a662a5c161b6361a7cc15",
+    "testJournalSha256": "4b82379cea8c78ada02ebc7eed7c7498fc4287344a861c53ee6458f6e069f023"
+  }
+}

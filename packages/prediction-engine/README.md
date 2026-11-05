@@ -1057,3 +1057,14 @@ Independent SQL parity runs from `scripts/database/contextual-skip-reference.sql
 in a disposable temporary namespace, outside application migrations. The existing
 mobile durable outbox is tested against the oracle; no new production queue or RPC
 is introduced. Legacy UNKNOWN/NOT_INTERESTED and 0/5/10 behavior remain unchanged.
+
+## Undated external research
+
+`./adapters/book-genome` and `./research-static` add the reviewed book ratings
+path without changing the root/serving graph. `StaticResearchRating` retains
+unknown time and cannot satisfy temporal `Observation`. Train-only means and
+shrunken visible-rating residuals produce uncalibrated static estimates with
+source/scale/duplicate/target guards. The generic contract also has a synthetic
+non-media 0–10 fixture. It does not infer timing, native actors, exposure or
+cross-source identity. [Research commands, fixed replay and limits](../../research/README.md#book-genome--undated-static-research-417)
+own the exact source/protocol. No fitted artifact is admitted to native serving.
