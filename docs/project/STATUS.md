@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-06**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, Taste recovery #428 accepted; synthetic preservation CI #430 before native-only preflight #427; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, Taste recovery #428 accepted; synthetic preservation CI #430 before owned Taste numeric source #432; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -31,8 +31,13 @@ broader accessibility and predictive quality are not established by that report.
 on the identical accepted tree failed the synthetic native-acquisition preservation
 test; its aggregate error concealed individual proof/cleanup causes. Diagnose and
 repair the fixture with deterministic evidence, preserving exact row/score/retry
-and security assertions. Source checks and accepted runtime behavior remain
-separate. No hosted migration or account mutation belongs to this packet.
+and security assertions. PR #431 exposes the hidden causes in this disposable
+fixture runner. The focused case passes on Node 24 and CI's exact Node 22.23.4;
+the complete ten-test file also passes. The original failure is not reproduced
+and is not claimed fixed. Local `npm run check` passes lint, typecheck and 1,427
+dependency/mobile/catalogue tests before Deno registry connection refusal. Final
+source CI owns the remaining gates; do not merge a failing/incomplete source tree.
+No hosted migration or account mutation belongs to this packet.
 
 **Repository hygiene:** all 46 obsolete development heads were removed after
 exact-head/accepted-history checks. Four nonancestor heads had identical trees
@@ -40,15 +45,21 @@ in reachable accepted merges; 42 were exact ancestors. The eight pinned catalogu
 operation/recovery branches remain. The [audit](retros/branch-audit-2026-11-06.json)
 retains all recovery identities. No open PR or unique unreviewed work was deleted.
 
-**After #430:** [#427](https://github.com/Kajooja/Kajo/issues/427) retains the bounded
-native-only content-evaluation preflight. Reconcile current private continuation,
-source-use permission, current Profile/declaration identity and unexposed windows
-before a fresh comparison. A retired/withdrawn declaration cannot be refilled or
-silently reused; ordinary mobile Taste answers are not private numeric FINAL
-evidence. Preserve installed receipts and current answers. The existing numeric
-capture contracts accept native ITEM_RATED evidence only; Taste bootstrap evidence
-already affects the canonical ranker but is not silently admitted to these numeric
-training prefixes. Any successor needs an explicit provenance-preserving contract.
+**After #430:** [#432](https://github.com/Kajooja/Kajo/issues/432) is the next
+bounded source packet: genuine owned Taste ratings in a versioned numeric
+training prefix. [#427](https://github.com/Kajooja/Kajo/issues/427) closes with an
+explicit source/evidence dependency, without a new capture or comparison. The
+retained declaration supplies no reusable fresh window. Keep withdrawn experiments
+retired; require a new private declaration and permission horizon before evaluation.
+
+Existing numeric v1/v2 captures accept only native ITEM_RATED evidence. Taste
+bootstrap evidence already affects the canonical ranker, but does not train those
+numeric contracts. #432 must retain old versions and exact retries, verify owned
+accepted Taste lineage, preserve native correction/undo/clear precedence, carry
+source withdrawal dependencies and freeze the prefix before a genuinely new target.
+Do not backfill completed Taste predictions, import external ratings as Events,
+expand source caps or activate a serving model. Preserve current answers and all
+installed receipts. Missing support remains explicit unavailable/mean fallback.
 
 The catalogue/admission [audit](../../research/reports/catalogue-admission-v1.md)
 and broad individual-rating [research](../../research/reports/rating-learning-curves-v1.md)
