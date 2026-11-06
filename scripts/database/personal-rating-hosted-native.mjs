@@ -2,11 +2,10 @@
 // the isolated runtime. This module never connects to a hosted database.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { buildFreshInstallation } from './fresh-installation.mjs';
 import { withPersonalRatingProspectiveFixture }
   from './personal-rating-prospective.mjs';
 import {
-  personalRatingHostedManifest, loadPersonalRatingHostedSources,
+  personalRatingHostedManifest, loadPersonalRatingHostedSources, loadPersonalRatingHostedLineage,
   personalRatingHostedMetadataSql, personalRatingHostedRowsSql,
   personalRatingHostedPreflightSql, personalRatingHostedGuardedMigrationSql,
   personalRatingHostedPostflightAssertionSql,
@@ -48,7 +47,7 @@ export async function verifyPersonalRatingHostedUpgrade(execSql, {
     return { target: { projectRef: expectedProjectRef, postgresMajor: 17 }, metadata, rows };
   };
   try {
-    const { files } = await buildFreshInstallation();
+    const files = await loadPersonalRatingHostedLineage();
     assert.equal(files.length, 56, 'Exact reviewed canonical lineage required');
     assert.equal(files[53].name, personalRatingHostedManifest.omitted);
     const sources = await loadPersonalRatingHostedSources();

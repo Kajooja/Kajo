@@ -1,6 +1,6 @@
 # ADR-0011 — Taste as guided Discovery with measured readiness
 
-Date: 2026-10-25
+Date: 2026-10-25; domain-order correction: 2026-11-05
 Status: Accepted product direction from owner feedback; implementation and quality acceptance remain open.
 Tracking: #336; refines ADR-0007/0008/0010 without rewriting retained sessions.
 
@@ -8,17 +8,17 @@ Tracking: #336; refines ADR-0007/0008/0010 without rewriting retained sessions.
 
 The owner reports that Taste still feels disconnected from Discovery. A shared
 card is insufficient: each rating must update the same predictive state and the
-next recommendation. The requested flow is BOOK first, then MOVIE, with a visible
+next recommendation. The requested flow is MOVIE first, then BOOK, with a visible
 readiness measure and automatic completion when supported accuracy is sufficient.
 The film-A rating-4 example illustrates conditional preference learning; it is
 not a hardcoded title, score, first-domain choice or rule that every next result
-must differ. The explicit BOOK → MOVIE order takes precedence over that example.
+must differ. The explicit MOVIE → BOOK order takes precedence over that example.
 
-The current V4 source shares canonical scoring and PersonalProfile evidence but
+The original V4 source shares canonical scoring and PersonalProfile evidence but
 acquires a recognition-bounded pool, then applies a separate Taste utility and
 maximum-two-opportunity domain lead. Its native readiness is always INSUFFICIENT.
-It is therefore neither the requested selection policy nor a completed readiness
-implementation. Provider popularity and aggregate votes do not supply the joint
+Its selection/readiness gap remains distinct from the bounded progression
+correction below. Provider popularity and aggregate votes do not supply the joint
 histories needed for “people who disliked A liked B”.
 
 ## Decision
@@ -72,8 +72,9 @@ research pipeline; do not build a second Taste-only neighbor engine.
 
 ### Ordered domains, shared state
 
-New guided progression is BOOK → MOVIE. Stay in BOOK until its declared readiness
-criterion is met, then show a compact transition and continue MOVIE with the same
+New guided progression is MOVIE → BOOK. The November 5 owner correction
+supersedes the earlier reverse order. Stay in MOVIE until its declared readiness
+criterion is met, then show a compact transition and continue BOOK with the same
 Profile and all accepted evidence. Do not interleave domains or use fixed 10+10
 completion. Book evidence can inform movie predictions and vice versa, but
 transfer strength must be supported and evaluated; success in one domain cannot
@@ -83,6 +84,27 @@ Poor recognition, exhausted eligible covers/catalogue, user fatigue or safety
 limits must offer an explicit pause/continuation with that domain still
 insufficient. The user may continue to the other domain or ordinary Discovery;
 that exit is not a passed test. Never require an endless test or account reset.
+
+### Bounded native correction — 2026-11-05 / #428
+
+Fresh V4 NEXT selections use a separately versioned `movie-first-v1` progression:
+MOVIE until its 24-opportunity safety limit or unsupported eligible selection,
+then BOOK for the remainder of the existing 48-opportunity session limit. Once a
+new-version BOOK question is committed, the session never returns to MOVIE.
+These are maximum opportunities, including skips/withdrawn exposures, not fixed
+completion quotas or readiness thresholds. The user can leave for Discovery at
+any time; readiness remains explicitly insufficient. Within the chosen domain,
+the existing canonical-ordinal selector and full frozen candidate panel remain.
+This fixes ordering without claiming the shared expected-rating selection or
+calibrated stopping contract is complete.
+
+An existing mixed V4 session retains all prior questions and answers. Its next
+fresh question adopts the versioned progression; old unversioned BOOK exposures
+do not falsely mark the new BOOK phase as started, but still consume the total
+budget. Pending questions, frozen measurements, old cached replies and V1–V3
+policies are unchanged. No account reset is needed. Complete reply persistence
+must accommodate all 1,128 possible ordinal pairs under the session bound; the
+512 KiB response cap replaces the insufficient 32 KiB cap without truncation.
 
 ### A meaningful meter and stopping rule
 
@@ -132,7 +154,7 @@ rewrite or blanket account reset is authorized by this design.
 
 1. Reproducible catalogue/cover and shared-retrieval audit; cover repair binds exact
    source identity and changes no preference/model/evidence data.
-2. One shared serving path with a versioned BOOK → MOVIE progression, proven by
+2. One shared serving path with a versioned MOVIE → BOOK progression, proven by
    same-input parity, low/high first-answer and cross-domain transfer fixtures.
 3. Admitted outcome/readiness contract, prequential evaluation and calibrated
    meter with pass, insufficient, contradiction, correction and withdrawal tests.
@@ -143,4 +165,5 @@ rewrite or blanket account reset is authorized by this design.
    evidence that prediction quality or calibration has passed.
 
 ROADMAP orders these dependencies. Native readiness and the data/model foundation
-are substantive open work; this decision does not install a new selector or model.
+are substantive open work; #428 implements only the bounded correction above.
+Source, hosted and phone acceptance are recorded separately in STATUS/the PR.

@@ -548,7 +548,7 @@ probabilities/readiness explicitly unavailable and continue learning in Discover
 
 [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md) refines the
 owner's required #336 behavior: common candidate acquisition/scoring/state across
-Taste and Discovery, BOOK → MOVIE guidance, conditional low/high-rating recall,
+Taste and Discovery, MOVIE → BOOK guidance, conditional low/high-rating recall,
 and a measured per-domain readiness report that controls phase completion.
 BOOK/MOVIE are presentation/evaluation scopes within one Profile, not independent
 models. Same-input serving parity and supported cross-domain transfer are required.
@@ -1007,8 +1007,13 @@ adds `CANONICAL_FORECAST_POOL_V4` for newly created sessions only. Each fresh NE
 uses the current server cutoff, excludes previously asked/labelled and currently
 suppressed Items before the recognition source limit (up to 128 Items per domain),
 then retains at most 25 BOOK and 25 MOVIE candidates for one canonical evaluation
-capture. The V3 selector's ordinal preference, utility weights and coverage guard
-remain unchanged within that panel. This refresh admits candidates beyond START;
+capture. The V3 selector's ordinal preference and utility weights remain unchanged.
+The November 5 #428 correction applies `movie-first-v1` before within-domain
+selection: MOVIE has a maximum 24 opportunities, then BOOK uses the remaining
+48-opportunity session budget; unsupported MOVIE selection can advance earlier.
+A new-version BOOK presentation makes that transition permanent. Legacy mixed
+exposures still consume the budget, without retroactively changing phase traces.
+These bounds never establish readiness. The full frozen panel is retained. This refresh admits candidates beyond START;
 it is not whole-catalog personalized retrieval or measured recommendation uplift.
 
 The exact acquired catalog belongs to its immutable question panel, not to a
@@ -1738,7 +1743,7 @@ Keep already-delivered origins immutable,
 finish exact retries, and obtain a new origin for new delivery rather than
 silently rescoring frozen pagination. Under ADR-0011, equal declared Profile/
 prefix/domain/mode/source/cutoff and eligibility must use the same acquisition and
-scoring on both surfaces. First-question recognition and BOOK → MOVIE progression
+scoring on both surfaces. First-question recognition and MOVIE → BOOK progression
 are explicit guided-policy constraints. Any bounded information-seeking tradeoff
 is shared, versioned and evaluated; there is no separate hidden Taste utility.
 

@@ -519,7 +519,9 @@ alone do not establish this parity. STATUS/DEVICE_TEST own correction evidence.
 
 **Guided-learning refinement — 2026-10-25:** visual parity must extend to the
 common prediction/learning loop under [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md).
-Show BOOK first, then MOVIE, without mixing cards across unfinished guided phases.
+Show MOVIE first, then BOOK (owner correction 2026-11-05), without mixing cards
+across unfinished guided phases. The bounded native #428 safety-limit/support
+transition remains insufficient; it does not implement the calibrated meter below.
 A compact active-domain readiness indicator explains measured support and missing
 certainty without shrinking the shared artwork/rating viewport. Advance/end only
 when the server's validated criterion passes; voluntary continuation is visibly

@@ -162,7 +162,7 @@ Taste Test is not a genre questionnaire.
 
 It is guided Discovery using the same Profile, candidate acquisition, state and
 scoring under equal declared inputs. Each first-answer forecast is frozen before
-that answer contributes to future learning. A recognizable opener and BOOK → MOVIE
+that answer contributes to future learning. A recognizable opener and MOVIE → BOOK
 progression are explicit policy constraints; later questions pursue the same
 personal expected-rating objective with declared bounded exploration. The engine
 core and existing owned-app consumer are developed and evaluated before the public

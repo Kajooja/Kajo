@@ -8,7 +8,7 @@ import { withPersonalRatingProspectiveFixture, verifyPersonalRatingProspective }
 import { verifyPersonalRatingBaseline } from './personal-rating-baseline.mjs';
 import { verifyPersonalContentRating } from './personal-content-rating.mjs';
 import {
-  personalRatingHostedManifest, validatePersonalRatingHostedSources, loadPersonalRatingHostedSources,
+  personalRatingHostedManifest, validatePersonalRatingHostedSources, loadPersonalRatingHostedSources, loadPersonalRatingHostedLineage,
   personalRatingHostedMetadataSql, personalRatingHostedRowsSql, personalRatingHostedPreflightSql,
   personalRatingHostedGuardedMigrationSql, personalRatingHostedPostflightSql,
 } from './personal-rating-hosted-upgrade.mjs';
@@ -37,7 +37,7 @@ async function predecessor() {
     create role supabase_auth_admin;create table auth.schema_migrations(version text);
     alter table auth.schema_migrations owner to supabase_auth_admin;grant select on auth.schema_migrations to postgres;
     insert into auth.schema_migrations values('retained-provider-history');`);
-  const { files } = await buildFreshInstallation();
+  const files = await loadPersonalRatingHostedLineage();
   assert.equal(files.length, 56);assert.equal(files[53].name, personalRatingHostedManifest.omitted);
   for (const file of files.slice(0, 53)) {
     await db.exec(`begin;${file.sql}commit;`);
@@ -58,6 +58,12 @@ function replacementBodySql(signature) {
 
 test('numeric hosted preparation pins two exact ordered sources and never includes optional 54', async () => {
   const files = await loadPersonalRatingHostedSources();
+  const lineage = await loadPersonalRatingHostedLineage();
+  assert.equal(lineage.length, 56);
+  assert.equal(lineage.at(-1).name, personalRatingHostedManifest.sources.at(-1).filename);
+  const current = await buildFreshInstallation();
+  assert.ok(current.files.length > lineage.length, 'Current Taste forward remains outside the historical numeric package');
+  assert.deepEqual(current.files.slice(0, lineage.length), lineage);
   assert.equal(validatePersonalRatingHostedSources(files), files);
   assert.throws(() => validatePersonalRatingHostedSources([...files].reverse()), /Exact ordered/);
   assert.throws(() => validatePersonalRatingHostedSources([files[0]]), /Exactly two/);
