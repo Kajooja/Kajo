@@ -70,7 +70,7 @@ export async function verifyOwnedTasteNumericCapture(exec, withSession) {
           const tampered = structuredClone(forecast);tampered.prefix.ratings[0].value = 6;
           await connection(`select ${finalizeOwnedTaste(malformed.id, tampered)};`);
         },
-      }), /differs from native input binding/);
+      }), error => error.code === '22023' || /\(SQLSTATE 22023\)/.test(error.message));
       assert.equal(await one(`select count(*)::integer from private.personal_rating_allocations where id=${literal(malformed.id)};`, 'owned-rollback'), 0);
       const answeredCapture = await captureOwnedTasteNumericForecast(withSession, malformed);
       const firstCommand = await command(malformed.target, 6, { source: malformed.source });
@@ -84,7 +84,8 @@ export async function verifyOwnedTasteNumericCapture(exec, withSession) {
       state = await rpc(cmd(state, 'CORRECT', { questionId: questions[0].questionId, answer: { kind: 'RATING', value: 4 } }));
       assert.equal((await call(inspect(movieRequest.id))).status, 'WITHDRAWN');
       assert.equal((await call(inspect(malformed.id))).firstAnswer, null, 'Source withdrawal must retire dependent first-answer copies');
-      await assert.rejects(captureOwnedTasteNumericForecast(withSession, movieRequest), /withdrawn/);
+      await assert.rejects(captureOwnedTasteNumericForecast(withSession, movieRequest),
+        error => error.code === '55000' || /\(SQLSTATE 55000\)/.test(error.message));
       assert.deepEqual((await captureOwnedTasteNumericForecast(withSession, bookRequest)).stored, unrelated.stored);
       assert.deepEqual((await captureContent(f.targets[0], { id: old.preparation.forecastId })).stored, old.stored);
       return { status: 'PASS', actualTasteRatings: [0, 10], actualForecastMean: 5, oldGenerationRetry: 'EXACT',
