@@ -44,13 +44,13 @@ export async function verifyOwnedTasteNumericUpgrade(exec, withSession, migratio
         for (const fn of newFunctions) {
           assert.equal(fn.prosecdef, fn.proname === 'withdraw_personal_rating_training_source_v2');
           assert.deepEqual(fn.proconfig, ['search_path=""']);
-          assert.equal(await query(`select exists(select 1 from unnest(array['anon','authenticated','service_role']) role
-            where has_function_privilege(role,${fn.oid},'EXECUTE'));`), false, 'New helper EXECUTE must remain closed');
+          assert.equal(await query(`select to_jsonb(exists(select 1 from unnest(array['anon','authenticated','service_role']) role
+            where has_function_privilege(role,${fn.oid},'EXECUTE')));`), false, 'New helper EXECUTE must remain closed');
         }
         for (const table of ['private.personal_rating_bootstrap_refs', 'private.personal_rating_taste_lineage_refs']) {
-          assert.equal(await query(`select relrowsecurity from pg_class where oid=${literal(table)}::regclass;`), true, 'New source refs require RLS');
-          assert.equal(await query(`select exists(select 1 from unnest(array['anon','authenticated','service_role']) role
-            where has_table_privilege(role,${literal(table)},'SELECT,INSERT,UPDATE,DELETE'));`), false, 'New source refs permission must remain closed');
+          assert.equal(await query(`select to_jsonb(relrowsecurity) from pg_class where oid=${literal(table)}::regclass;`), true, 'New source refs require RLS');
+          assert.equal(await query(`select to_jsonb(exists(select 1 from unnest(array['anon','authenticated','service_role']) role
+            where has_table_privilege(role,${literal(table)},'SELECT,INSERT,UPDATE,DELETE')));`), false, 'New source refs permission must remain closed');
         }
         assert.deepEqual(await query('select ' + prepare(v1.preparation.forecastId, v1.preparation.sourcePredictionId,
           v1.preparation.targetItemId) + ';'), v1.stored, 'V1 exact retry changed');

@@ -40,6 +40,29 @@ checks, then stops at Deno registry connection refusal. Required final-source CI
 must establish all six gates, including the new native concurrent-writer and
 populated-forward checks. Do not merge a failing/incomplete tree.
 
+**PR #433 continuation:** CI #857 passed five gates; the native CLI gate
+failed in the new populated-forward verifier with `invalid JSON acknowledgement`.
+Its ACL/RLS queries returned PostgreSQL `t`/`f` instead of JSON booleans. The
+correction serializes those three query forms as JSON and verifies result types
+locally, including rejection of unauthorized function/table grants and disabled
+RLS. The regression fails on the prior source at the function-ACL query. This
+changes the disposable verifier only, not migration SQL or prediction math.
+Earlier CI #856's rejected-forecast assertion required SQLSTATE rather than
+redacted server prose; that separate correction is retained. Require all six
+gates on the corrected final tree before merge; earlier passing subsets do not
+constitute acceptance.
+
+The corrected verifier and transport suite pass all ten focused tests when run
+sequentially. An initial parallel local run failed the transport's short deadline
+fixture; its sequential rerun passes without a transport change. The current full
+`npm run check` passes lint/typecheck and 1,427 dependency/mobile/catalogue tests;
+it was stopped after repeated Deno dependency-download stalls, so it is not a
+completed full-check pass. On November 6 the owner explicitly approved publishing
+this correction to PR #433 and merging after all six required final-source checks
+pass. Inspect the corrected source/tree and native proof before merge, then retain
+the acceptance receipt in the PR and continue the private declaration/forward
+preparation below. Earlier passing subsets do not replace final-source acceptance.
+
 **Operational boundary:** this migration is source work, not installed hosted
 state. No account reset, observed capture, declaration refill, historical forecast
 backfill or serving admission belongs to this packet. After source acceptance,

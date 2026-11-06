@@ -14,17 +14,32 @@ test('owned Taste forward preserves populated captures, committed answers, priva
     const { files } = await buildFreshInstallation(), index = files.findIndex(file => file.name.endsWith('_owned_taste_numeric_sources.sql'));
     assert.ok(index > 0);
     for (const file of files.slice(0, index)) await db.exec(`begin;${file.sql}commit;`);
-    const exec = async sql => {
-      try { return (await db.exec(sql)).flatMap(result => result.rows.map(row => Object.values(row)[0])); }
+    const exec = async (sql, requireJson = false) => {
+      try {
+        return (await db.exec(sql)).flatMap(result => result.rows.map(row => {
+          // PGlite decodes SQL booleans directly, hiding psql's non-JSON t/f
+          // output. Require this verifier's result statements to emit JSON,
+          // then exercise the same JSON value boundary as the native transport.
+          if (requireJson === true) {
+            assert.equal(result.fields.length, 1, 'Upgrade proof must return one JSON column');
+            assert.ok([114, 3802].includes(result.fields[0].dataTypeID),
+              'Upgrade proof must return JSON for the native psql transport');
+          }
+          return JSON.parse(JSON.stringify(Object.values(row)[0]));
+        }));
+      }
       catch (error) { await db.exec('rollback;');throw error; }
     };
-    const report = await verifyOwnedTasteNumericUpgrade(exec, callback => callback(exec), files[index]);
+    const withSession = callback => callback(sql => exec(sql, true));
+    const report = await verifyOwnedTasteNumericUpgrade(exec, withSession, files[index]);
     assert.equal(report.status, 'PASS');t.diagnostic(JSON.stringify(report));
     for (const mutation of [
       'grant execute on function private.prepare_personal_rating_forecast_v3(uuid,uuid,uuid,integer,text,jsonb) to authenticated;',
+      'grant select on private.personal_rating_bootstrap_refs to authenticated;',
+      'alter table private.personal_rating_taste_lineage_refs disable row level security;',
       "alter function private.finalize_personal_rating_forecast_v2(uuid,jsonb) set statement_timeout='10s';",
       'update public.items set title=title||\' unwanted rewrite\';',
-    ]) await assert.rejects(verifyOwnedTasteNumericUpgrade(exec, callback => callback(exec),
-      { ...files[index], sql: files[index].sql + '\n' + mutation }), /changed|closed/);
+    ]) await assert.rejects(verifyOwnedTasteNumericUpgrade(exec, withSession,
+      { ...files[index], sql: files[index].sql + '\n' + mutation }), /changed|closed|require RLS/);
   } finally { await db.close(); }
 });
