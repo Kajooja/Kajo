@@ -1,0 +1,339 @@
+{
+  "date": "2026-11-06",
+  "acceptedMain": "89f8649ca52f3672df23e2e5dcf0e2a07369f3f9",
+  "openPullRequestsAtCleanup": 0,
+  "removed": [
+    {
+      "branch": "docs/final-input-hosted-receipt",
+      "head": "6dcdb8f38296b5b119b322c5b7713eb1473b3690",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "6dcdb8f38296b5b119b322c5b7713eb1473b3690"
+    },
+    {
+      "branch": "docs/friend-network-shared-sessions",
+      "head": "ad8cf74c5ade3f68907eece369a07afab906c6b6",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "ad8cf74c5ade3f68907eece369a07afab906c6b6"
+    },
+    {
+      "branch": "docs/frozen-final-input-receipt",
+      "head": "3a5ff8dee3aa7b802b2cc08ba3857d7f15553e68",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "3a5ff8dee3aa7b802b2cc08ba3857d7f15553e68"
+    },
+    {
+      "branch": "docs/native-taste-consumer-receipt",
+      "head": "dda667556fc3d27260724f0a612f2221ce6c2805",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "dda667556fc3d27260724f0a612f2221ce6c2805"
+    },
+    {
+      "branch": "docs/numeric-observation-handoff",
+      "head": "69b25e581d1ea7fe8e2cabf3fff90bc7f47f725d",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "69b25e581d1ea7fe8e2cabf3fff90bc7f47f725d"
+    },
+    {
+      "branch": "docs/shared-acquisition-hosted-receipt",
+      "head": "982037591ae4725ebaefb352b6e212e747e7047b",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "982037591ae4725ebaefb352b6e212e747e7047b"
+    },
+    {
+      "branch": "docs/shared-consumption-hosted-receipt",
+      "head": "b384a8fdaebfd3c3822d1cfd1611bf1ea7f617ca",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "b384a8fdaebfd3c3822d1cfd1611bf1ea7f617ca"
+    },
+    {
+      "branch": "docs/shared-native-acquisition-receipt",
+      "head": "32d68db0cd42c7c0571c766dfd3ee3fba065bb48",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "32d68db0cd42c7c0571c766dfd3ee3fba065bb48"
+    },
+    {
+      "branch": "docs/shared-reconciliation-rollout",
+      "head": "3eb56f4dccf4ad512edc31dfec705011c6621488",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "3eb56f4dccf4ad512edc31dfec705011c6621488"
+    },
+    {
+      "branch": "docs/v4-receipt-acceptance-receipt",
+      "head": "075cf9233d0bfcd97235f282ce8de8b225d432e3",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "075cf9233d0bfcd97235f282ce8de8b225d432e3"
+    },
+    {
+      "branch": "docs/v4-receipt-hosted-acceptance",
+      "head": "05bebd8f0cd2ba1f64a686d030146e1c0451b257",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "05bebd8f0cd2ba1f64a686d030146e1c0451b257"
+    },
+    {
+      "branch": "docs/working-native-admission-receipt",
+      "head": "fc7cc527a6314e5ae8b506e811c4eaf8798e9179",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "fc7cc527a6314e5ae8b506e811c4eaf8798e9179"
+    },
+    {
+      "branch": "docs/363-source-receipt",
+      "head": "babfb3201397b71ea5f68d8c02859b7075bf897c",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "babfb3201397b71ea5f68d8c02859b7075bf897c"
+    },
+    {
+      "branch": "docs/365-rollout-receipt",
+      "head": "8591533abddadb7a933c725a14c375feba160e56",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "8591533abddadb7a933c725a14c375feba160e56"
+    },
+    {
+      "branch": "docs/367-conformance-receipt",
+      "head": "5405b1159ea5a5e97143b1ba203d19468427bb32",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "5405b1159ea5a5e97143b1ba203d19468427bb32"
+    },
+    {
+      "branch": "feat/engine-shared-input-contract",
+      "head": "d07ce07c03953dfeb14163bef96728036c02faa2",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "d07ce07c03953dfeb14163bef96728036c02faa2"
+    },
+    {
+      "branch": "feat/frozen-final-scoring-input",
+      "head": "9cc8db296fa7bdd0c5bf7a1366713984f3146333",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "9cc8db296fa7bdd0c5bf7a1366713984f3146333"
+    },
+    {
+      "branch": "feat/native-candidate-request-contract",
+      "head": "c38ec5cd49adfd9c243983d0bca892e1c7f33af3",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "c38ec5cd49adfd9c243983d0bca892e1c7f33af3"
+    },
+    {
+      "branch": "feat/native-personal-rating-baseline",
+      "head": "ea5fcc330b710318a70828dccbd88fb5843e7e51",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "ea5fcc330b710318a70828dccbd88fb5843e7e51"
+    },
+    {
+      "branch": "feat/native-prediction-adapter",
+      "head": "f3f7e86d7de8c30b7b5a8ac3efa62fd0ca60f18c",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "f3f7e86d7de8c30b7b5a8ac3efa62fd0ca60f18c"
+    },
+    {
+      "branch": "feat/native-quality-feasibility",
+      "head": "af7ddc92a8e2e96d4bc0159614e65b31e42d8b58",
+      "basis": "REVIEWED_IDENTICAL_TREE_ACCEPTED_MERGE",
+      "pullRequest": 397,
+      "acceptedMerge": "b3fad53d7a811e82807e48ab77b7817a465b3061",
+      "tree": "08743a875ea102d56c4c1ce94c671071e1a45942"
+    },
+    {
+      "branch": "feat/personal-content-rating",
+      "head": "62f5482679030782aec30a9efbbd9956247ce838",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "62f5482679030782aec30a9efbbd9956247ce838"
+    },
+    {
+      "branch": "feat/personal-rating-evaluation",
+      "head": "34786d1b5ec19ad6358acfcfc7c3068ebc0a4469",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "34786d1b5ec19ad6358acfcfc7c3068ebc0a4469"
+    },
+    {
+      "branch": "feat/personal-rating-hosted-readiness",
+      "head": "48fc4b51634f3ae8d94b2a0cafaf319c80d8bc76",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "48fc4b51634f3ae8d94b2a0cafaf319c80d8bc76"
+    },
+    {
+      "branch": "feat/personal-rating-operator-connection",
+      "head": "09168811bd540f0221a75b817b918ca074ff78b5",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "09168811bd540f0221a75b817b918ca074ff78b5"
+    },
+    {
+      "branch": "feat/personal-rating-session-pooler",
+      "head": "6fad1a053147a7a3f2ae9668cae9b6f0d7cfab3d",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "6fad1a053147a7a3f2ae9668cae9b6f0d7cfab3d"
+    },
+    {
+      "branch": "feat/prospective-personal-rating",
+      "head": "174cc1578883c8194617104409e7d3dddedcce2d",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "174cc1578883c8194617104409e7d3dddedcce2d"
+    },
+    {
+      "branch": "feat/shared-native-candidate-acquisition",
+      "head": "527a18a1ee6205d907ef602c45a53b4c6a71a3dc",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "527a18a1ee6205d907ef602c45a53b4c6a71a3dc"
+    },
+    {
+      "branch": "feat/v4-receipt-forecast-binding",
+      "head": "db0c43834efaf7fb51fbb97143717df876f59c75",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "db0c43834efaf7fb51fbb97143717df876f59c75"
+    },
+    {
+      "branch": "feat/working-native-admission-v2",
+      "head": "bfe9ffd7fcbcad8ab94d788b95ac5724e7b89d38",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "bfe9ffd7fcbcad8ab94d788b95ac5724e7b89d38"
+    },
+    {
+      "branch": "feat/232f-shared-input-consumer",
+      "head": "1e5a6963418fd31e8ab6971a1923679dd55be7da",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "1e5a6963418fd31e8ab6971a1923679dd55be7da"
+    },
+    {
+      "branch": "feat/232f-shared-outcome-reconciliation",
+      "head": "42fd7d4072fd4bdb7d372e0751ac4c56a756459d",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "42fd7d4072fd4bdb7d372e0751ac4c56a756459d"
+    },
+    {
+      "branch": "fix/private-probe-diagnostics",
+      "head": "9003153ef3e275b0520c1a97c10c0a65705888bb",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "9003153ef3e275b0520c1a97c10c0a65705888bb"
+    },
+    {
+      "branch": "fix/taste-answer-recovery-and-domain-order",
+      "head": "d4caa744d099ad40044e34e26cd2664c09711ad8",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "d4caa744d099ad40044e34e26cd2664c09711ad8"
+    },
+    {
+      "branch": "perf/contextual-skip-prefetch",
+      "head": "51e817bf4dd665871c2f350c87fdff3b426f9b8e",
+      "basis": "REVIEWED_IDENTICAL_TREE_ACCEPTED_MERGE",
+      "pullRequest": 391,
+      "acceptedMerge": "2f6f3811e3489adca55d945481674a30a5064583",
+      "tree": "7583355e048e6c4700aa739a6486ab9a207446f4"
+    },
+    {
+      "branch": "research/book-cohort-confirmation-419",
+      "head": "8edfb9367d50284b93a5f177f75c806530472710",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "8edfb9367d50284b93a5f177f75c806530472710"
+    },
+    {
+      "branch": "research/book-genome-static-417",
+      "head": "bd0d329342075f1aed9db132246dcd1b708f9449",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "bd0d329342075f1aed9db132246dcd1b708f9449"
+    },
+    {
+      "branch": "research/catalogue-admission-425",
+      "head": "3679513c356335ed3361352377d83063d6bb2ca6",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "3679513c356335ed3361352377d83063d6bb2ca6"
+    },
+    {
+      "branch": "research/rating-response-spread-421",
+      "head": "27d22211ed9b5c1395bd5ccc43556df62c40086b",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "27d22211ed9b5c1395bd5ccc43556df62c40086b"
+    },
+    {
+      "branch": "research/scalable-rating-training-422",
+      "head": "fa6d497afbfa01de5135e5fa01010cb7fa56c867",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "fa6d497afbfa01de5135e5fa01010cb7fa56c867"
+    },
+    {
+      "branch": "test/native-four-consumer-parity",
+      "head": "32cf13eb7247b603edd2d0c5dffa4b2e3ad9b2f6",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "32cf13eb7247b603edd2d0c5dffa4b2e3ad9b2f6"
+    },
+    {
+      "branch": "test/native-performance-repeatability",
+      "head": "4b98c8fb1033ee2a5dd93e855198fa70b6a84509",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "4b98c8fb1033ee2a5dd93e855198fa70b6a84509"
+    },
+    {
+      "branch": "test/native-prediction-performance",
+      "head": "15c939b3355333ae2b75e3ee417e99dfd88cf7e0",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "15c939b3355333ae2b75e3ee417e99dfd88cf7e0"
+    },
+    {
+      "branch": "test/native-skip-call-diagnosis",
+      "head": "9931ad157f621033e43f21a8dbc1938a4a0b780e",
+      "basis": "REVIEWED_IDENTICAL_TREE_ACCEPTED_MERGE",
+      "pullRequest": 395,
+      "acceptedMerge": "b7e38a6533eaa0771070b41d1fed1fe592e67927",
+      "tree": "9c80ef29e09e6d68c1b4e5b03ab2a2d79b31f12b"
+    },
+    {
+      "branch": "test/native-skip-history-envelope",
+      "head": "49248cd3e261abbc3a3d4b62d101b28e2fb4d84a",
+      "basis": "REVIEWED_IDENTICAL_TREE_ACCEPTED_MERGE",
+      "pullRequest": 393,
+      "acceptedMerge": "0f04f5d954ba99992ff4e7291d53e1c14c5b3d28",
+      "tree": "42de48588d7a53fbe84848bc9da1937124efc179"
+    },
+    {
+      "branch": "test/native-taste-consumer-conformance",
+      "head": "ee80fb9bd00aa9d147786bea7d52c83950a7583f",
+      "basis": "EXACT_ANCESTOR",
+      "mergeBase": "ee80fb9bd00aa9d147786bea7d52c83950a7583f"
+    }
+  ],
+  "retained": [
+    {
+      "branch": "catalog-acquisition/ol-20260831-conflicts",
+      "head": "11bada2563374616cc8d014d787039c9235ea071",
+      "reason": "PINNED_CATALOG_OPERATION_IDENTITY_AND_RECOVERY"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-continuation",
+      "head": "f2558795be45be17bd2632071cf25746e4ec82a2",
+      "reason": "PINNED_CATALOG_OPERATION_IDENTITY_AND_RECOVERY"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-framed",
+      "head": "67b4a7480af41c1e664c6b80bbe7754530ec59b2",
+      "reason": "PINNED_CATALOG_OPERATION_IDENTITY_AND_RECOVERY"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831-reviewed",
+      "head": "4727b4cb3d82a7bc10d134d1c2b7e9fcdbdf22bb",
+      "reason": "PINNED_CATALOG_OPERATION_IDENTITY_AND_RECOVERY"
+    },
+    {
+      "branch": "catalog-acquisition/ol-20260831",
+      "head": "4308943cf0157ec6648017a0bf7a25e5b0876c5a",
+      "reason": "PINNED_CATALOG_OPERATION_IDENTITY_AND_RECOVERY"
+    },
+    {
+      "branch": "catalog-diagnostic/ol-20260831-edition-prefix",
+      "head": "be0ec18cdc968b5643e45c57c5ab9919f885e195",
+      "reason": "PINNED_CATALOG_OPERATION_IDENTITY_AND_RECOVERY"
+    },
+    {
+      "branch": "catalog-diagnostic/ol-20260831-work-prefix",
+      "head": "6a6dc390940db1b15d68a8d850dd08bfbb88bd4a",
+      "reason": "PINNED_CATALOG_OPERATION_IDENTITY_AND_RECOVERY"
+    },
+    {
+      "branch": "catalog-diagnostic/ol-20260831",
+      "head": "bbc351eb9fa7eee0fb25f2183be3c1a729b59191",
+      "reason": "PINNED_CATALOG_OPERATION_IDENTITY_AND_RECOVERY"
+    },
+    {
+      "branch": "main",
+      "head": "89f8649ca52f3672df23e2e5dcf0e2a07369f3f9",
+      "reason": "DEFAULT_BRANCH"
+    }
+  ],
+  "verification": "Exact heads unchanged before deletion; GitHub UI confirmed all 46 deletions; fresh API inventory contains only main plus the eight preserved operation branches. Commits and pull requests remain recoverable."
+}

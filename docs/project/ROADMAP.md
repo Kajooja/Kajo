@@ -22,9 +22,16 @@ their history; this refinement and the updated Phase 16 scope govern the target.
 
 ## Taste correctness — owner correction 2026-11-05
 
-Fix #428's valid-answer receipt overflow and fresh MOVIE → BOOK order before
-resuming #427's native-only evaluation preflight. Preserve all accepted evidence
-and pending commands; no reset. The bounded phase transition does not close
+#428's valid-answer receipt overflow and fresh MOVIE → BOOK source correction
+are accepted through #429 and installed. The November 6 phone report confirms
+resumed completion and BOOK continuation. Repository cleanup removed 46 completed
+development branches while retaining eight catalogue operation/recovery refs.
+Resolve #430's synthetic preservation-test failure on accepted main before
+starting #432's versioned owned-Taste numeric training prefix. #427's bounded
+preflight closes with a source/declaration dependency; new private evaluation follows
+its accepted source and fresh declaration, with old windows left retired. Preserve
+accepted evidence and pending commands; no reset or repeated deployment. The
+bounded phase transition does not close
 Sprint 019's shared-policy/calibrated-readiness requirements. This necessary
 observation repair fits the engine-first order below.
 
