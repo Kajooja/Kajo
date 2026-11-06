@@ -52,6 +52,16 @@ redacted server prose; that separate correction is retained. Require all six
 gates on the corrected final tree before merge; earlier passing subsets do not
 constitute acceptance.
 
+CI #858 then completed 2,573 tests and four configured iOS/Android exports, but
+its CLI proof exposed a second verifier defect: the rollback restored the caller's
+float serialization setting before the final row snapshot. Only the prediction
+candidate digest differed. The new regression reproduces that failure on the
+prior source with reduced caller precision. The corrected readback uses its own
+read-only transaction at the original snapshot precision, then restores the
+caller settings; all row/function and ACL checks remain exact. The regression
+exercises caller precisions -3, 0 and 3. This is another disposable-verifier
+correction, not a migration or prediction change; CI #858 remains a failed run.
+
 The corrected verifier and transport suite pass all ten focused tests when run
 sequentially. An initial parallel local run failed the transport's short deadline
 fixture; its sequential rerun passes without a transport change. The current full

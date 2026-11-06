@@ -58,8 +58,12 @@ export async function verifyOwnedTasteNumericUpgrade(exec, withSession, migratio
           v2.preparation.targetItemId, 3600, 'synthetic', contentFeatureUse) + ';'), v2.stored, 'V2 exact retry changed');
         assert.deepEqual(await query(rows), before, 'Upgrade retry changed predecessor rows');
         await connection('rollback;', { stage: 'owned-taste-upgrade-rollback' });
+        // ROLLBACK also restores the caller's float serialization settings.
+        // Read the restored rows at the same precision as the before snapshot.
+        await connection('begin read only;set local extra_float_digits=3;', { stage: 'owned-taste-upgrade-readback' });
         assert.deepEqual(await query(functions), oldFunctions, 'Rollback did not restore predecessor functions');
         assert.deepEqual(await query(rows), before, 'Rollback did not restore predecessor rows');
+        await connection('rollback;', { stage: 'owned-taste-upgrade-readback-rollback' });
         return { status: 'PASS', retainedCaptures: 2, retainedTasteAnswers: 2, newPrivateTables: 2, newPrivateFunctions: 4,
           v1AndV2Retries: 'EXACT', migration: 'ROLLED_BACK', qualityAdmission: 'NONE', servingActivation: 'NONE' };
       } catch (error) {

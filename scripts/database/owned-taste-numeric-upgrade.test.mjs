@@ -31,8 +31,13 @@ test('owned Taste forward preserves populated captures, committed answers, priva
       catch (error) { await db.exec('rollback;');throw error; }
     };
     const withSession = callback => callback(sql => exec(sql, true));
-    const report = await verifyOwnedTasteNumericUpgrade(exec, withSession, files[index]);
-    assert.equal(report.status, 'PASS');t.diagnostic(JSON.stringify(report));
+    for (const digits of [-3, 0, 3]) {
+      await db.exec(`set extra_float_digits=${digits};`);
+      const report = await verifyOwnedTasteNumericUpgrade(exec, withSession, files[index]);
+      assert.equal(report.status, 'PASS');t.diagnostic(JSON.stringify({ digits, ...report }));
+      assert.equal((await db.query('show extra_float_digits')).rows[0].extra_float_digits, String(digits),
+        'Upgrade proof must restore caller precision after rollback');
+    }
     for (const mutation of [
       'grant execute on function private.prepare_personal_rating_forecast_v3(uuid,uuid,uuid,integer,text,jsonb) to authenticated;',
       'grant select on private.personal_rating_bootstrap_refs to authenticated;',
