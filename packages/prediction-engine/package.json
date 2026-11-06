@@ -95,6 +95,10 @@
       "types": "./dist/adapters/kajo-personal-content-rating.d.ts",
       "import": "./dist/adapters/kajo-personal-content-rating.js"
     },
+    "./adapters/kajo-owned-taste-rating": {
+      "types": "./dist/adapters/kajo-owned-taste-rating.d.ts",
+      "import": "./dist/adapters/kajo-owned-taste-rating.js"
+    },
     "./adapters/kajo-personal-rating": {
       "types": "./dist/adapters/kajo-personal-rating.d.ts",
       "import": "./dist/adapters/kajo-personal-rating.js"

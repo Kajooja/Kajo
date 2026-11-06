@@ -359,6 +359,51 @@ references: [connection modes](https://supabase.com/docs/guides/database/connect
 [psql and project CA](https://supabase.com/docs/guides/database/psql), and the
 [Ubuntu 24.04 runtime inventory](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md).
 
+### Owned sequential Taste numeric source — Sprint 016 / #432
+
+Private capture v3 uses `kajo-personal-content-rating-preparation-v2` and
+`kajo-personal-content-rating-prefix-v2`. Its training-source version is
+`owned-rating-source-v2:<training-resolver-md5>:<canonical-resolver-md5>:<feature-version>`.
+The numerical model, domain mean, ridge parameter, content mapping and admission
+state remain the #405 versions below. The existing evaluation inventory accepts
+this generation only under its exact declared source version; it never refits a
+retained forecast. Old v1/v2 capture requests and retries retain their contracts.
+
+One effective Item label comes from the canonical native resolver, or from an
+active `KAJO_CALIBRATION / TASTE_SESSION_V2 / RATED` source joined to the same
+Personal owner, committed import job, accepted current sequential response,
+command receipt and retained valid panel. All integer grades 0–10 are labels.
+Provider flags alone, imported user files, external ratings, skipped/unknown,
+saved and consumed-without-grade evidence do not qualify. Ambiguous/unavailable
+native authority and explicit history clear cannot fall back to an old Taste
+grade. The existing native writer may retire bootstrap evidence; Undo never
+reactivates that withdrawn source.
+
+The raw prefix retains bootstrap, session, question, response/revision and job
+identity. The portable core's historical `sourceEventId` field carries the
+explicit `taste:<bootstrap-id>:<response-id>` namespace; no Event is fabricated.
+Accepted/imported time is report availability, **not known experience time**.
+Training excludes the prospective target and uses only committed available
+sources. A completed Taste question cannot become a new first-answer evaluation.
+
+After existing lifecycle/Event/Profile locks, capture fences bootstrap, import
+job, sequential session/command/panel and catalogue relations with `SHARE NOWAIT`
+through actual TypeScript calculation and finalization. A prior writer yields
+`55P03` and an atomic rollback; retry is explicit after writer commit. The 8,192
+Event and 8,192 bootstrap inventories, 8,192 combined label cap, 50-candidate pool,
+128-owner allocation cap, 4 MiB input and 250,000 dependent-row erasure ceiling
+remain bounded. Same-domain bootstrap dependencies and exact accepted lineage
+are private references, protected by RLS and closed grants.
+
+Corrections, retirement/removal, receipt/panel invalidation, relevant Item/source
+mutation and native authority changes retire dependent new-generation copies,
+including copied first-answer measurements. Unrelated domains and old capture
+generations retain their original rules. Ordinary later independent Taste answers
+and NEXT do not rewrite a frozen prefix. No public RPC, hosted execution,
+external prior, serving activation or measured quality follows from source CI.
+[STATUS](../project/STATUS.md) owns acceptance and the fresh private declaration
+required before an observed comparison.
+
 ### Frozen-content numeric challenger — Sprint 016 / #405
 
 The active source implementation adds `./personal-content-rating` and

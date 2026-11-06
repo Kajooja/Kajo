@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-06**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, Taste recovery #428 accepted; synthetic preservation CI #430 before owned Taste numeric source #432; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; owned Taste numeric source #432 active; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,61 +11,91 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — native acquisition preservation CI #430
+## Current handoff — owned Taste numeric source #432
 
-**Accepted source base:** `89f8649ca52f3672df23e2e5dcf0e2a07369f3f9`,
-[PR #429](https://github.com/Kajooja/Kajo/pull/429), common source/tested/accepted
-tree `fa99fa4143a6273a0f144dedaa45aea3bed4385e`. All six required
-[PR CI #851](https://github.com/Kajooja/Kajo/actions/runs/42111054422) gates passed.
-The exact append-only Taste forward was installed once; PR #429 owns the verified
-hosted receipt and postflight. Do not reinstall it or reset current answers.
+**Accepted base:** `7bd103beb975cbda7378b3aa9894a66e6bba4b30`,
+[PR #431](https://github.com/Kajooja/Kajo/pull/431). Source
+`dac22fbf6c23e9f5713be27f25ed9753b2a45fec`, tested merge
+`0473454e4ac3b2dea556b5e2493051d8621f7c36` and accepted merge share tree
+`ed4d024bc8cdb80f381657d4a019135a819be07e`. All six required
+[CI #854](https://github.com/Kajooja/Kajo/actions/runs/42189344540) gates passed.
+#430 closes with the diagnostics gap corrected. The original CI #852 failure
+remains **NOT_REPRODUCED / cause unresolved**, not claimed fixed; a recurrence
+must retain and inspect the newly visible proof/cleanup causes.
 
-**Device observation — November 6:** the owner finished the interrupted Taste
-session and reported that the remaining cards were books. This establishes
-recovery and continuation in BOOK. A brand-new phone session's complete order,
-broader accessibility and predictive quality are not established by that report.
-[DEVICE_TEST](DEVICE_TEST.md) owns the scoped device record.
+**One active packet:** [#432](https://github.com/Kajooja/Kajo/issues/432), branch
+`feat/owned-taste-numeric-prefix`. Private prepare/finalize **v3**, preparation/
+input **v2**, admit genuine owned sequential Taste ratings alongside canonically
+resolved native ratings. The unchanged numerical core computes the full-prefix
+mean and permitted content ridge. Retain bootstrap/response identity and report
+availability; do not create native Events or invent experience dates.
 
-**One active packet:** [#430](https://github.com/Kajooja/Kajo/issues/430), branch
-`fix/native-acquisition-preservation`. Push [CI #852](https://github.com/Kajooja/Kajo/actions/runs/42184402241)
-on the identical accepted tree failed the synthetic native-acquisition preservation
-test; its aggregate error concealed individual proof/cleanup causes. Diagnose and
-repair the fixture with deterministic evidence, preserving exact row/score/retry
-and security assertions. PR #431 exposes the hidden causes in this disposable
-fixture runner. The focused case passes on Node 24 and CI's exact Node 22.23.4;
-the complete ten-test file also passes. The original failure is not reproduced
-and is not claimed fixed. Local `npm run check` passes lint, typecheck and 1,427
-dependency/mobile/catalogue tests before Deno registry connection refusal. Final
-source CI owns the remaining gates; do not merge a failing/incomplete source tree.
-No hosted migration or account mutation belongs to this packet.
+The source includes closed lineage checks, new source dependency references,
+correction/withdrawal retirement, same-transaction capture and explicit source
+version binding in the existing evaluation inventory. Old v1/v2 captures and
+exact retries remain intact. Local source, actual compiled capture/first-answer,
+old-generation retry and populated-forward/rollback checks pass; the engine's
+437 tests pass. `npm run check` passes lint/typecheck and dependency/mobile/catalogue
+checks, then stops at Deno registry connection refusal. Required final-source CI
+must establish all six gates, including the new native concurrent-writer and
+populated-forward checks. Do not merge a failing/incomplete tree.
 
-**Repository hygiene:** all 46 obsolete development heads were removed after
-exact-head/accepted-history checks. Four nonancestor heads had identical trees
-in reachable accepted merges; 42 were exact ancestors. The eight pinned catalogue
-operation/recovery branches remain. The [audit](retros/branch-audit-2026-11-06.json)
-retains all recovery identities. No open PR or unique unreviewed work was deleted.
+**PR #433 continuation:** CI #857 passed five gates; the native CLI gate
+failed in the new populated-forward verifier with `invalid JSON acknowledgement`.
+Its ACL/RLS queries returned PostgreSQL `t`/`f` instead of JSON booleans. The
+correction serializes those three query forms as JSON and verifies result types
+locally, including rejection of unauthorized function/table grants and disabled
+RLS. The regression fails on the prior source at the function-ACL query. This
+changes the disposable verifier only, not migration SQL or prediction math.
+Earlier CI #856's rejected-forecast assertion required SQLSTATE rather than
+redacted server prose; that separate correction is retained. Require all six
+gates on the corrected final tree before merge; earlier passing subsets do not
+constitute acceptance.
 
-**After #430:** [#432](https://github.com/Kajooja/Kajo/issues/432) is the next
-bounded source packet: genuine owned Taste ratings in a versioned numeric
-training prefix. [#427](https://github.com/Kajooja/Kajo/issues/427) closes with an
-explicit source/evidence dependency, without a new capture or comparison. The
-retained declaration supplies no reusable fresh window. Keep withdrawn experiments
-retired; require a new private declaration and permission horizon before evaluation.
+CI #858 then completed 2,573 tests and four configured iOS/Android exports, but
+its CLI proof exposed a second verifier defect: the rollback restored the caller's
+float serialization setting before the final row snapshot. Only the prediction
+candidate digest differed. The new regression reproduces that failure on the
+prior source with reduced caller precision. The corrected readback uses its own
+read-only transaction at the original snapshot precision, then restores the
+caller settings; all row/function and ACL checks remain exact. The regression
+exercises caller precisions -3, 0 and 3. This is another disposable-verifier
+correction, not a migration or prediction change; CI #858 remains a failed run.
 
-Existing numeric v1/v2 captures accept only native ITEM_RATED evidence. Taste
-bootstrap evidence already affects the canonical ranker, but does not train those
-numeric contracts. #432 must retain old versions and exact retries, verify owned
-accepted Taste lineage, preserve native correction/undo/clear precedence, carry
-source withdrawal dependencies and freeze the prefix before a genuinely new target.
-Do not backfill completed Taste predictions, import external ratings as Events,
-expand source caps or activate a serving model. Preserve current answers and all
-installed receipts. Missing support remains explicit unavailable/mean fallback.
+The corrected verifier and transport suite pass all ten focused tests when run
+sequentially. An initial parallel local run failed the transport's short deadline
+fixture; its sequential rerun passes without a transport change. The current full
+`npm run check` passes lint/typecheck and 1,427 dependency/mobile/catalogue tests;
+it was stopped after repeated Deno dependency-download stalls, so it is not a
+completed full-check pass. On November 6 the owner explicitly approved publishing
+this correction to PR #433 and merging after all six required final-source checks
+pass. Inspect the corrected source/tree and native proof before merge, then retain
+the acceptance receipt in the PR and continue the private declaration/forward
+preparation below. Earlier passing subsets do not replace final-source acceptance.
 
-The catalogue/admission [audit](../../research/reports/catalogue-admission-v1.md)
-and broad individual-rating [research](../../research/reports/rating-learning-curves-v1.md)
-remain accepted research. Do not repeat broad training, manufacture confidence,
-activate rejected challengers or infer production-use permission. `MVP-ALG-013`,
-Sprint 016 and Engine V1 quality/serving acceptance remain open.
+**Operational boundary:** this migration is source work, not installed hosted
+state. No account reset, observed capture, declaration refill, historical forecast
+backfill or serving admission belongs to this packet. After source acceptance,
+use a fresh private DEVELOPMENT declaration, permission horizon and genuinely
+new first-answer target. The retired #427 window remains retired. Source fixtures
+do not establish recommendation benefit, confidence or Sprint 016 acceptance.
+
+**Taste recovery retained:** #429's append-only correction is already installed;
+its PR owns the verified hosted receipt. On November 6 the owner completed the
+interrupted session and reported that the remaining cards were books. This
+confirms resumed completion and BOOK continuation, not a fresh-session full order
+or predictive quality. [DEVICE_TEST](DEVICE_TEST.md) owns that scoped observation.
+Do not reinstall the correction or reset current answers.
+
+**Repository hygiene retained:** 46 obsolete development heads were removed;
+42 were exact ancestors, and four had identical accepted merge trees. Eight
+pinned catalogue operation/recovery branches remain. The
+[audit](retros/branch-audit-2026-11-06.json) preserves every recovery identity.
+
+Catalogue/admission #425 / #426 and broad individual-rating research #422 / #424
+remain accepted research. Do not repeat broad training, activate rejected
+challengers or infer production-use permission. `MVP-ALG-013`, Sprint 016 and
+Engine V1 quality/serving acceptance remain open.
 
 ## Retained owned numeric DEVELOPMENT route — private continuation
 

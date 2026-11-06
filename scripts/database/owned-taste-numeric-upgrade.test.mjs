@@ -1,0 +1,50 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { PGlite } from '@electric-sql/pglite';
+import { buildFreshInstallation } from './fresh-installation.mjs';
+import { verifyOwnedTasteNumericUpgrade } from './owned-taste-numeric-upgrade.mjs';
+
+test('owned Taste forward preserves populated captures, committed answers, private ACLs and rollback', { timeout: 240_000 }, async t => {
+  const db = new PGlite();
+  try {
+    await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema auth;
+      create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}',is_anonymous boolean default false);
+      create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+      grant usage on schema public,auth to anon,authenticated,service_role;`);
+    const { files } = await buildFreshInstallation(), index = files.findIndex(file => file.name.endsWith('_owned_taste_numeric_sources.sql'));
+    assert.ok(index > 0);
+    for (const file of files.slice(0, index)) await db.exec(`begin;${file.sql}commit;`);
+    const exec = async (sql, requireJson = false) => {
+      try {
+        return (await db.exec(sql)).flatMap(result => result.rows.map(row => {
+          // PGlite decodes SQL booleans directly, hiding psql's non-JSON t/f
+          // output. Require this verifier's result statements to emit JSON,
+          // then exercise the same JSON value boundary as the native transport.
+          if (requireJson === true) {
+            assert.equal(result.fields.length, 1, 'Upgrade proof must return one JSON column');
+            assert.ok([114, 3802].includes(result.fields[0].dataTypeID),
+              'Upgrade proof must return JSON for the native psql transport');
+          }
+          return JSON.parse(JSON.stringify(Object.values(row)[0]));
+        }));
+      }
+      catch (error) { await db.exec('rollback;');throw error; }
+    };
+    const withSession = callback => callback(sql => exec(sql, true));
+    for (const digits of [-3, 0, 3]) {
+      await db.exec(`set extra_float_digits=${digits};`);
+      const report = await verifyOwnedTasteNumericUpgrade(exec, withSession, files[index]);
+      assert.equal(report.status, 'PASS');t.diagnostic(JSON.stringify({ digits, ...report }));
+      assert.equal((await db.query('show extra_float_digits')).rows[0].extra_float_digits, String(digits),
+        'Upgrade proof must restore caller precision after rollback');
+    }
+    for (const mutation of [
+      'grant execute on function private.prepare_personal_rating_forecast_v3(uuid,uuid,uuid,integer,text,jsonb) to authenticated;',
+      'grant select on private.personal_rating_bootstrap_refs to authenticated;',
+      'alter table private.personal_rating_taste_lineage_refs disable row level security;',
+      "alter function private.finalize_personal_rating_forecast_v2(uuid,jsonb) set statement_timeout='10s';",
+      'update public.items set title=title||\' unwanted rewrite\';',
+    ]) await assert.rejects(verifyOwnedTasteNumericUpgrade(exec, withSession,
+      { ...files[index], sql: files[index].sql + '\n' + mutation }), /changed|closed|require RLS/);
+  } finally { await db.close(); }
+});

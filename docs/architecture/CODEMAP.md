@@ -73,6 +73,18 @@ The native receipt is simulated in an isolated transaction; actual provider API
 atomicity, committed pre-#391 capture runtime, hosted deployment and observed
 DEVELOPMENT collection remain separate. See [ADR-0006](decisions/0006-clean-install-database-baseline.md#private-numeric-forward-preparation--2026-11-04).
 
+## Owned Taste numeric capture — Sprint 016 / #432
+
+| Responsibility | Implementation |
+| --- | --- |
+| Committed owned source resolution, v3 capture and dependency retirement | `supabase/migrations/20261106090733_owned_taste_numeric_sources.sql`; native precedence, verified sequential lineage, closed bootstrap/lineage refs and bounded retirement; old v1/v2 payloads preserved |
+| Explicit source normalization | `packages/prediction-engine/src/adapters/kajo-owned-taste-rating.ts`, optional `./adapters/kajo-owned-taste-rating`; bootstrap/report identity, integer 0–10 labels and unchanged content-feature validation/core |
+| Trusted transaction worker | `scripts/database/owned-taste-numeric-capture.mjs`; dedicated BEGIN → prepare v3 → compiled core → finalize v3 → COMMIT; explicit retry and no public route |
+| Source, capture, native locks and populated forward checks | `scripts/database/owned-taste-numeric-{sources,capture,upgrade}.test.mjs`, `owned-taste-numeric-{verification,concurrency,upgrade}.mjs`; CLI gate includes native concurrent relation witnesses and predecessor rollback |
+| Retained declared evaluation | Existing `kajo-personal-rating-evaluation.ts` adapter binds the exact new source/preparation generation without historical refit or reuse of an old declaration |
+
+[STATUS](../project/STATUS.md) separates source CI, installation and real quality evidence.
+
 ## Frozen-content Personal rating challenger — Sprint 016 / #405
 
 Source accepted through [PR #406](https://github.com/Kajooja/Kajo/pull/406);

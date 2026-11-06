@@ -264,6 +264,14 @@ an operator assertion to validate and retain, not a license decision or rights
 certificate. A null manifest or unlisted source copies no feature payload and
 leaves the model on its native Personal-mean fallback.
 
+Owned sequential Taste is a separate first-party numeric source in capture v3
+(#432), not an external-data admission. Its bootstrap row must match the owned
+committed response, import job, receipt and retained panel; original identities
+and report availability remain explicit. Imported user files and external people
+still cannot enter this route. Earlier native-only v1/v2 captures keep their
+contracts. The [owned source contract](../domain/PREDICTION_MODEL.md#owned-sequential-taste-numeric-source--sprint-016--432)
+owns precedence, withdrawal and the new declaration boundary.
+
 The capture freezes bounded sanitized source assertions, exact Item/source/alias
 identity and provenance for both numeric training Items and delivered candidates.
 It copies no description, popularity or external preference prior. The original

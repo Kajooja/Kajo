@@ -5,6 +5,8 @@ import { forecastPersonalRatingBaseline } from '../src/personal-rating.js';
 import { normalizeKajoPersonalContentRatingPrefix, personalContentFeatureContract } from '../src/adapters/kajo-personal-content-rating.js';
 import type { KajoPersonalContentRatingPrefix } from '../src/adapters/kajo-personal-content-rating.js';
 import { forecastPersonalContentRating } from '../src/personal-content-rating.js';
+import { normalizeKajoOwnedTasteRatingPrefix } from '../src/adapters/kajo-owned-taste-rating.js';
+import type { KajoOwnedTasteRatingPrefix } from '../src/adapters/kajo-owned-taste-rating.js';
 
 const id = (n: number) => `a4020000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 type Mutable<T> = T extends object ? { -readonly [K in keyof T]: Mutable<T[K]> } : T;
@@ -219,6 +221,34 @@ describe('Declared native numeric inventory', () => {
 });
 
 describe('Retained content challenger evaluation compatibility', () => {
+  it('requires an explicitly declared owned-Taste source generation and retains its original numeric forecast', () => {
+    const f = contentFixture(4), oldBinding = structuredClone(f.binding);
+    const snapshotId = f.input.snapshotId.replace('native-content-prospective:', 'native-owned-content:');
+    const input: KajoOwnedTasteRatingPrefix = { ...f.input, version: 'kajo-personal-content-rating-prefix-v2', snapshotId,
+      trainingSource: { signature: 'private.personal_rating_training_sources_v2(uuid,text,timestamp with time zone)', bodyMd5: 'e'.repeat(32) },
+      candidatePool: { ...f.input.candidatePool, snapshotId }, contentFeatures: { ...f.input.contentFeatures, snapshotId },
+      labels: f.input.labels.map((label, index) => ({ itemId: label.itemId, sourceStatus: 'OWNED_TASTE_RATING',
+        sourceBootstrapId: id(200 + index), orderingBasis: 'ACCEPTED_SEQUENTIAL_TASTE_RESPONSE', bootstrap: {
+          id: id(200 + index), actorUserId: f.input.actorUserId, profileId: f.input.profile.id,
+          itemId: label.itemId, itemType: 'BOOK', sourceProvider: 'KAJO_CALIBRATION', datasetKind: 'TASTE_SESSION_V2',
+          evidenceKind: 'RATED', rating: label.event.rating, sourceJobId: id(210), sessionId: id(211),
+          sessionVersion: 'personal-taste-session-v2', questionId: id(220 + index), panelId: id(230 + index),
+          responseId: id(240 + index), responseRevision: 1, commandHash: 'f'.repeat(32),
+          acceptedAtMicros: label.event.availableAtMicros, availableAtMicros: label.event.availableAtMicros, experienceTime: 'UNKNOWN',
+        } })),
+    };
+    f.preparation.forecast = structuredClone(forecastPersonalContentRating(normalizeKajoOwnedTasteRatingPrefix(input))) as
+      Mutable<ReturnType<typeof forecastPersonalContentRating>>;
+    f.binding.sourceVersions.source = f.preparation.forecast.prefix.sourceVersion;f.measure();
+    const preparation = { ...f.preparation, version: 'kajo-personal-content-rating-preparation-v2', input };
+    const census = { ...f.census, owners: [{ ...f.census.owners[0]!, allocations: [{ ...f.census.owners[0]!.allocations[0]!,
+      inspection: { ...f.inspection, preparation } }] }] };
+    expect(normalize(f.binding, census).opportunities[0]).toMatchObject({ prefixSupport: 2, firstAnswer: { rating: 4 },
+      forecasts: { candidate: preparation.forecast.forecasts[0]!.candidate.value, control: 5 } });
+    expect(() => normalize(oldBinding, census)).toThrow(/preparation binding/);
+    preparation.version = 'kajo-personal-content-rating-preparation-v1';
+    expect(() => normalize(f.binding, census)).toThrow(/preparation binding/);
+  });
   it('passes different frozen candidate/control values through the same first-answer measurement for every grade', () => {
     for (let rating = 0; rating <= 10; rating++) {
       const f = contentFixture(rating), result = normalize(f.binding, f.census);
