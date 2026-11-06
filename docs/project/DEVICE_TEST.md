@@ -1,5 +1,18 @@
 # Collection device checkpoint — #228 / #229
 
+## Taste answer recovery — owner observation 2026-11-06
+
+After the server correction in [PR #429](https://github.com/Kajooja/Kajo/pull/429),
+the owner reports: “Tehty. Nyt loput olivat kirjoja.” The interrupted Taste session
+was completed and its remaining cards were books. This closes the reported
+answer-blocking recovery case and confirms continued BOOK phase in that session.
+
+No new APK or account reset was needed for this compatible server correction.
+The observation does not establish the complete MOVIE → BOOK sequence of a
+brand-new phone session, supersede older layout/accessibility gates or measure
+numerical prediction quality. Preserve the accepted current answers; an unchanged
+recovery test does not need to be repeated.
+
 ## APK #721 Taste layout blocker — 2026-10-25
 
 During the fresh Taste test, the owner reports wrong margins, an oversized image

@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-11-05**
+Last updated: **2026-11-06**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, Taste correctness #428 before native-only preflight #427; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, Taste recovery #428 accepted; synthetic preservation CI #430 before native-only preflight #427; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,49 +11,50 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — Taste answer recovery and domain order #428
+## Current handoff — native acquisition preservation CI #430
 
-**Accepted source base:** `c1d48e42a7ba82d8855d6e6adf79eda9c29c4bde`,
-[PR #426](https://github.com/Kajooja/Kajo/pull/426). The catalogue/admission audit
-#425 is integrated; retain its aggregate [result](../../research/reports/catalogue-admission-v1.md)
-and the earlier broad individual-rating [research](../../research/reports/rating-learning-curves-v1.md).
-Neither admits a native model or closes Sprint 016 quality/serving gates.
+**Accepted source base:** `89f8649ca52f3672df23e2e5dcf0e2a07369f3f9`,
+[PR #429](https://github.com/Kajooja/Kajo/pull/429), common source/tested/accepted
+tree `fa99fa4143a6273a0f144dedaa45aea3bed4385e`. All six required
+[PR CI #851](https://github.com/Kajooja/Kajo/actions/runs/42111054422) gates passed.
+The exact append-only Taste forward was installed once; PR #429 owns the verified
+hosted receipt and postflight. Do not reinstall it or reset current answers.
 
-**One active packet:** [#428](https://github.com/Kajooja/Kajo/issues/428), branch
-`fix/taste-answer-recovery-and-domain-order`. The owner reports a later Taste
-rating rollback and mixed domains. Complete ordinal reply pairs exceed the old
-32 KiB database constraint before the allowed 48 opportunities; the mobile client
-then shows misleading access/reload copy. The additive migration raises the
-finite complete-reply cap to 512 KiB and versions fresh V4 progression as
-MOVIE → BOOK. [ADR-0011](../architecture/decisions/0011-taste-as-guided-discovery.md#bounded-native-correction--2026-11-05--428)
-owns exact safety bounds and preservation. No accepted answer, pending question,
-frozen pool or cached reply is rewritten. No reset or new model is involved.
+**Device observation — November 6:** the owner finished the interrupted Taste
+session and reported that the remaining cards were books. This establishes
+recovery and continuation in BOOK. A brand-new phone session's complete order,
+broader accessibility and predictive quality are not established by that report.
+[DEVICE_TEST](DEVICE_TEST.md) owns the scoped device record.
 
-Implementation: [PR #429](https://github.com/Kajooja/Kajo/pull/429). The seven-test
-local regression passes and reproduces the old failure,
-checks rollback, upgrades populated state, retries the same answer, and finishes
-long sessions with exact retries, all 0–10 grades, pause/resume and domain order.
-The native CLI gate runs the same committed-transaction proof. Required final
-source CI, accepted-tree identity, hosted forward and real-phone observation are
-separate gates. CI #850 exposed historical tests that assumed the total lineage
-was still 56 files and current V4 interleaved domains. The numeric upgrade now
-pins its unchanged 56-file historical checkpoint; current MOVIE-phase ranking
-is compared with the same domain-independent reference under that phase constraint.
-The PR/issue owns the final acceptance and hosted operation receipts. Read those
-before acting: once both are complete, continue #427 without reinstalling/resetting.
-The existing mobile wire remains compatible; physical-phone acceptance stays open
-until the owner's fresh observation.
+**One active packet:** [#430](https://github.com/Kajooja/Kajo/issues/430), branch
+`fix/native-acquisition-preservation`. Push [CI #852](https://github.com/Kajooja/Kajo/actions/runs/42184402241)
+on the identical accepted tree failed the synthetic native-acquisition preservation
+test; its aggregate error concealed individual proof/cleanup causes. Diagnose and
+repair the fixture with deterministic evidence, preserving exact row/score/retry
+and security assertions. Source checks and accepted runtime behavior remain
+separate. No hosted migration or account mutation belongs to this packet.
 
-**After #428:** [#427](https://github.com/Kajooja/Kajo/issues/427) retains the bounded
+**Repository hygiene:** all 46 obsolete development heads were removed after
+exact-head/accepted-history checks. Four nonancestor heads had identical trees
+in reachable accepted merges; 42 were exact ancestors. The eight pinned catalogue
+operation/recovery branches remain. The [audit](retros/branch-audit-2026-11-06.json)
+retains all recovery identities. No open PR or unique unreviewed work was deleted.
+
+**After #430:** [#427](https://github.com/Kajooja/Kajo/issues/427) retains the bounded
 native-only content-evaluation preflight. Reconcile current private continuation,
 source-use permission, current Profile/declaration identity and unexposed windows
-before any fresh comparison. A retired/withdrawn declaration cannot be refilled
-or silently reused after an owner reset; ordinary mobile Taste answers are not
-private numeric FINAL evidence. Preserve installed receipts and current answers.
-If permission or eligible support is missing, retain the supported mean fallback
-and name the dependency. Do not repeat broad training, manufacture confidence,
-activate the rejected challengers or infer external-prior production permission.
-`MVP-ALG-013`, Sprint 016 and Engine V1 quality/serving acceptance remain open.
+before a fresh comparison. A retired/withdrawn declaration cannot be refilled or
+silently reused; ordinary mobile Taste answers are not private numeric FINAL
+evidence. Preserve installed receipts and current answers. The existing numeric
+capture contracts accept native ITEM_RATED evidence only; Taste bootstrap evidence
+already affects the canonical ranker but is not silently admitted to these numeric
+training prefixes. Any successor needs an explicit provenance-preserving contract.
+
+The catalogue/admission [audit](../../research/reports/catalogue-admission-v1.md)
+and broad individual-rating [research](../../research/reports/rating-learning-curves-v1.md)
+remain accepted research. Do not repeat broad training, manufacture confidence,
+activate rejected challengers or infer production-use permission. `MVP-ALG-013`,
+Sprint 016 and Engine V1 quality/serving acceptance remain open.
 
 ## Retained owned numeric DEVELOPMENT route — private continuation
 

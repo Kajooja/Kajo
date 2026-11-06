@@ -393,7 +393,16 @@ test('shared native acquisition preserves the populated V4/Discovery predecessor
     await db.exec('begin;create function private.acquire_native_candidates_v1(integer) returns integer language sql as $$select $1$$;');
     await assert.rejects(db.exec(files[index].sql), /Native acquisition owner or target collision/);
     await db.exec('rollback;');
-    const report = await verifyNativeAcquisitionUpgrade(exec, files[index]);
+    let report;
+    try { report = await verifyNativeAcquisitionUpgrade(exec, files[index]); }
+    catch (error) {
+      // This runner owns a disposable synthetic database. Node's TAP reporter
+      // otherwise hides the individual proof and cleanup assertion failures.
+      for (const cause of error instanceof AggregateError ? error.errors : [error]) {
+        t.diagnostic(String(cause.stack ?? cause));
+      }
+      throw error;
+    }
     assert.equal(report.status, 'PASS');
     t.diagnostic(JSON.stringify(report));
     const { nativeAcquisitionSmokeSql } = await import('./native-candidate-request.mjs');
