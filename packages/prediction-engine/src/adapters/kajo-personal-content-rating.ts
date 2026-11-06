@@ -1,4 +1,5 @@
 import type { PersonalContentRatingInput } from '../personal-content-rating.js';
+import type { PersonalRatingBaselineInput } from '../personal-rating.js';
 import { normalizeKajoPersonalRatingProspectivePrefix } from './kajo-personal-rating-prospective.js';
 import type { KajoPersonalRatingProspectivePrefix } from './kajo-personal-rating-prospective.js';
 
@@ -115,6 +116,14 @@ export function normalizeKajoPersonalContentRatingPrefix(input: KajoPersonalCont
     snapshotId: legacySnapshot, candidatePool: { ...input.candidatePool, snapshotId: legacySnapshot } });
   const baseline = { ...projected, prefix: { ...projected.prefix, snapshotId: input.snapshotId },
     candidatePool: { ...projected.candidatePool, snapshotId: input.snapshotId } };
+  return normalizeKajoPersonalContentFeatures(input, baseline);
+}
+
+/** Shared feature validation after the version-specific source/label boundary. */
+export function normalizeKajoPersonalContentFeatures(
+  input: Pick<KajoPersonalContentRatingPrefix, 'contentFeatures' | 'cutoffMicros' | 'snapshotId' | 'itemType' | 'evidenceOrigin' | 'source'>,
+  baseline: PersonalRatingBaselineInput,
+): PersonalContentRatingInput {
   const content = input.contentFeatures, cutoff = micros(input.cutoffMicros);
   shape(content, ['version', 'snapshotId', 'cutoffMicros', 'mappingVersion', 'mappingHash', 'transformVersion',
     'semantics', 'featureUse', 'featureIds', 'objects'], 'feature snapshot shape');

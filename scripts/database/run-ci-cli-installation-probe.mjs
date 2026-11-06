@@ -58,6 +58,9 @@ import { verifyPersonalRatingProspectiveUpgrade } from './personal-rating-prospe
 import { verifyPersonalRatingEvaluation } from './personal-rating-evaluation.mjs';
 import { verifyPersonalContentRating } from './personal-content-rating.mjs';
 import { verifyPersonalContentRatingConcurrency } from './personal-content-rating-concurrency.mjs';
+import { verifyOwnedTasteNumericCapture } from './owned-taste-numeric-verification.mjs';
+import { verifyOwnedTasteNumericConcurrency } from './owned-taste-numeric-concurrency.mjs';
+import { verifyOwnedTasteNumericUpgrade } from './owned-taste-numeric-upgrade.mjs';
 import { verifyPersonalContentRatingUpgrade } from './personal-content-rating-upgrade.mjs';
 import { verifyPersonalRatingHostedUpgrade } from './personal-rating-hosted-native.mjs';
 import { initializePersonalRatingSqlSession, probePersonalRatingSqlSession } from './personal-rating-connection.mjs';
@@ -123,12 +126,21 @@ try {
     const nativePersonalContentRatingConcurrency = await verifyPersonalContentRatingConcurrency(execConcurrentSql, withSqlSession);
     assert.equal(nativePersonalContentRating.status, 'PASS');
     assert.equal(nativePersonalContentRatingConcurrency.status, 'PASS');
+    const nativeOwnedTasteNumeric = await verifyOwnedTasteNumericCapture(execConcurrentSql, withSqlSession);
+    const nativeOwnedTasteNumericConcurrency = await verifyOwnedTasteNumericConcurrency(execConcurrentSql, withSqlSession);
+    assert.equal(nativeOwnedTasteNumeric.status, 'PASS');
+    assert.equal(nativeOwnedTasteNumericConcurrency.status, 'PASS');
     const nativeDiscoveryParity = await verifyNativeDiscoveryParity(exec);
     assert.equal(nativeDiscoveryParity.status, 'PASS');
     assert.deepEqual(await snapshotApplication(exec, candidate, { forward: true }), expected,
       'Discovery parity changed the installed source');
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
+    const ownedTasteIndex = files.findIndex(file => file.name.endsWith('_owned_taste_numeric_sources.sql'));
+    assert.ok(ownedTasteIndex > 0);
+    await resetFromMigrations(files.slice(0, ownedTasteIndex));
+    const nativeOwnedTasteNumericUpgrade = await verifyOwnedTasteNumericUpgrade(execConcurrentSql, withSqlSession, files[ownedTasteIndex]);
+    assert.equal(nativeOwnedTasteNumericUpgrade.status, 'PASS');
     const contentRatingIndex = files.findIndex(file => file.name.endsWith('_personal_content_rating.sql'));
     assert.ok(contentRatingIndex > 0);
     await resetFromMigrations(files.slice(0, contentRatingIndex));
@@ -550,6 +562,7 @@ try {
       personalEvaluation, sharedPredictionCutoff, nativeCandidateRequest, nativeAcquisitionUpgrade, nativeAcquisition, nativePredictionAdapter, nativeTasteConsumer, nativeDiscoveryParity, nativePersonalRatingBaseline, nativePersonalRatingProspective,
       nativePersonalRatingProspectiveConcurrency, nativePersonalRatingProspectiveUpgrade, nativePersonalRatingEvaluation, nativeSkipPrefilter,
       nativePersonalContentRating, nativePersonalContentRatingConcurrency, nativePersonalContentRatingUpgrade, nativePersonalRatingHostedUpgrade,
+      nativeOwnedTasteNumeric, nativeOwnedTasteNumericConcurrency, nativeOwnedTasteNumericUpgrade,
       nativePersonalRatingConnection, nativePersonalRatingSessionSettings,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,
