@@ -325,9 +325,12 @@ not change them or admit a source/model.
 
 #### Wikidata provider integration — next source packet
 
-Implement an explicit provider/evidence contract rather than a manifest-only
-toggle or relabeling of retained TMDB features. The bounded review uses the
-following direct, finite candidate mapping into the existing six concepts:
+The first source slice, [#436](https://github.com/Kajooja/Kajo/issues/436), provides
+the offline `@kajo/catalog-contracts/wikidata-film` contract. Source/CI acceptance
+belongs to STATUS and the linked PR. Its candidate output is not admitted to the
+native content adapter or capture: that remaining integration must use a new
+generation, not a manifest-only toggle or relabeling of retained TMDB features.
+The bounded direct mapping into the existing six concepts is:
 
 | Concept | Direct P136 value |
 | --- | --- |
@@ -337,6 +340,41 @@ following direct, finite candidate mapping into the existing six concepts:
 | romance | [Q1054574](https://www.wikidata.org/wiki/Q1054574) |
 | science-fiction | [Q471839](https://www.wikidata.org/wiki/Q471839) |
 | thriller | [Q2484376](https://www.wikidata.org/wiki/Q2484376) |
+
+`wikidata-film-direct-genres-v1` pins the complete mapping, selection rules,
+identity namespaces and bounds by canonical SHA-256. `extractWikidataFilmEvidence`
+accepts bounded UTF-8 EntityData JSON bytes and an explicit retrieval/cutoff and
+expected identity. Duplicate JSON keys (including escaped spellings), invalid
+UTF-8, redirects, missing/changed entities and ambiguous external identifiers fail
+closed. Both selected `P345` and `P4947` values must exactly corroborate the
+reviewed identifiers; selected `P31` types must be direct film (`Q11424`) or
+feature film (`Q24869`). Unsupported subtypes stay unavailable without traversal.
+The contract follows the publisher's [JSON format](https://doc.wikimedia.org/Wikibase/master/php/docs_topics_json.html),
+[rank semantics](https://www.wikidata.org/wiki/Help:Ranking) and
+[revision-addressed EntityData access](https://www.wikidata.org/wiki/Wikidata:Data_access#Revisions_and_caching),
+with the narrower eligibility rules above. The finite mapping hash is
+`22f5e0ec0682e44d803d2c68fb69ba7bf0709b59ba14c44f118f00ba0ce3b9e8`.
+
+`wikidata-film-evidence-v1` retains exact source-byte SHA-256, entity revision,
+provider modified time, actual caller-supplied retrieval microseconds, finite
+mapping digest, selected diagnostics and bounded original statements/references.
+Only `P31/P345/P4947/P136/P577/P57/P1476` claims are retained; title/date/director
+claims remain review evidence, never numeric features or a fuzzy identity match.
+Labels, descriptions, sitelinks and unrelated claims are excluded. The caller
+retains the original bytes privately. Modified time never substitutes for Kajo
+availability; a future retrieval is ineligible at an earlier cutoff. All outputs
+retain unresolved origin and `admission: NONE`, including reference-free records.
+
+`inspectWikidataFilmBatch` checks `imdb_title`, `tmdb_movie` and the new
+`wikidata_item` namespace against a complete caller-supplied BOOK/MOVIE catalogue
+review snapshot and all requested entities. Aliases and existing Wikidata source
+identities cannot collide or silently migrate to another Item. Its snapshot hash
+is a consistency binding, not proof of native census completeness or a lock.
+It performs no network request, source upsert, permission grant or model fit.
+Source bytes are capped at 2 MiB per record/16 MiB per batch, retained evidence at
+256 KiB per record, requests at 128, catalogue rows at 10,000/8 MiB, relevant
+statements at 128 per property and references at 16 per statement. Unknown source
+support remains a null vector, not a six-zero training example.
 
 Select preferred ranks when present, otherwise normal, before other filters;
 never fall back to suppressed normal statements because a preferred value is
@@ -354,8 +392,9 @@ the source-use review relies on the publisher's structured-data CC0 dedication
 and retains unresolved/reference-free origins. Do not fetch prose or external
 rating histories from statement reference links as a side effect.
 
-Before ingestion or fitting, review the provider/evidence identity and finite
-mapping digest, append-only source/capture version, exact alias collision and
+The next native source packet must consume this explicit contract. Before
+ingestion or fitting, review the provider/evidence identity and finite mapping
+digest, append-only source/capture version, exact alias collision and
 redirect/merge handling, permission horizon and available-at cutoff. Require
 SQL/TypeScript parity and concurrent-writer/lifecycle tests: source or alias
 correction/deletion and explicit review withdrawal must retire dependent copies,

@@ -5,6 +5,23 @@ Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
 
+## Wikidata provider evidence — #436
+
+The first source slice of the current provider integration adds bounded offline
+EntityData extraction and the six direct genre concepts, plus exact external-ID
+and complete supplied-catalogue collision checks. Revision/source/mapping hashes,
+statement/reference evidence and actual retrieval cutoffs remain explicit.
+Unsupported preferred statements cannot fall back to suppressed normal values;
+known TMDB-origin genre references cannot supply features. Candidate output keeps
+origin unresolved and grants no permission or model admission.
+
+The optional catalogue-contract export and deterministic synthetic tests are
+source work only. STATUS/the linked PR own final CI acceptance. The single next
+implementation is its native content/capture generation, SQL/JavaScript parity,
+permission/fence/withdrawal and old-generation preservation proofs. Then reviewed
+ingestion and actual fitting support precede DEVELOPMENT. This does not complete
+the Wikidata integration, Sprint 016 or any quality/serving gate.
+
 ## Owned Taste numeric source — #432
 
 The accepted #433 source adds a distinct private capture generation for verified
@@ -30,9 +47,9 @@ Separate read-only inspection confirms permitted BOOK support and an available
 content fit; the repair must not be replayed. MOVIE feature support remains
 insufficient. The bounded label-blind Wikidata identity/coverage inspection is
 complete and supplies candidate assertions with explicit unsupported gaps and
-origin uncertainty. After #435's final-source acceptance, the next packet is the
-explicit provider/evidence adapter and finite mapping, new source/capture version,
-SQL/TypeScript parity and identity/availability/withdrawal preservation checks.
+origin uncertainty. #435 is accepted; #436 supplies the offline evidence/finite
+mapping source slice above. Its native source/capture version, SQL/JavaScript
+parity and identity/availability/withdrawal preservation checks remain next.
 Reviewed ingestion and actual fitting support precede a fresh private
 MOVIE-then-BOOK DEVELOPMENT declaration. Keep the prepared worker inactive and TMDB
 features unlisted under the [November 7 source-use review](../../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07).
