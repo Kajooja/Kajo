@@ -13,7 +13,8 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current handoff — Wikidata evidence extraction, then native capture
 
-**Current source packet:** [#436](https://github.com/Kajooja/Kajo/issues/436),
+**Current source packet:** [#436](https://github.com/Kajooja/Kajo/issues/436) /
+[PR #437](https://github.com/Kajooja/Kajo/pull/437),
 branch `feat/wikidata-content-evidence`, supplies the bounded offline Wikidata
 provider/evidence boundary in `@kajo/catalog-contracts/wikidata-film`. Finish its
 linked PR's final-source acceptance if still open; otherwise continue to the
@@ -29,7 +30,7 @@ unsupported gaps, identity collisions, time/hash binding and resource bounds.
 The caller's completeness and retrieval assertions are not native transaction
 evidence or permission. No source was downloaded or ingested by this packet.
 
-Local verification: all 57 new synthetic cases pass, as do the unchanged 450
+Local verification: all 60 new synthetic cases pass, as do the unchanged 450
 catalogue script tests, workspace lint/typecheck and the new declaration file's
 strict TypeScript check. A full `npm run check` reached Deno dependency retrieval
 but did not finish because registry downloads repeatedly stalled; it is not a

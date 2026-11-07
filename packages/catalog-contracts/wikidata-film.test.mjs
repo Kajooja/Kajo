@@ -160,6 +160,8 @@ test('malformed or duplicate source JSON, clocks, revisions and budgets never pr
     ['future source time', s => { s.entities[entityId].modified = '2027-01-01T00:00:00Z'; }, 'INVALID_REVISION'],
     ['revision unsafe', s => { s.entities[entityId].lastrevid = 9007199254740992; }, 'INVALID_REVISION'],
     ['revision string', s => { s.entities[entityId].lastrevid = '100'; }, 'INVALID_REVISION'],
+    ['null genre claims', s => { s.entities[entityId].claims.P136 = null; }, 'CLAIM_BUDGET'],
+    ['null review-only claims', s => { s.entities[entityId].claims.P577 = null; }, 'CLAIM_BUDGET'],
     ['too many statements', s => { s.entities[entityId].claims.P136 = Array(129).fill({}); }, 'CLAIM_BUDGET'],
     ['too many references', s => { s.entities[entityId].claims.P136[0].references = Array(17).fill({}); }, 'REFERENCE_BUDGET'],
     ['unknown statement payload', s => { s.entities[entityId].claims.P136[0].description = 'unexpected'; }, 'INVALID_CLAIMS'],
@@ -222,4 +224,34 @@ test('batch checks full catalogue and request collisions before any candidate is
   assert.throws(() => inspectWikidataFilmBatch([request()], catalogue([{ ...item(), aliases: [{ namespace: 12, externalId: 'x' }] }])), /catalogue alias/);
   const huge = new Uint8Array(2 * 1024 * 1024);
   assert.throws(() => inspectWikidataFilmBatch(Array.from({ length: 9 }, (_, n) => ({ ...request(n + 1), bytes: huge })), catalogue([item()])), /batch source byte budget/);
+});
+
+test('catalogue byte limit covers the complete envelope and separators', () => {
+  const snapshot = catalogue([item()]);
+  const maxBytes = 8 * 1024 * 1024;
+  let size = bytes(snapshot).length;
+  // Fill the snapshot with bounded, unrelated aliases without alias collisions.
+  while (size < maxBytes - 700) {
+    const row = { itemId: id(snapshot.items.length + 1), itemType: 'BOOK', aliases: [], sources: [] };
+    const overhead = bytes(row).length + 1;
+    const remaining = maxBytes - size - overhead;
+    for (let n = 0, added = 0; n < 32; n++) {
+      const alias = { namespace: 'padding', externalId: 'x'.repeat(512) };
+      const cost = bytes(alias).length + (n ? 1 : 0);
+      if (added + cost > remaining) break;
+      row.aliases.push(alias); added += cost;
+    }
+    snapshot.items.push(row); size += bytes(row).length + 1;
+  }
+  const tail = { itemId: id(snapshot.items.length + 1), itemType: 'BOOK', aliases: [{ namespace: 'padding', externalId: 'x' }], sources: [] };
+  const padding = maxBytes - size - bytes(tail).length - 1;
+  assert.ok(padding >= 0 && padding < 512);
+  tail.aliases[0].externalId += 'x'.repeat(padding);
+  snapshot.items.push(tail);
+  assert.equal(bytes(snapshot).length, maxBytes);
+  assert.equal(inspectWikidataFilmBatch([request()], snapshot)[0].status, 'CANDIDATE');
+  tail.aliases[0].externalId += 'x';
+  assert.equal(bytes(snapshot).length, maxBytes + 1);
+  assert.ok(snapshot.items.reduce((sum, row) => sum + bytes(row).length, 0) < maxBytes);
+  assert.throws(() => inspectWikidataFilmBatch([request()], snapshot), /catalogue byte budget/);
 });

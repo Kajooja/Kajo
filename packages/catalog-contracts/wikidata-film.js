@@ -195,7 +195,8 @@ export function extractWikidataFilmEvidence(bytes, context) {
     || new Date(entity.modified).toISOString() !== entity.modified.replace('Z', '.000Z')
     || Date.parse(entity.modified) < 0 || BigInt(Date.parse(entity.modified)) * 1000n > BigInt(context.retrievedAtMicros)) return unavailable('INVALID_REVISION');
   if (!object(entity.claims)) return unavailable('INVALID_CLAIMS');
-  const claims = Object.fromEntries(WIKIDATA_FILM_MAPPING.properties.map(property => [property, entity.claims[property] ?? []]));
+  const claims = Object.fromEntries(WIKIDATA_FILM_MAPPING.properties.map(property =>
+    [property, Object.hasOwn(entity.claims, property) ? entity.claims[property] : []]));
   const ids = new Set();
   for (const statements of Object.values(claims)) {
     if (!Array.isArray(statements) || statements.length > limits.statementsPerProperty) return unavailable('CLAIM_BUDGET');
@@ -280,7 +281,9 @@ export function inspectWikidataFilmBatch(requests, catalogue) {
     if (request.bytes instanceof Uint8Array) sourceBytes += request.bytes.length;
     if (sourceBytes > limits.batchSourceBytes) throw new Error('Wikidata batch source byte budget exceeded');
   }
-  const catalogueSha256 = hash(canonical(catalogue));
+  const catalogueJson = canonical(catalogue);
+  if (new TextEncoder().encode(catalogueJson).length > limits.catalogueBytes) throw new Error('Wikidata catalogue byte budget exceeded');
+  const catalogueSha256 = hash(catalogueJson);
   return requests.map(request => {
     const result = (() => {
       const item = items.get(request.itemId);
