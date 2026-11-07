@@ -30,10 +30,24 @@ development branches while retaining eight catalogue operation/recovery refs.
 closed while the original synthetic failure remains unreproduced. #432's
 versioned owned-Taste numeric training prefix is accepted through #433 after all
 six CI #859 gates; its single forward is installed and preservation-verified on
-November 7. Complete #434's bounded query/rollback diagnostics and final-source CI
-after the CI #861 recurrence, then prepare a fresh private DEVELOPMENT declaration
-before new first-answer evaluation. The underlying portal failure remains
-unreproduced locally; diagnostics do not establish its cause or fix it.
+November 7. #434's bounded query/rollback diagnostics are accepted after all six
+CI #862 gates. The explicitly authorized bounded BOOK source/alias repair is
+applied and post-commit preservation-verified; separate read-only inspection
+confirms permitted BOOK content support and an available fit. Do not replay the
+repair. The bounded label-blind Wikidata identity/coverage review is complete;
+its direct structured assertions remain candidate inputs, not admitted runtime
+features. After final-source acceptance of the #435 handoff, implement the
+explicit Wikidata provider/evidence adapter and finite mapping with versioned
+capture, deterministic feature parity and identity/permission/availability/
+withdrawal preservation checks. Reviewed ingestion and actual support inspection
+then precede a fresh private MOVIE-then-BOOK DEVELOPMENT declaration and
+first-answer evaluation. Do not restart the completed coverage lookup by default.
+Numeric labels and an available fit do not establish usefulness. TMDB feature
+fitting/validation remains
+excluded under the [November 7 source-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
+unless an applicable separate written agreement is reviewed. The underlying
+CI #861 portal failure remains unreproduced locally; diagnostics do not establish
+its cause or fix it. STATUS owns exact #434 acceptance and the active packet.
 #427's bounded preflight is closed; its old window remains retired. Preserve
 accepted evidence and pending commands; no reset or repeated deployment. The
 bounded phase transition does not close

@@ -83,6 +83,15 @@ catalogue enrichment exposes the repair on both surfaces when next loaded;
 already cached cards may require reopening. No schema migration or APK is needed.
 This does not guarantee a provider image will remain available indefinitely.
 
+Cover attribution alone is not native content-feature source/alias provenance.
+For a bounded linkage repair, verify the exact provider Work and complete source
+assertions against the existing Item before adding its source and namespaced
+alias. Reject occupied aliases, source collisions and stale snapshots rather
+than reassigning identities. Preserve Item fields, existing sources and user
+evidence. Record new provenance at its actual availability time; linking a source
+now cannot make it an input to an earlier frozen forecast. Inspect permitted
+feature support after the operation before declaring a prospective comparison.
+
 ## 2. Source registry — verified documentation
 
 The following facts were checked against publisher documentation on 2026-09-12. The pipeline must verify actual downloaded bytes independently. Adapter/evaluation requirements below are Kajo design decisions, not publisher guarantees; source-specific factual details link to their publisher.
@@ -262,7 +271,8 @@ provider/evidence-kind pairs, validity interval and source-bound retention until
 withdrawal. The interval covers capture and the whole answer horizon. This is
 an operator assertion to validate and retain, not a license decision or rights
 certificate. A null manifest or unlisted source copies no feature payload and
-leaves the model on its native Personal-mean fallback.
+leaves the model on its native Personal-mean fallback. Implemented provider
+mappings are structural capabilities, not permission for an observed use.
 
 Owned sequential Taste is a separate first-party numeric source in capture v3
 (#432), not an external-data admission. Its bootstrap row must match the owned
@@ -284,6 +294,76 @@ copies; ordinary source refresh cannot rewrite an older prediction snapshot.
 The [numeric contract](../domain/PREDICTION_MODEL.md#frozen-content-numeric-challenger--sprint-016--405)
 owns bounds and fallback. No hosted install, quality/serving admission or new
 external dataset authorization follows from this source implementation.
+
+#### TMDB content-use restriction — reviewed 2026-11-07
+
+The full official [API Terms of Use](https://www.themoviedb.org/api-terms-of-use)
+were retrieved on November 7; the page displays an October 20, 2023 update date.
+Sections 1.A and 1.C reserve or restrict ML/AI use of the API and its content.
+Section 2.A expressly includes training or validating ML/AI with TMDB content
+among uses requiring a separate written agreement. This supersedes the earlier
+incomplete full-terms review; general noncommercial API access and attribution
+do not establish permission for this specific use.
+
+Keep TMDB genre-derived features unlisted for native model fitting and validation
+unless an applicable separate written agreement is reviewed. No such agreement
+has been reviewed. First-party rating labels do not supply rights to copied
+provider features. Mean fallback does not independently clear other uses of
+provider content in ranking, capture or the wider application. Any later use
+needs a complete scope review or an independently permitted alternative source;
+this documentation neither changes serving nor approves a broader pipeline.
+
+Wikidata structured film data is a **research candidate only**, under its
+[CC0 licensing policy](https://www.wikidata.org/wiki/Wikidata:Licensing) and
+[documented data access](https://www.wikidata.org/wiki/Wikidata:Data_access).
+The bounded label-blind inspection of independently retrieved `P136` genre
+statements and `P345`/`P4947` identity corroboration is complete. It found direct
+candidate support and unsupported gaps, retaining raw revisions, statement
+metadata and actual retrieval times. Detailed operational evidence remains
+private. Current SQL and TypeScript bind MOVIE features to TMDB; the review does
+not change them or admit a source/model.
+
+#### Wikidata provider integration — next source packet
+
+Implement an explicit provider/evidence contract rather than a manifest-only
+toggle or relabeling of retained TMDB features. The bounded review uses the
+following direct, finite candidate mapping into the existing six concepts:
+
+| Concept | Direct P136 value |
+| --- | --- |
+| fantasy | [Q157394](https://www.wikidata.org/wiki/Q157394) |
+| horror | [Q200092](https://www.wikidata.org/wiki/Q200092) |
+| mystery | [Q1200678](https://www.wikidata.org/wiki/Q1200678) |
+| romance | [Q1054574](https://www.wikidata.org/wiki/Q1054574) |
+| science-fiction | [Q471839](https://www.wikidata.org/wiki/Q471839) |
+| thriller | [Q2484376](https://www.wikidata.org/wiki/Q2484376) |
+
+Select preferred ranks when present, otherwise normal, before other filters;
+never fall back to suppressed normal statements because a preferred value is
+unsupported. Deprecated, non-value, malformed or qualified genre statements
+remain unavailable pending their explicit semantic review. Do not traverse
+arbitrary subclass graphs or infer science-fiction from a superhero label.
+Missing eligible mapped assertions are unavailable, not all-zero training rows.
+Inside a valid mapped record, zero retains the existing assertion-not-present
+meaning rather than a factual negative genre claim.
+
+Retain exact entity and external identity, statements/references, entity revision,
+full source hash and actual availability. Quarantine known TMDB-origin reference
+markers. Their absence does not certify each statement's original provenance;
+the source-use review relies on the publisher's structured-data CC0 dedication
+and retains unresolved/reference-free origins. Do not fetch prose or external
+rating histories from statement reference links as a side effect.
+
+Before ingestion or fitting, review the provider/evidence identity and finite
+mapping digest, append-only source/capture version, exact alias collision and
+redirect/merge handling, permission horizon and available-at cutoff. Require
+SQL/TypeScript parity and concurrent-writer/lifecycle tests: source or alias
+correction/deletion and explicit review withdrawal must retire dependent copies,
+while old v1/v2/v3 capture meanings and exact retries stay unchanged. A source's
+earlier modified time cannot backdate Kajo's knowledge or refill an old forecast.
+Bound payloads, statements, references and requests; retain safe unsupported
+fallback. Only actual permitted runtime support can precede a new DEVELOPMENT
+declaration, and measured native usefulness still precedes model admission.
 
 ## 5. Isolated research storage and execution
 
