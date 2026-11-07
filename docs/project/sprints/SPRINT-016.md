@@ -28,10 +28,13 @@ source/alias repair is now applied. Post-commit readback verifies exact addition
 fresh provenance and preservation of existing catalogue rows and answers.
 Separate read-only inspection confirms permitted BOOK support and an available
 content fit; the repair must not be replayed. MOVIE feature support remains
-insufficient. Review an independent permitted source, identity mapping, source
-version and lifecycle/coverage checks before any adapter or feature-use change
-and before a fresh private MOVIE-then-BOOK DEVELOPMENT declaration. Keep the
-prepared worker inactive and TMDB
+insufficient. The bounded label-blind Wikidata identity/coverage inspection is
+complete and supplies candidate assertions with explicit unsupported gaps and
+origin uncertainty. After #435's final-source acceptance, the next packet is the
+explicit provider/evidence adapter and finite mapping, new source/capture version,
+SQL/TypeScript parity and identity/availability/withdrawal preservation checks.
+Reviewed ingestion and actual fitting support precede a fresh private
+MOVIE-then-BOOK DEVELOPMENT declaration. Keep the prepared worker inactive and TMDB
 features unlisted under the [November 7 source-use review](../../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07).
 An eligible numeric prefix, source linkage or fitted coefficients do not establish
 an observed comparison or quality/serving admission.

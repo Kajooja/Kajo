@@ -316,12 +316,54 @@ this documentation neither changes serving nor approves a broader pipeline.
 Wikidata structured film data is a **research candidate only**, under its
 [CC0 licensing policy](https://www.wikidata.org/wiki/Wikidata:Licensing) and
 [documented data access](https://www.wikidata.org/wiki/Wikidata:Data_access).
-A bounded, label-blind inspection may evaluate independently retrieved `P136`
-genre statements and `P345`/`P4947` identifiers for exact matching. Current SQL
-and TypeScript bind MOVIE features to TMDB, so this requires a reviewed adapter,
-finite mapping, explicit source version and identity/coverage/lifecycle checks;
-it is not a manifest toggle or admitted source. Retain statement and revision
-provenance, and never relabel TMDB-derived genres as independent Wikidata data.
+The bounded label-blind inspection of independently retrieved `P136` genre
+statements and `P345`/`P4947` identity corroboration is complete. It found direct
+candidate support and unsupported gaps, retaining raw revisions, statement
+metadata and actual retrieval times. Detailed operational evidence remains
+private. Current SQL and TypeScript bind MOVIE features to TMDB; the review does
+not change them or admit a source/model.
+
+#### Wikidata provider integration — next source packet
+
+Implement an explicit provider/evidence contract rather than a manifest-only
+toggle or relabeling of retained TMDB features. The bounded review uses the
+following direct, finite candidate mapping into the existing six concepts:
+
+| Concept | Direct P136 value |
+| --- | --- |
+| fantasy | [Q157394](https://www.wikidata.org/wiki/Q157394) |
+| horror | [Q200092](https://www.wikidata.org/wiki/Q200092) |
+| mystery | [Q1200678](https://www.wikidata.org/wiki/Q1200678) |
+| romance | [Q1054574](https://www.wikidata.org/wiki/Q1054574) |
+| science-fiction | [Q471839](https://www.wikidata.org/wiki/Q471839) |
+| thriller | [Q2484376](https://www.wikidata.org/wiki/Q2484376) |
+
+Select preferred ranks when present, otherwise normal, before other filters;
+never fall back to suppressed normal statements because a preferred value is
+unsupported. Deprecated, non-value, malformed or qualified genre statements
+remain unavailable pending their explicit semantic review. Do not traverse
+arbitrary subclass graphs or infer science-fiction from a superhero label.
+Missing eligible mapped assertions are unavailable, not all-zero training rows.
+Inside a valid mapped record, zero retains the existing assertion-not-present
+meaning rather than a factual negative genre claim.
+
+Retain exact entity and external identity, statements/references, entity revision,
+full source hash and actual availability. Quarantine known TMDB-origin reference
+markers. Their absence does not certify each statement's original provenance;
+the source-use review relies on the publisher's structured-data CC0 dedication
+and retains unresolved/reference-free origins. Do not fetch prose or external
+rating histories from statement reference links as a side effect.
+
+Before ingestion or fitting, review the provider/evidence identity and finite
+mapping digest, append-only source/capture version, exact alias collision and
+redirect/merge handling, permission horizon and available-at cutoff. Require
+SQL/TypeScript parity and concurrent-writer/lifecycle tests: source or alias
+correction/deletion and explicit review withdrawal must retire dependent copies,
+while old v1/v2/v3 capture meanings and exact retries stay unchanged. A source's
+earlier modified time cannot backdate Kajo's knowledge or refill an old forecast.
+Bound payloads, statements, references and requests; retain safe unsupported
+fallback. Only actual permitted runtime support can precede a new DEVELOPMENT
+declaration, and measured native usefulness still precedes model admission.
 
 ## 5. Isolated research storage and execution
 

@@ -11,9 +11,9 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — permitted MOVIE source support before DEVELOPMENT
+## Current handoff — Wikidata provider integration before DEVELOPMENT
 
-**Accepted main:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) merged on
+**Accepted runtime source:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) merged on
 November 7 as `350ce05001f2554971649a9be5872a560a4a4039`. Source
 `61eaa74bf3d92b8c5bf44e281e392a8f5ce3c5e8`, tested merge
 `9d91ae848a87c89bb24fcc70a2d17eea320c6d85` and accepted main share tree
@@ -88,11 +88,34 @@ now confirms permitted BOOK content support and an available content fit. This i
 engineering readiness, not a prospective prediction or evidence of usefulness.
 The repair is complete; do not replay it or reset current answers.
 
-**One next packet:** establish permitted MOVIE content-feature support before a
-fresh private MOVIE-then-BOOK DEVELOPMENT declaration. Current MOVIE feature support
-remains insufficient. Review an independent source, exact identity mapping,
-source-version binding and lifecycle/coverage checks before any adapter or
-feature-use change. Keep the prepared observation worker inactive until that
+**Continuation entry:** [PR #435](https://github.com/Kajooja/Kajo/pull/435) carries
+this documentation handoff. Check its final-source CI and accepted merge receipt
+before starting the next code packet; if it is still open, finish that acceptance
+first. Its approved public research summary is already published; do not request
+the same publication approval again. Earlier CI #865 failed isolated Supabase
+startup before the platform probe while validation remained unusually long in
+Test. Image-download/port-binding signals do not establish a cause. Preserve that
+attempt; a newer documentation source requires its own complete checks and does
+not demonstrate a runtime fix for the earlier failure or delay.
+
+**Wikidata coverage review completed — November 7:** the bounded label-blind
+inspection corroborates exact external identities, film type, year, directors
+and titles, retaining statement/revision/hash/retrieval evidence. The preselected
+direct mapping has usable candidate assertions and unsupported gaps. This is
+private engineering evidence, not an admitted provider, fitted MOVIE model or
+prediction-quality result. Do not repeat that completed lookup as the default
+next task. [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md#wikidata-provider-integration--next-source-packet)
+owns the reviewed extraction boundaries and remaining implementation checks.
+
+**One next code packet:** implement the explicit Wikidata provider/evidence
+adapter and finite mapping, with a new source/capture version where required.
+Use an append-only migration for database changes; preserve old captures and
+exact retries. Require deterministic SQL/TypeScript feature parity, identity
+collision/redirect refusal, permission/available-at fences, correction/withdrawal
+retirement and concurrent-writer preservation tests before hosted ingestion.
+Then inspect actual permitted fitting support and prepare a fresh private
+MOVIE-then-BOOK DEVELOPMENT declaration. Current runtime MOVIE feature support
+remains insufficient. Keep the prepared observation worker inactive until the
 scope is supported. Operational identities, counts and evidence stay private.
 
 The November 7 [provider-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
