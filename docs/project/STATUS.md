@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-11-06**
+Last updated: **2026-11-07**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; owned Taste numeric source #432 active; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 retains query/rollback diagnostics after CI #861 before fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,20 +11,22 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — owned Taste numeric source #432
+## Current handoff — acquisition failure diagnostics #434
 
-**Accepted base:** `7bd103beb975cbda7378b3aa9894a66e6bba4b30`,
-[PR #431](https://github.com/Kajooja/Kajo/pull/431). Source
-`dac22fbf6c23e9f5713be27f25ed9753b2a45fec`, tested merge
-`0473454e4ac3b2dea556b5e2493051d8621f7c36` and accepted merge share tree
-`ed4d024bc8cdb80f381657d4a019135a819be07e`. All six required
-[CI #854](https://github.com/Kajooja/Kajo/actions/runs/42189344540) gates passed.
-#430 closes with the diagnostics gap corrected. The original CI #852 failure
-remains **NOT_REPRODUCED / cause unresolved**, not claimed fixed; a recurrence
-must retain and inspect the newly visible proof/cleanup causes.
+**Accepted source:** [PR #433](https://github.com/Kajooja/Kajo/pull/433) merged on
+November 6 as `9f55634bc2457fd8d552b24ca216a31f6ae10d6d`. Source
+`c52b2347b949bfa7f4e24e9285643ce1367315a3`, tested merge
+`dfc9233eb26f483928c57acaaa5b092b186bfdd0` and accepted merge share tree
+`8ba95fe2461bd80f09459e4d6455a5779a8d860c`. All six required
+[CI #859](https://github.com/Kajooja/Kajo/actions/runs/42219124581) gates passed:
+2,573 tests, four configured iOS/Android exports, lint/typecheck and dependency
+audit with no unmitigated findings. Optional standalone APK was skipped. The PR
+retains independently verified artifacts, source/tree identities, native
+concurrent-writer witnesses and populated predecessor preservation/rollback.
+[Issue #432](https://github.com/Kajooja/Kajo/issues/432) is closed; do not repeat
+its source implementation or treat the earlier failed CI runs as outstanding work.
 
-**One active packet:** [#432](https://github.com/Kajooja/Kajo/issues/432), branch
-`feat/owned-taste-numeric-prefix`. Private prepare/finalize **v3**, preparation/
+Private prepare/finalize **v3**, preparation/
 input **v2**, admit genuine owned sequential Taste ratings alongside canonically
 resolved native ratings. The unchanged numerical core computes the full-prefix
 mean and permitted content ridge. Retain bootstrap/response identity and report
@@ -33,14 +35,56 @@ availability; do not create native Events or invent experience dates.
 The source includes closed lineage checks, new source dependency references,
 correction/withdrawal retirement, same-transaction capture and explicit source
 version binding in the existing evaluation inventory. Old v1/v2 captures and
-exact retries remain intact. Local source, actual compiled capture/first-answer,
-old-generation retry and populated-forward/rollback checks pass; the engine's
-437 tests pass. `npm run check` passes lint/typecheck and dependency/mobile/catalogue
-checks, then stops at Deno registry connection refusal. Required final-source CI
-must establish all six gates, including the new native concurrent-writer and
-populated-forward checks. Do not merge a failing/incomplete tree.
+exact retries remain intact. Native CI verifies actual owned-Taste capture,
+ten distinct-backend source-fence witnesses, private ACL/RLS boundaries and
+populated-forward rollback. These are source/runtime fixtures, not observed
+prediction usefulness or serving admission.
 
-**PR #433 continuation:** CI #857 passed five gates; the native CLI gate
+**Hosted installation completed — November 7:** the approved exact
+`20261106090733_owned_taste_numeric_sources.sql` forward is installed. Independent
+postflight verifies the expected source/security metadata and retained-row/history
+preservation; the new private reference tables remain empty. Current answers are
+preserved. The earlier absence observation is superseded by this installation.
+Its execution receipt and operational details stay private. The historical
+two-forward numeric wrapper remains frozen; do not reinstall accepted forwards.
+
+**One active packet:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) records
+the accepted source/deployment and corrects a disposable fixture's error masking.
+[CI #861](https://github.com/Kajooja/Kajo/actions/runs/42400959745) passed 522 of 523
+database tests; the populated acquisition proof and cleanup both reported
+`cannot drop active portal`. The remaining three dependent required gates were
+skipped. The fixture awaited rollback before reporting its original query error,
+so rollback failure could replace that error. The correction logs the query error
+and stage before rollback, retains both errors when recovery fails and never
+retries the query. It changes no SQL, production behavior or preservation check.
+
+The three new diagnostic regressions and complete acquisition test file pass
+all 13 tests on Node 22.23.4 and Node 24. The double-failure regression fails on
+the prior executor. A local full `npm run check` passes lint/typecheck and 1,427
+dependency/mobile/catalogue tests, then fails fetching Deno dependencies because
+the registry connection is refused; that full check remains incomplete.
+The underlying intermittent portal failure is **NOT_REPRODUCED locally / cause
+unresolved**. Do not claim it is fixed or erase CI #861's failed result.
+All six required checks must pass on the corrected final source before merge.
+
+After that source acceptance, prepare a fresh private DEVELOPMENT declaration
+with explicit owned-Taste source version, reviewed feature-use horizon and genuine
+new first-answer opportunities. No observed numerical comparison is claimed.
+
+The retired #427 window stays retired. No account reset, observed capture,
+declaration refill, historical forecast backfill or serving activation is claimed.
+Use the existing private route below; Sprint 016 and Engine V1 quality gates remain
+open. Operational identities, configuration, execution records and experiment
+files stay outside this public repository.
+
+### Retained source-validation history
+
+#430 / #431 closed after all six CI #854 gates with the diagnostics gap corrected.
+The original CI #852 synthetic preservation failure remains
+**NOT_REPRODUCED / cause unresolved**, not claimed fixed. A recurrence must retain
+and inspect the individual proof/cleanup causes.
+
+During PR #433, CI #857 passed five gates; the native CLI gate
 failed in the new populated-forward verifier with `invalid JSON acknowledgement`.
 Its ACL/RLS queries returned PostgreSQL `t`/`f` instead of JSON booleans. The
 correction serializes those three query forms as JSON and verifies result types
@@ -48,9 +92,8 @@ locally, including rejection of unauthorized function/table grants and disabled
 RLS. The regression fails on the prior source at the function-ACL query. This
 changes the disposable verifier only, not migration SQL or prediction math.
 Earlier CI #856's rejected-forecast assertion required SQLSTATE rather than
-redacted server prose; that separate correction is retained. Require all six
-gates on the corrected final tree before merge; earlier passing subsets do not
-constitute acceptance.
+redacted server prose; that separate correction is retained. Final-source CI #859
+subsequently passed all six gates; the earlier passing subsets were not acceptance.
 
 CI #858 then completed 2,573 tests and four configured iOS/Android exports, but
 its CLI proof exposed a second verifier defect: the rollback restored the caller's
@@ -62,23 +105,14 @@ caller settings; all row/function and ACL checks remain exact. The regression
 exercises caller precisions -3, 0 and 3. This is another disposable-verifier
 correction, not a migration or prediction change; CI #858 remains a failed run.
 
-The corrected verifier and transport suite pass all ten focused tests when run
+The corrected verifier and transport suite passed all ten focused tests when run
 sequentially. An initial parallel local run failed the transport's short deadline
-fixture; its sequential rerun passes without a transport change. The current full
-`npm run check` passes lint/typecheck and 1,427 dependency/mobile/catalogue tests;
-it was stopped after repeated Deno dependency-download stalls, so it is not a
-completed full-check pass. On November 6 the owner explicitly approved publishing
-this correction to PR #433 and merging after all six required final-source checks
-pass. Inspect the corrected source/tree and native proof before merge, then retain
-the acceptance receipt in the PR and continue the private declaration/forward
-preparation below. Earlier passing subsets do not replace final-source acceptance.
-
-**Operational boundary:** this migration is source work, not installed hosted
-state. No account reset, observed capture, declaration refill, historical forecast
-backfill or serving admission belongs to this packet. After source acceptance,
-use a fresh private DEVELOPMENT declaration, permission horizon and genuinely
-new first-answer target. The retired #427 window remains retired. Source fixtures
-do not establish recommendation benefit, confidence or Sprint 016 acceptance.
+fixture; its sequential rerun passed without a transport change. The local full
+`npm run check` passed lint/typecheck and 1,427 dependency/mobile/catalogue tests,
+then was stopped after repeated Deno dependency-download stalls; that local run
+is not a completed full-check pass. CI #859 supplies the final complete check.
+The earlier local PGlite/Wasm atomic-page failure also remains an unresolved
+local-runtime observation; the native/CI passes do not establish its cause.
 
 **Taste recovery retained:** #429's append-only correction is already installed;
 its PR owns the verified hosted receipt. On November 6 the owner completed the
@@ -144,8 +178,10 @@ rating writer is not the private numeric first-answer route: its accepted use ca
 retire a pending evaluation target. Do not tell an owner to rate through that
 route while claiming to measure the private frozen forecast.
 
-Reuse `capturePersonalContentRatingForecast` for one held BEGIN → prepare →
-TypeScript → finalize → COMMIT transaction. Only afterward submit the owner's
+For the new owned-Taste source generation, reuse `captureOwnedTasteNumericForecast`
+in `scripts/database/owned-taste-numeric-capture.mjs` for one held BEGIN → prepare
+v3 → TypeScript → finalize v3 → COMMIT transaction. Prior-generation retries
+retain their original worker/contracts. Only afterward submit the owner's
 actual integer rating through `private.commit_personal_rating_answer_v1`.
 Use `inspectPersonalRatingOwnerCensus` for every declared owner and the existing
 declaration/report CLI. A missing feature-use permission uses the documented

@@ -27,10 +27,14 @@ are accepted through #429 and installed. The November 6 phone report confirms
 resumed completion and BOOK continuation. Repository cleanup removed 46 completed
 development branches while retaining eight catalogue operation/recovery refs.
 #430 / #431 is accepted after all six final-tree CI gates; its diagnostics gap is
-closed while the original synthetic failure remains unreproduced. Continue #432's
-versioned owned-Taste numeric training prefix through final source/native CI. #427's bounded
-preflight closes with a source/declaration dependency; new private evaluation follows
-its accepted source and fresh declaration, with old windows left retired. Preserve
+closed while the original synthetic failure remains unreproduced. #432's
+versioned owned-Taste numeric training prefix is accepted through #433 after all
+six CI #859 gates; its single forward is installed and preservation-verified on
+November 7. Complete #434's bounded query/rollback diagnostics and final-source CI
+after the CI #861 recurrence, then prepare a fresh private DEVELOPMENT declaration
+before new first-answer evaluation. The underlying portal failure remains
+unreproduced locally; diagnostics do not establish its cause or fix it.
+#427's bounded preflight is closed; its old window remains retired. Preserve
 accepted evidence and pending commands; no reset or repeated deployment. The
 bounded phase transition does not close
 Sprint 019's shared-policy/calibrated-readiness requirements. This necessary

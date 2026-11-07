@@ -4,6 +4,7 @@ import test from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { buildFreshInstallation } from './fresh-installation.mjs';
 import { nativeCandidateRequestFixtureSql, nativeCandidateRequestSmokeSql } from './native-candidate-request.mjs';
+import { createNativeAcquisitionPgliteExecutor } from './native-acquisition-pglite.mjs';
 
 const actor = 'ab157000-0000-4000-8000-000000000001';
 const other = 'ab157000-0000-4000-8000-000000000002';
@@ -371,11 +372,7 @@ test('shared native acquisition preserves the populated V4/Discovery predecessor
     const index = files.findIndex(f => f.name.endsWith('_shared_native_candidate_acquisition.sql'));
     assert.ok(index > 0);
     for (const file of files.slice(0, index)) await db.exec(`begin;${file.sql}commit;`);
-    const exec = async sql => {
-      // Match psql's omitted blank SQL-NULL row as well as its JSON values.
-      try { return (await db.exec(sql)).flatMap(r => r.rows.map(row => Object.values(row)[0])).filter(value => value !== null); }
-      catch (error) { await db.exec('rollback;'); t.diagnostic(JSON.stringify({ message: error.message, code: error.code, detail: error.detail, where: error.where })); throw error; }
-    };
+    const exec = createNativeAcquisitionPgliteExecutor(db, value => t.diagnostic(value));
     const previous = (await db.query(`select oid::regprocedure::text signature,prosrc,pg_get_functiondef(oid) definition
       from pg_proc where pronamespace='private'::regnamespace and proname in(
         'rank_items_request_base_v1','rank_items_request_with_identity_v1','taste_candidate_catalog_v4')`)).rows;
