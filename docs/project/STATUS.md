@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-07**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 retains query/rollback diagnostics after CI #861 before fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; reviewed catalogue source support precedes fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,9 +11,21 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — acquisition failure diagnostics #434
+## Current handoff — reviewed catalogue source support before DEVELOPMENT
 
-**Accepted source:** [PR #433](https://github.com/Kajooja/Kajo/pull/433) merged on
+**Accepted main:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) merged on
+November 7 as `350ce05001f2554971649a9be5872a560a4a4039`. Source
+`61eaa74bf3d92b8c5bf44e281e392a8f5ce3c5e8`, tested merge
+`9d91ae848a87c89bb24fcc70a2d17eea320c6d85` and accepted main share tree
+`6f76c2d0f25a9c93944b853f12c0c7bf758bc9fb`. All six required
+[CI #862](https://github.com/Kajooja/Kajo/actions/runs/42403022392) gates passed:
+2,576 tests, four configured iOS/Android exports, lint/typecheck and dependency
+audit with no unmitigated findings. All five runtime artifacts were independently
+verified. Optional standalone APK was skipped. The performance gate confirms
+complete diagnostics, with the retained failed reference comparison and no
+optimization admission; it is not a latency or quality acceptance.
+
+**Owned-Taste source history:** [PR #433](https://github.com/Kajooja/Kajo/pull/433) merged on
 November 6 as `9f55634bc2457fd8d552b24ca216a31f6ae10d6d`. Source
 `c52b2347b949bfa7f4e24e9285643ce1367315a3`, tested merge
 `dfc9233eb26f483928c57acaaa5b092b186bfdd0` and accepted merge share tree
@@ -48,7 +60,7 @@ preserved. The earlier absence observation is superseded by this installation.
 Its execution receipt and operational details stay private. The historical
 two-forward numeric wrapper remains frozen; do not reinstall accepted forwards.
 
-**One active packet:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) records
+**Accepted diagnostic correction:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) records
 the accepted source/deployment and corrects a disposable fixture's error masking.
 [CI #861](https://github.com/Kajooja/Kajo/actions/runs/42400959745) passed 522 of 523
 database tests; the populated acquisition proof and cleanup both reported
@@ -65,11 +77,29 @@ dependency/mobile/catalogue tests, then fails fetching Deno dependencies because
 the registry connection is refused; that full check remains incomplete.
 The underlying intermittent portal failure is **NOT_REPRODUCED locally / cause
 unresolved**. Do not claim it is fixed or erase CI #861's failed result.
-All six required checks must pass on the corrected final source before merge.
+The final source acceptance above supplies the complete required checks; preserve
+the earlier failed run and incomplete local run as history.
 
-After that source acceptance, prepare a fresh private DEVELOPMENT declaration
-with explicit owned-Taste source version, reviewed feature-use horizon and genuine
-new first-answer opportunities. No observed numerical comparison is claimed.
+**One next packet:** establish reviewed catalogue source support before a fresh
+private DEVELOPMENT declaration. Read-only readiness inspection identified missing
+reviewed source provenance; eligible numeric labels alone do not establish a
+fitted content challenger. A bounded exact-Work source/alias linkage proposal is
+prepared, independently reviewed and rehearsed, but has not been applied.
+Execution awaits operator authorization. Apply only against its unchanged-source
+guards, preserve existing Items and answers, then inspect the actual permitted fit. Current catalogue state remains unchanged;
+no resulting runtime fit is claimed. Keep observation inactive until its supported
+scope is explicit. Operational evidence stays private.
+
+The November 7 [provider-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
+keeps TMDB features unlisted: its full standard API terms restrict ML/AI use and
+explicitly cover training or validation. No applicable separate agreement was
+reviewed. Mean fallback is not clearance for other provider-content use in the
+wider pipeline; keep that scope review separate from numerical support.
+
+After source support is established, retain a new pre-window declaration with
+explicit owned-Taste source version, reviewed feature-use horizon and genuine
+first-answer opportunities. Source linkage and an available fit are engineering
+readiness, not an observed numerical comparison or quality admission.
 
 The retired #427 window stays retired. No account reset, observed capture,
 declaration refill, historical forecast backfill or serving activation is claimed.

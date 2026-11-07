@@ -83,6 +83,15 @@ catalogue enrichment exposes the repair on both surfaces when next loaded;
 already cached cards may require reopening. No schema migration or APK is needed.
 This does not guarantee a provider image will remain available indefinitely.
 
+Cover attribution alone is not native content-feature source/alias provenance.
+For a bounded linkage repair, verify the exact provider Work and complete source
+assertions against the existing Item before adding its source and namespaced
+alias. Reject occupied aliases, source collisions and stale snapshots rather
+than reassigning identities. Preserve Item fields, existing sources and user
+evidence. Record new provenance at its actual availability time; linking a source
+now cannot make it an input to an earlier frozen forecast. Inspect permitted
+feature support after the operation before declaring a prospective comparison.
+
 ## 2. Source registry — verified documentation
 
 The following facts were checked against publisher documentation on 2026-09-12. The pipeline must verify actual downloaded bytes independently. Adapter/evaluation requirements below are Kajo design decisions, not publisher guarantees; source-specific factual details link to their publisher.
@@ -262,7 +271,8 @@ provider/evidence-kind pairs, validity interval and source-bound retention until
 withdrawal. The interval covers capture and the whole answer horizon. This is
 an operator assertion to validate and retain, not a license decision or rights
 certificate. A null manifest or unlisted source copies no feature payload and
-leaves the model on its native Personal-mean fallback.
+leaves the model on its native Personal-mean fallback. Implemented provider
+mappings are structural capabilities, not permission for an observed use.
 
 Owned sequential Taste is a separate first-party numeric source in capture v3
 (#432), not an external-data admission. Its bootstrap row must match the owned
@@ -284,6 +294,34 @@ copies; ordinary source refresh cannot rewrite an older prediction snapshot.
 The [numeric contract](../domain/PREDICTION_MODEL.md#frozen-content-numeric-challenger--sprint-016--405)
 owns bounds and fallback. No hosted install, quality/serving admission or new
 external dataset authorization follows from this source implementation.
+
+#### TMDB content-use restriction — reviewed 2026-11-07
+
+The full official [API Terms of Use](https://www.themoviedb.org/api-terms-of-use)
+were retrieved on November 7; the page displays an October 20, 2023 update date.
+Sections 1.A and 1.C reserve or restrict ML/AI use of the API and its content.
+Section 2.A expressly includes training or validating ML/AI with TMDB content
+among uses requiring a separate written agreement. This supersedes the earlier
+incomplete full-terms review; general noncommercial API access and attribution
+do not establish permission for this specific use.
+
+Keep TMDB genre-derived features unlisted for native model fitting and validation
+unless an applicable separate written agreement is reviewed. No such agreement
+has been reviewed. First-party rating labels do not supply rights to copied
+provider features. Mean fallback does not independently clear other uses of
+provider content in ranking, capture or the wider application. Any later use
+needs a complete scope review or an independently permitted alternative source;
+this documentation neither changes serving nor approves a broader pipeline.
+
+Wikidata structured film data is a **research candidate only**, under its
+[CC0 licensing policy](https://www.wikidata.org/wiki/Wikidata:Licensing) and
+[documented data access](https://www.wikidata.org/wiki/Wikidata:Data_access).
+A bounded, label-blind inspection may evaluate independently retrieved `P136`
+genre statements and `P345`/`P4947` identifiers for exact matching. Current SQL
+and TypeScript bind MOVIE features to TMDB, so this requires a reviewed adapter,
+finite mapping, explicit source version and identity/coverage/lifecycle checks;
+it is not a manifest toggle or admitted source. Retain statement and revision
+provenance, and never relabel TMDB-derived genres as independent Wikidata data.
 
 ## 5. Isolated research storage and execution
 

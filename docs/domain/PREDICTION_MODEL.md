@@ -453,7 +453,11 @@ null does not establish factual absence. The separate
 assertion appears in an otherwise valid, permitted source containing at least
 one mapped assertion. A missing, unpermitted, malformed or unmapped whole source
 stays unavailable with a null vector; it is not an all-zero negative example.
-The fixed vocabulary does not imply book/movie transfer.
+The fixed vocabulary does not imply book/movie transfer. These are implemented
+source mappings, not provider-use approvals. The [November 7 source-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
+keeps TMDB features unlisted for observed fitting and validation absent an
+applicable separate agreement. A permitted catalogue source and valid alias must
+exist before a numeric label can supply content-feature support.
 
 The explicit `personal-content-feature-use-v1` manifest is a trusted operator
 assertion of purpose, origin, review reference, time interval, source allowlist

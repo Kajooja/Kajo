@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 / #424 and catalogue/admission audit #425 / #426 accepted; Taste recovery #428 / #429 installed and resumed completion observed; preservation diagnostics #430 / #431 accepted after six CI gates; owned-Taste numeric source #432 / #433 accepted after all six CI #859 gates and installed November 7; #434 query/rollback diagnostics awaiting final-source CI; native preflight #427 reconciled; fresh owned DEVELOPMENT preparation follows from private records; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 / #424 and catalogue/admission audit #425 / #426 accepted; Taste recovery #428 / #429 installed and resumed completion observed; preservation diagnostics #430 / #431 accepted after six CI gates; owned-Taste numeric source #432 / #433 accepted after all six CI #859 gates and installed November 7; #434 query/rollback diagnostics accepted after all six CI #862 gates; native preflight #427 reconciled; reviewed catalogue source support precedes fresh owned DEVELOPMENT preparation; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -18,12 +18,20 @@ failed CI/local results remain scoped in [STATUS](../STATUS.md) and PR #433;
 the accepted correction does not erase those observations or explain unrelated
 runtime failures. The exact approved forward is installed on November 7 with
 independent metadata/history and retained-row preservation checks. Current answers
-remain intact; execution details stay private. #434 first corrects query/rollback
-error masking exposed by CI #861, with all final-source gates still required.
+remain intact; execution details stay private. #434 corrects query/rollback
+error masking exposed by CI #861 and is accepted after all six final-source
+CI #862 gates, 2,576 tests and four configured exports.
 The underlying intermittent portal failure remains unreproduced locally and is
-not claimed fixed. [STATUS](../STATUS.md) owns that bounded continuation before a
-fresh private DEVELOPMENT declaration. No observed comparison or quality/serving
-admission is established by source acceptance or installation.
+not claimed fixed. [STATUS](../STATUS.md) owns exact acceptance and the subsequent
+catalogue source-support packet. Before a fresh private DEVELOPMENT declaration,
+resolve missing reviewed provider source/alias provenance while preserving Items
+and current answers. The bounded linkage proposal is reviewed and rehearsed but
+not applied; execution awaits operator authorization and its resulting runtime
+fit remains unverified. Inspect that fit after execution before starting
+observations. Keep TMDB
+features unlisted under the [November 7 source-use review](../../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07).
+An eligible numeric prefix, source linkage or fitted coefficients do not establish
+an observed comparison or quality/serving admission.
 
 ## Bounded external numeric research — #417
 
