@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-07**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted; its approved single forward remains uninstalled before fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 retains query/rollback diagnostics after CI #861 before fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,7 +11,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — owned Taste forward before fresh DEVELOPMENT preparation
+## Current handoff — acquisition failure diagnostics #434
 
 **Accepted source:** [PR #433](https://github.com/Kajooja/Kajo/pull/433) merged on
 November 6 as `9f55634bc2457fd8d552b24ca216a31f6ae10d6d`. Source
@@ -40,18 +40,36 @@ ten distinct-backend source-fence witnesses, private ACL/RLS boundaries and
 populated-forward rollback. These are source/runtime fixtures, not observed
 prediction usefulness or serving admission.
 
-**One next packet:** install the approved single exact owned-Taste forward
-`20261106090733_owned_taste_numeric_sources.sql` after fresh target-bound preflight
-and provider execution confirmation. Read-only reconciliation on November 7
-confirms that its installation receipt, new reference tables and source resolver
-are absent; the forward remains **uninstalled**. Retain the execution receipt and
-verify postflight preservation before continuing. The historical two-forward
-numeric wrapper remains frozen. Preserve already installed receipts and current
-answers; do not reapply old forwards.
+**Hosted installation completed — November 7:** the approved exact
+`20261106090733_owned_taste_numeric_sources.sql` forward is installed. Independent
+postflight verifies the expected source/security metadata and retained-row/history
+preservation; the new private reference tables remain empty. Current answers are
+preserved. The earlier absence observation is superseded by this installation.
+Its execution receipt and operational details stay private. The historical
+two-forward numeric wrapper remains frozen; do not reinstall accepted forwards.
 
-Only after verified installation, prepare a fresh private DEVELOPMENT declaration
-with explicit source version, reviewed feature-use horizon and genuine new
-first-answer opportunities. No installation or observed comparison is claimed.
+**One active packet:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) records
+the accepted source/deployment and corrects a disposable fixture's error masking.
+[CI #861](https://github.com/Kajooja/Kajo/actions/runs/42400959745) passed 522 of 523
+database tests; the populated acquisition proof and cleanup both reported
+`cannot drop active portal`. The remaining three dependent required gates were
+skipped. The fixture awaited rollback before reporting its original query error,
+so rollback failure could replace that error. The correction logs the query error
+and stage before rollback, retains both errors when recovery fails and never
+retries the query. It changes no SQL, production behavior or preservation check.
+
+The three new diagnostic regressions and complete acquisition test file pass
+all 13 tests on Node 22.23.4 and Node 24. The double-failure regression fails on
+the prior executor. A local full `npm run check` passes lint/typecheck and 1,427
+dependency/mobile/catalogue tests, then fails fetching Deno dependencies because
+the registry connection is refused; that full check remains incomplete.
+The underlying intermittent portal failure is **NOT_REPRODUCED locally / cause
+unresolved**. Do not claim it is fixed or erase CI #861's failed result.
+All six required checks must pass on the corrected final source before merge.
+
+After that source acceptance, prepare a fresh private DEVELOPMENT declaration
+with explicit owned-Taste source version, reviewed feature-use horizon and genuine
+new first-answer opportunities. No observed numerical comparison is claimed.
 
 The retired #427 window stays retired. No account reset, observed capture,
 declaration refill, historical forecast backfill or serving activation is claimed.

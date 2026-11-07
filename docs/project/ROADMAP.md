@@ -29,9 +29,11 @@ development branches while retaining eight catalogue operation/recovery refs.
 #430 / #431 is accepted after all six final-tree CI gates; its diagnostics gap is
 closed while the original synthetic failure remains unreproduced. #432's
 versioned owned-Taste numeric training prefix is accepted through #433 after all
-six CI #859 gates. Its approved single forward remains uninstalled. Follow STATUS
-for fresh preflight, provider execution confirmation and verified installation,
-then a fresh private DEVELOPMENT declaration before new first-answer evaluation.
+six CI #859 gates; its single forward is installed and preservation-verified on
+November 7. Complete #434's bounded query/rollback diagnostics and final-source CI
+after the CI #861 recurrence, then prepare a fresh private DEVELOPMENT declaration
+before new first-answer evaluation. The underlying portal failure remains
+unreproduced locally; diagnostics do not establish its cause or fix it.
 #427's bounded preflight is closed; its old window remains retired. Preserve
 accepted evidence and pending commands; no reset or repeated deployment. The
 bounded phase transition does not close
