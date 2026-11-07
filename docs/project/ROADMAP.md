@@ -31,10 +31,14 @@ closed while the original synthetic failure remains unreproduced. #432's
 versioned owned-Taste numeric training prefix is accepted through #433 after all
 six CI #859 gates; its single forward is installed and preservation-verified on
 November 7. #434's bounded query/rollback diagnostics are accepted after all six
-CI #862 gates. Complete reviewed catalogue source support before a fresh private DEVELOPMENT
-declaration and first-answer evaluation. Resolve exact source/alias provenance,
-preserve existing Items and answers, and inspect permitted fitted support; numeric
-label availability alone is insufficient. TMDB feature fitting/validation remains
+CI #862 gates. The explicitly authorized bounded BOOK source/alias repair is
+applied and post-commit preservation-verified; separate read-only inspection
+confirms permitted BOOK content support and an available fit. Do not replay the
+repair. Next establish permitted MOVIE features, with reviewed independent source,
+identity mapping, source version and lifecycle/coverage checks, before a fresh
+private MOVIE-then-BOOK DEVELOPMENT declaration and first-answer evaluation.
+Numeric labels and an available fit do not establish usefulness. TMDB feature
+fitting/validation remains
 excluded under the [November 7 source-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
 unless an applicable separate written agreement is reviewed. The underlying
 CI #861 portal failure remains unreproduced locally; diagnostics do not establish

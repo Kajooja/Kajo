@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 / #424 and catalogue/admission audit #425 / #426 accepted; Taste recovery #428 / #429 installed and resumed completion observed; preservation diagnostics #430 / #431 accepted after six CI gates; owned-Taste numeric source #432 / #433 accepted after all six CI #859 gates and installed November 7; #434 query/rollback diagnostics accepted after all six CI #862 gates; native preflight #427 reconciled; reviewed catalogue source support precedes fresh owned DEVELOPMENT preparation; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 / #424 and catalogue/admission audit #425 / #426 accepted; Taste recovery #428 / #429 installed and resumed completion observed; preservation diagnostics #430 / #431 accepted after six CI gates; owned-Taste numeric source #432 / #433 accepted after all six CI #859 gates and installed November 7; #434 query/rollback diagnostics accepted after all six CI #862 gates; native preflight #427 reconciled; BOOK source support verified; permitted MOVIE features precede fresh owned DEVELOPMENT preparation; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -23,12 +23,15 @@ error masking exposed by CI #861 and is accepted after all six final-source
 CI #862 gates, 2,576 tests and four configured exports.
 The underlying intermittent portal failure remains unreproduced locally and is
 not claimed fixed. [STATUS](../STATUS.md) owns exact acceptance and the subsequent
-catalogue source-support packet. Before a fresh private DEVELOPMENT declaration,
-resolve missing reviewed provider source/alias provenance while preserving Items
-and current answers. The bounded linkage proposal is reviewed and rehearsed but
-not applied; execution awaits operator authorization and its resulting runtime
-fit remains unverified. Inspect that fit after execution before starting
-observations. Keep TMDB
+catalogue source-support packet. The explicitly authorized bounded BOOK
+source/alias repair is now applied. Post-commit readback verifies exact additions,
+fresh provenance and preservation of existing catalogue rows and answers.
+Separate read-only inspection confirms permitted BOOK support and an available
+content fit; the repair must not be replayed. MOVIE feature support remains
+insufficient. Review an independent permitted source, identity mapping, source
+version and lifecycle/coverage checks before any adapter or feature-use change
+and before a fresh private MOVIE-then-BOOK DEVELOPMENT declaration. Keep the
+prepared worker inactive and TMDB
 features unlisted under the [November 7 source-use review](../../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07).
 An eligible numeric prefix, source linkage or fitted coefficients do not establish
 an observed comparison or quality/serving admission.

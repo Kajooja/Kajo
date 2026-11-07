@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-07**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; reviewed catalogue source support precedes fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; BOOK source support verified; permitted MOVIE features precede fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,7 +11,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — reviewed catalogue source support before DEVELOPMENT
+## Current handoff — permitted MOVIE source support before DEVELOPMENT
 
 **Accepted main:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) merged on
 November 7 as `350ce05001f2554971649a9be5872a560a4a4039`. Source
@@ -80,15 +80,20 @@ unresolved**. Do not claim it is fixed or erase CI #861's failed result.
 The final source acceptance above supplies the complete required checks; preserve
 the earlier failed run and incomplete local run as history.
 
-**One next packet:** establish reviewed catalogue source support before a fresh
-private DEVELOPMENT declaration. Read-only readiness inspection identified missing
-reviewed source provenance; eligible numeric labels alone do not establish a
-fitted content challenger. A bounded exact-Work source/alias linkage proposal is
-prepared, independently reviewed and rehearsed, but has not been applied.
-Execution awaits operator authorization. Apply only against its unchanged-source
-guards, preserve existing Items and answers, then inspect the actual permitted fit. Current catalogue state remains unchanged;
-no resulting runtime fit is claimed. Keep observation inactive until its supported
-scope is explicit. Operational evidence stays private.
+**BOOK source linkage completed — November 7:** the independently reviewed and
+rehearsed exact-Work source/alias repair was explicitly authorized and applied.
+Post-commit readback verifies the exact additions, unchanged existing catalogue
+rows and answers, and fresh provenance timestamps. A separate read-only inspection
+now confirms permitted BOOK content support and an available content fit. This is
+engineering readiness, not a prospective prediction or evidence of usefulness.
+The repair is complete; do not replay it or reset current answers.
+
+**One next packet:** establish permitted MOVIE content-feature support before a
+fresh private MOVIE-then-BOOK DEVELOPMENT declaration. Current MOVIE feature support
+remains insufficient. Review an independent source, exact identity mapping,
+source-version binding and lifecycle/coverage checks before any adapter or
+feature-use change. Keep the prepared observation worker inactive until that
+scope is supported. Operational identities, counts and evidence stay private.
 
 The November 7 [provider-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
 keeps TMDB features unlisted: its full standard API terms restrict ML/AI use and
