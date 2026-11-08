@@ -42,15 +42,22 @@ independent SQL/JavaScript vectors, exact identities, permission/availability
 fences, complete dependency retirement and old-generation retry preservation.
 #438 / #439 is accepted after all six final-source CI gates; its exact forward
 is installed and independently preservation-verified. Source data was not added
-by that installation. The retained original-source review now identifies #442:
-a versioned compatibility correction for legacy statement GUID entity-prefix case,
-without rewriting original bytes or changing older capture meanings. Its active
-source implementation adds explicit extraction v2 and capture v5. Complete final
-source validation/acceptance and guarded installation, then reviewed bounded ingestion and actual support
-inspection before a fresh private MOVIE-then-BOOK DEVELOPMENT declaration and
-first-answer evaluation. Do not restart the completed coverage lookup by default.
-Numeric labels and an available fit do not establish usefulness. TMDB feature
-fitting/validation remains
+by that installation. #442 / #443's explicit extraction v2 and native capture v5
+are accepted and installed, preserving earlier captures and original source-byte
+contracts. Reviewed bounded original-source ingestion is complete through
+separately committed batches and independent final preservation verification.
+Read-only inspection now verifies actual permitted BOOK/MOVIE training support.
+Current Wikidata sources belong to already-rated training Items; not-yet-rated
+catalogue MOVIE source coverage remains absent. Next define the canonical eligible
+first-answer candidate scope and inspect complete feature coverage label-blind,
+then perform any necessary bounded reviewed acquisition/linkage independently of
+numeric ratings, model scores and outcomes. Before a fresh private MOVIE-then-BOOK
+DEVELOPMENT declaration, accept the disabled v5/source-v4 runner successor and
+consumed-attempt continuation, then use a fresh
+database clock to retain the declaration before its window. Do not replay
+installed forwards or restart the completed coverage lookup by default. Numeric
+labels and an available training fit do not establish target coverage or
+usefulness. TMDB feature fitting/validation remains
 excluded under the [November 7 source-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
 unless an applicable separate written agreement is reviewed. The underlying
 CI #861 portal failure remains unreproduced locally; diagnostics do not establish
