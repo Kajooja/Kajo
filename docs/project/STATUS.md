@@ -13,7 +13,8 @@ hosted deployment and device/quality acceptance are separate states.
 
 ## Current handoff — native Wikidata content capture
 
-**Current source packet:** [#438](https://github.com/Kajooja/Kajo/issues/438),
+**Current source packet:** [#438](https://github.com/Kajooja/Kajo/issues/438) /
+[PR #439](https://github.com/Kajooja/Kajo/pull/439),
 branch `feat/wikidata-native-capture`. Finish the linked PR's final-source checks
 and integration if still open. This implements private prepare/finalize **v4**,
 preparation/input **v3**, feature snapshot/permission manifest **v2**. MOVIE uses
@@ -40,7 +41,13 @@ verification, not actual source ingestion, rights clearance or prediction qualit
 Local `npm run check` passes lint/typecheck and the dependency/mobile/catalogue
 tests, then fails during Deno dependency retrieval with a refused registry
 connection. It is not a full-check pass. Independent focused database/engine
-checks are recorded in the linked PR; complete final-source CI remains required.
+checks are recorded in the linked PR; complete final-source CI remains required. First
+[CI #872](https://github.com/Kajooja/Kajo/actions/runs/42430155601) rejected the
+new test's Node-specific crypto type import. It is replaced by standard Web
+Crypto without adding a dependency. Review also added explicit commit-status
+checks for released SAVEPOINT source/alias writes in both domains; four real
+subtransaction regressions and old-generation rollback pass locally. Final-source
+CI must cover the corrected head; the earlier failed run remains history.
 
 **Single next action after #438 source acceptance:** prepare and rehearse the
 exact new forward on retained hosted state, then install and preservation-verify

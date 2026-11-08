@@ -112,6 +112,24 @@ export async function withWikidataContentFixture(exec, withSession, run) {
 
 export async function verifyWikidataContentCapture(exec, withSession) {
   return withWikidataContentFixture(exec, withSession, async ({ f, call, one, request, movieSources, featureUse, command }) => {
+    const subtransaction = async captured => {
+      const input = captured.preparation.input, object = input.contentFeatures.objects.find(o => o.status === 'AVAILABLE');
+      assert.ok(object);
+      for (const kind of ['source', 'alias']) {
+        const table = kind === 'source' ? 'private.item_sources' : 'private.item_external_ids';
+        const predicate = kind === 'source' ? `id=${literal(object.sourceId)}`
+          : `namespace=${literal(object.provenance.alias.namespace)} and external_id=${literal(object.provenance.alias.externalId)}`;
+        const column = kind === 'source' ? 'synced_at' : 'last_seen_at';
+        const result = await one(`begin;savepoint source_write;update ${table} set ${column}=clock_timestamp() where ${predicate};
+          release savepoint source_write;lock table public.items,private.item_sources,private.item_external_ids in share mode nowait;
+          select jsonb_build_object('child',(select xmin::text from ${table} where ${predicate}),'parent',pg_current_xact_id()::text,
+            'features',private.capture_personal_rating_content_v2(${json(input)}||jsonb_build_object('cutoffMicros',
+              (extract(epoch from clock_timestamp())*1000000)::bigint::text),${json(featureUse)}));rollback;`);
+        assert.notEqual(result.child, result.parent, 'Exercise actual released subtransaction xmin');
+        assert.equal(result.features.objects.find(o => o.objectId === object.objectId).provenance, null, input.itemType + '/' + kind);
+        assert.equal((await call(inspect(captured.preparation.forecastId))).status, 'AVAILABLE', 'Rollback restores retained capture');
+      }
+    };
     const selected = await request();
     await assert.rejects(captureWikidataContentNumericForecast(withSession, { ...selected, featureUse: {
       ...featureUse, validUntilMicros: String(BigInt(featureUse.validFromMicros) + 1n) } }), /interval/);
@@ -121,6 +139,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     assert.equal(captured.forecast.location.personalMean, 5);assert.equal(captured.forecast.servingActivation, 'NONE');
     assert.equal(captured.preparation.input.contentFeatures.objects.some(o => o.provenance?.providerKey === 'tmdb'), false);
     assert.deepEqual((await captureWikidataContentNumericForecast(withSession, selected)).stored, captured.stored);
+    await subtransaction(captured);
     const { normalizeKajoPersonalRatingEvaluationInventory } = await import('../../packages/prediction-engine/dist/adapters/kajo-personal-rating-evaluation.js');
     const member = { actorUserId: f.actor, profileId: f.profile, subjectId: 'native:wikidata-subject' };
     const owner = await inspectPersonalRatingOwnerCensus(withSession, member);
@@ -178,6 +197,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     const bookRequest = await request('BOOK', f.targets[1]);
     const book = await captureWikidataContentNumericForecast(withSession, bookRequest);
     assert.equal(book.forecast.contentFit.status, 'FITTED');
+    await subtransaction(book);
     const tamper = await request();
     await assert.rejects(captureWikidataContentNumericForecast(withSession, tamper, { beforeFinalize: async ({ exec: connection, forecast }) => {
       const changed = structuredClone(forecast);changed.content.objects[0].values[0] = 9;
@@ -191,7 +211,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     assert.equal((await call(inspect(tamper.id))).firstAnswer, null);
     assert.equal((await call(inspect(bookRequest.id))).status, 'WITHDRAWN');
     assert.equal(final.forecast.qualityAdmission, 'NONE');
-    return { status: 'PASS', ownedTasteLabels: 2, domains: ['MOVIE', 'BOOK'], exactRetry: 'PASS',
+    return { status: 'PASS', ownedTasteLabels: 2, domains: ['MOVIE', 'BOOK'], exactRetry: 'PASS', subtransactionWrites: 'INELIGIBLE_4_CASES',
       sourceCorrection: 'RETIRED', aliasChanges: 'RETIRED', permissionWithdrawal: 'RETIRED', qualityAdmission: 'NONE', servingActivation: 'NONE' };
   });
 }

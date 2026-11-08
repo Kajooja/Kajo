@@ -224,6 +224,26 @@ begin
     raise exception 'Duplicate content feature-use source' using errcode='22023';end if;
 end;$$;
 
+-- xmin equality with the top-level XID misses released SAVEPOINT writes. Resolve
+-- a visible tuple's 32-bit xmin near the current full XID and ask commit status.
+-- Old/frozen visible tuples may have discarded commit metadata; an unknown past
+-- XID is eligible, whereas unknown/future or in-progress IDs fail closed.
+create function private.personal_rating_source_committed_v1(source_xmin xid)
+returns boolean language plpgsql volatile security invoker set search_path='' as $$
+declare current_id numeric:=pg_current_xact_id()::text::numeric;full_id numeric;status text;
+begin
+  if source_xmin is null then return false;end if;
+  if source_xmin='2'::xid then return true;end if;
+  if source_xmin::text::numeric<3 then return false;end if;
+  full_id:=current_id-mod(current_id,4294967296)+source_xmin::text::numeric;
+  if full_id-current_id>2147483647 then full_id:=full_id-4294967296;
+  elsif current_id-full_id>2147483647 then full_id:=full_id+4294967296;end if;
+  if full_id<3 then return false;end if;
+  status:=pg_xact_status(full_id::text::xid8);
+  return coalesce(status='committed',false) or (status is null and full_id<current_id);
+exception when invalid_parameter_value then return false;
+end;$$;
+
 create function private.capture_personal_rating_content_v2(input jsonb,feature_use jsonb)
 returns jsonb language plpgsql volatile security invoker set search_path='' as $$
 declare objects jsonb:='[]';row_value jsonb;object_id uuid;source private.item_sources%rowtype;
@@ -235,7 +255,19 @@ begin
     book:=private.capture_personal_rating_content_v1(input,case when feature_use is null or feature_use='null'::jsonb then null else
       feature_use||jsonb_build_object('version','personal-content-feature-use-v1','sources',
         (select coalesce(jsonb_agg(s),'[]') from jsonb_array_elements(feature_use->'sources') s where s->>'providerKey'='open_library')) end);
-    objects:=book->'objects';feature_ids:=book->'featureIds';
+    feature_ids:=book->'featureIds';
+    for row_value in select * from jsonb_array_elements(book->'objects') loop
+      if row_value->'provenance'<>'null'::jsonb then
+        if not exists(select 1 from private.item_sources s where s.id=(row_value->>'sourceId')::uuid
+          and private.personal_rating_source_committed_v1(s.xmin))
+        or not exists(select 1 from private.item_external_ids a where a.namespace=row_value#>>'{provenance,alias,namespace}'
+          and a.external_id=row_value#>>'{provenance,alias,externalId}' and private.personal_rating_source_committed_v1(a.xmin)) then
+          row_value:=row_value||jsonb_build_object('sourceId','unavailable:'||(row_value->>'objectId'),
+            'status','UNAVAILABLE','assertions',null,'values',null,'provenance',null);
+        end if;
+      end if;
+      objects:=objects||jsonb_build_array(row_value);
+    end loop;
   elsif input->>'itemType'='MOVIE' then
     select jsonb_agg('wikidata-direct-film-genre:'||c order by n) into feature_ids
       from unnest(array['fantasy','horror','mystery','romance','science-fiction','thriller']) with ordinality x(c,n);
@@ -258,7 +290,7 @@ begin
         into aliases from private.item_external_ids a where a.item_id=object_id
           and a.namespace in('imdb_title','tmdb_movie','wikidata_item')
           and isfinite(a.created_at) and a.created_at<=cutoff and a.created_at>=timestamptz 'epoch'
-          and a.xmin::text<>pg_current_xact_id()::text;
+          and private.personal_rating_source_committed_v1(a.xmin);
       if jsonb_array_length(aliases) is distinct from 3
         or (select count(distinct a->>'namespace') from jsonb_array_elements(aliases) a)<>3
         or (select count(*) from private.item_external_ids a where a.item_id=object_id and a.namespace in('imdb_title','tmdb_movie','wikidata_item'))<>3
@@ -266,7 +298,7 @@ begin
         or not isfinite(source.created_at) or source.created_at not between timestamptz 'epoch' and cutoff
         or not isfinite(source.updated_at) or source.updated_at not between timestamptz 'epoch' and cutoff
         or not isfinite(source.synced_at) or source.synced_at not between timestamptz 'epoch' and cutoff
-        or exists(select 1 from private.item_sources s where s.id=source.id and s.xmin::text=pg_current_xact_id()::text)
+        or not exists(select 1 from private.item_sources s where s.id=source.id and private.personal_rating_source_committed_v1(s.xmin))
         or (select array_agg(k order by k) from jsonb_object_keys(source.source_payload) k)
           is distinct from array['retrievedAtMicros','sourceText','version']::text[]
         or source.source_payload->>'version' is distinct from 'wikidata-entitydata-source-v1'
@@ -398,6 +430,7 @@ end;$native_lifecycle$;
 revoke all on function private.wikidata_bounded_json_v1(text),private.wikidata_snak_map_v1(jsonb),
   private.wikidata_key_order_v1(jsonb,jsonb),private.wikidata_tmdb_reference_v1(jsonb),
   private.wikidata_statement_value_v1(jsonb,text,text),private.project_wikidata_film_v1(text,text,text,text,text,text),
-  private.validate_personal_rating_feature_use_v2(jsonb,text,text,text),private.capture_personal_rating_content_v2(jsonb,jsonb),
+  private.validate_personal_rating_feature_use_v2(jsonb,text,text,text),private.personal_rating_source_committed_v1(xid),
+  private.capture_personal_rating_content_v2(jsonb,jsonb),
   private.withdraw_personal_rating_catalog_v2(),private.prepare_personal_rating_forecast_v4(uuid,uuid,uuid,integer,text,jsonb),
   private.finalize_personal_rating_forecast_v4(uuid,jsonb) from public,anon,authenticated,service_role;

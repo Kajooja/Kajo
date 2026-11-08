@@ -508,7 +508,9 @@ bounded claims projection. The adapter independently re-extracts that projection
 with the #436 contract and verifies vectors and projection SHA-256; the separately
 retained source hash identifies the original bytes checked by SQL. Both IMDb/TMDB
 identifiers and the Wikidata Q identity require exact committed catalogue aliases,
-with global uniqueness and no competing source or alias on that Item. Provider
+with global uniqueness and no competing source or alias on that Item. Commit
+status excludes source/alias writes from the active transaction, including
+released SAVEPOINT children; equality with only the top-level XID is insufficient. Provider
 modified time cannot replace retrieval/native availability. The v2 permission
 manifest covers the full horizon, retains an explicit source-use review and
 excludes TMDB. Null permission retains the full-label mean fallback.

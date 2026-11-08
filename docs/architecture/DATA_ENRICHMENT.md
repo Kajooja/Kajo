@@ -397,7 +397,9 @@ this contract through a new private capture generation. Its source rows use
 `provider_key = wikidata` and the closed `wikidata-entitydata-source-v1` payload
 with original UTF-8 `sourceText` and actual `retrievedAtMicros`. Native capture
 checks original-byte SHA-256, revision-addressed URL, modified time and committed
-row/alias availability. PostgreSQL's unique-key JSON predicate precedes conversion
+row/alias availability, including released SAVEPOINT writes whose child XIDs
+differ from the top-level transaction. Commit status is checked explicitly;
+legacy capture generations remain unchanged. PostgreSQL's unique-key JSON predicate precedes conversion
 to JSONB ([PostgreSQL 17 JSON predicates](https://www.postgresql.org/docs/17/functions-json.html));
 node/depth, statement and reference limits remain bounded. PostgreSQL
 UTF-8 representability and a stricter **64 KiB claims projection** limit are native

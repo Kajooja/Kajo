@@ -46,7 +46,7 @@ export async function verifyWikidataContentUpgrade(exec, withSession, migration)
         const newFunctions = after.filter(row => !oldFunctions.some(old => old.oid === row.oid));
         assert.deepEqual(newFunctions.map(row => row.proname).sort(), ['wikidata_bounded_json_v1', 'wikidata_snak_map_v1', 'wikidata_key_order_v1', 'wikidata_tmdb_reference_v1',
           'wikidata_statement_value_v1', 'project_wikidata_film_v1', 'validate_personal_rating_feature_use_v2',
-          'capture_personal_rating_content_v2', 'withdraw_personal_rating_catalog_v2', 'prepare_personal_rating_forecast_v4',
+          'personal_rating_source_committed_v1', 'capture_personal_rating_content_v2', 'withdraw_personal_rating_catalog_v2', 'prepare_personal_rating_forecast_v4',
           'finalize_personal_rating_forecast_v4'].sort());
         for (const fn of newFunctions) {
           assert.equal(fn.prosecdef, fn.proname === 'withdraw_personal_rating_catalog_v2');
@@ -72,7 +72,7 @@ export async function verifyWikidataContentUpgrade(exec, withSession, migration)
         assert.deepEqual(await query(functions), oldFunctions, 'Rollback did not restore predecessor functions');
         assert.deepEqual(await query(rows), before, 'Rollback did not restore predecessor rows');
         await connection('rollback;', { stage: 'wikidata-upgrade-readback-rollback' });
-        return { status: 'PASS', retainedCaptures: 3, retainedTasteAnswers: 2, newPrivateTables: 1, newPrivateFunctions: 11,
+        return { status: 'PASS', retainedCaptures: 3, retainedTasteAnswers: 2, newPrivateTables: 1, newPrivateFunctions: 12,
           v1V2V3Retries: 'EXACT', migration: 'ROLLED_BACK', qualityAdmission: 'NONE', servingActivation: 'NONE' };
       } catch (error) {
         await connection('rollback;', { stage: 'wikidata-upgrade-rollback' }).catch(() => {});throw error;
