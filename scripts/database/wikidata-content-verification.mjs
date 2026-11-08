@@ -7,6 +7,10 @@ import { json, literal, inspect, answer } from './personal-rating-prospective.mj
 import { inspectPersonalRatingOwnerCensus } from './personal-rating-evaluation.mjs';
 
 const sha = value => createHash('sha256').update(value).digest('hex');
+// Native psql intentionally withholds server exception text. Require the same
+// SQLSTATE from the local driver or the isolated transport's bounded diagnostic.
+const sqlstate = expected => error => error.code === expected
+  || new RegExp(`\\(SQLSTATE ${expected}\\)`).test(error.message);
 const context = { entityId: 'Q900000001', retrievedAtMicros: '1794096000000000', cutoffMicros: '1794096000000001',
   identity: { imdbId: 'tt9000001', tmdbMovieId: '9000001' } };
 export function wikidataFixture(context, genres = ['Q471839']) {
@@ -169,7 +173,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     };
     const selected = await request();
     await assert.rejects(captureWikidataContentNumericForecast(withSession, { ...selected, featureUse: {
-      ...featureUse, validUntilMicros: String(BigInt(featureUse.validFromMicros) + 1n) } }), /interval/);
+      ...featureUse, validUntilMicros: String(BigInt(featureUse.validFromMicros) + 1n) } }), sqlstate('22023'));
     const captured = await captureWikidataContentNumericForecast(withSession, selected);
     assert.equal(captured.preparation.version, 'kajo-personal-content-rating-preparation-v3');
     assert.equal(captured.forecast.contentFit.status, 'FITTED');assert.equal(captured.forecast.prefix.support, 2);
@@ -201,7 +205,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     // Payload-only correction leaves old identity keys unchanged, but must retire v4.
     await exec(`update private.item_sources set source_payload=source_payload||'{"correction":true}' where provider_key='wikidata' and item_id=${literal(source.itemId)};`);
     assert.equal((await call(inspect(selected.id))).status, 'WITHDRAWN');
-    await assert.rejects(captureWikidataContentNumericForecast(withSession, selected), /withdrawn/);
+    await assert.rejects(captureWikidataContentNumericForecast(withSession, selected), sqlstate('55000'));
     await exec(`update private.item_sources set source_payload=source_payload-'correction' where provider_key='wikidata' and item_id=${literal(source.itemId)};`);
     const readFeatures = () => one(`begin;lock table public.items,private.item_sources,private.item_external_ids in share mode nowait;
       select private.capture_personal_rating_content_v2(${json(captured.preparation.input)}||jsonb_build_object('cutoffMicros',
@@ -255,7 +259,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     await assert.rejects(captureWikidataContentNumericForecast(withSession, tamper, { beforeFinalize: async ({ exec: connection, forecast }) => {
       const changed = structuredClone(forecast);changed.content.objects[0].values[0] = 9;
       await connection(`select ${finalizeWikidataContent(tamper.id, changed)};`);
-    } }), /differs|Invalid/);
+    } }), sqlstate('22023'));
     assert.equal(await one(`select count(*)::integer from private.personal_rating_allocations where id=${literal(tamper.id)};`), 0);
     const final = await captureWikidataContentNumericForecast(withSession, tamper);
     const first = await command(tamper.target, 6, { source: tamper.source });

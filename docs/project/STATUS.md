@@ -82,6 +82,17 @@ reproduction and unchanged validation rerun passed all 2,640 tests and four expo
 Both attempts remain evidence; neither accepts the subsequent numeric correction.
 Final-source CI must cover the linked PR's latest head and all six required gates.
 
+[CI #875](https://github.com/Kajooja/Kajo/actions/runs/42433194973) attempt 2 passes validation
+(including all 529 database tests), platform, clean installs and the populated
+forward gate. Its native Wikidata capture test receives the correct `22023`
+rejection but incorrectly expects server exception prose, which the isolated
+psql transport deliberately redacts. All three new capture rejection assertions
+now require exact SQLSTATE (`22023` or `55000`), matching both driver and redacted
+transport diagnostics. The complete capture/lifecycle verifier also runs locally
+through the redacted error shape as a regression. No SQL or eligibility rule
+changes in this correction. The new source still needs all six required CI gates;
+the failed attempt is retained and cannot be counted as native acceptance.
+
 **Single next action after #438 source acceptance:** prepare and rehearse the
 exact new forward on retained hosted state, then install and preservation-verify
 it through the existing guarded operational route. The new forward is not installed
