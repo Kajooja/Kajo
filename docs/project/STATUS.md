@@ -95,6 +95,15 @@ through the redacted error shape as a regression. No SQL or eligibility rule
 changes in this correction. The new source still needs all six required CI gates;
 the failed attempt is retained and cannot be counted as native acceptance.
 
+[CI #878](https://github.com/Kajooja/Kajo/actions/runs/42435812023) passes validation
+(2,641 tests and four exports), platform, clean installations and populated
+forward upgrade. Its CLI job reaches reset 39 and final verification, then the
+30-minute job limit cancels active SQL work without an assertion failure. The
+bounded job budget is now 45 minutes; every probe and per-statement deadline is
+unchanged. Cleanup/report upload did not complete on that attempt, so it is not
+native acceptance. All six gates must pass on the final source including this
+workflow correction.
+
 **Single next action after #438 source acceptance:** prepare and rehearse the
 exact new forward on retained hosted state, then install and preservation-verify
 it through the existing guarded operational route. The new forward is not installed

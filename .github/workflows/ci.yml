@@ -137,8 +137,9 @@ jobs:
     name: Supabase CLI installation and migration history
     needs: [validate, database-platform]
     runs-on: ubuntu-24.04
-    # 35 CLI resets take about 25 minutes; reserve time for cleanup and upload.
-    timeout-minutes: 30
+    # CI #878 reached reset 39 but hit 30 minutes during final verification.
+    # Keep every probe and its own deadline; reserve time for cleanup and upload.
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
