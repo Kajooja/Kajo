@@ -522,6 +522,8 @@ explicit unavailable source, not contradictory SQL/JavaScript features that abor
 the capture. Numeric labels remain eligible; DATA_ENRICHMENT owns the exact bounds.
 The same unavailable-source boundary covers fractional JSON numbers that round
 to integers in binary64, preventing inconsistent Q-id/reference eligibility.
+Unsupported compound reference IDs are also rejected before worker coercion;
+they cannot turn one bad content source into a failed numeric capture.
 
 The new complete Item dependency references include unavailable feature rows.
 Source/alias insertion, payload correction, reassignment or deletion on those

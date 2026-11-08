@@ -103,6 +103,17 @@ export async function verifyWikidataProjection(exec) {
     cases.push('native rounded ' + kind + ' identifier');
   }
   await check('ordinary finite fraction remains eligible', e => { e.extra = { number: 1.5 }; });
+  for (const marker of [{}, { toString: 0 }, { toString: null }, [{ toString: 0 }],
+    [1, { toString: 0 }], [], [20828898, 1], [[20828898, 1]]]) {
+    const source = wikidataFixture(context);
+    source.entities[context.entityId].claims.P136[0].references = [{ hash: 'a'.repeat(40), snaks: {
+      P248: [{ property: 'P248', snaktype: 'value', datavalue: { type: 'wikibase-entityid', value: { 'numeric-id': marker } } }],
+    } }];
+    const [native] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(JSON.stringify(source))},${literal(context.entityId)},
+      ${literal(context.identity.imdbId)},${literal(context.identity.tmdbMovieId)},${literal(context.retrievedAtMicros)},${literal(context.cutoffMicros)}),'null'::jsonb);`);
+    assert.equal(native, null, 'Unsupported compound reference ID must not reach worker coercion');
+    cases.push('native compound reference identifier ' + cases.length);
+  }
   for (const property of ['P31', 'P345', 'P4947']) await check('identity ' + property, e => { e.claims[property][0].mainsnak.snaktype = 'novalue'; });
   for (const mutate of [e => { e.redirect = null; }, e => { e.lastrevid = 1.5; }, e => { e.modified = '2026-02-30T12:00:00Z'; },
     e => { e.modified = '2026-11-09T12:00:00Z'; }, e => { e.claims.P136 = null; }, e => { e.claims.P31 = []; },
@@ -216,8 +227,12 @@ export async function verifyWikidataContentCapture(exec, withSession) {
       P854: [{ property: 'P854', snaktype: 'value', datavalue: { type: 'string', value: 'https://ｔｍｄｂ.org/film' } }],
     } }];
     const genreId = unsupported.entities[source.context.entityId].claims.P136[0].mainsnak.datavalue.value['numeric-id'];
+    const compound = JSON.parse(source.sourceText);
+    compound.entities[source.context.entityId].claims.P136[0].references = [{ hash: 'a'.repeat(40), snaks: {
+      P248: [{ property: 'P248', snaktype: 'value', datavalue: { type: 'wikibase-entityid', value: { 'numeric-id': { toString: 0 } } } }],
+    } }];
     const unsupportedSources = [JSON.stringify(unsupported), source.sourceText.replace('"numeric-id":' + genreId,
-      '"numeric-id":' + genreId + '.00000000000001')];
+      '"numeric-id":' + genreId + '.00000000000001'), JSON.stringify(compound)];
     for (const unsupportedText of unsupportedSources) {
       await exec(`update private.item_sources set source_hash=${literal(sha(unsupportedText))},
         source_payload=jsonb_set(source_payload,'{sourceText}',${json(unsupportedText)}) where id=${literal(original.id)};`);
@@ -271,6 +286,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     return { status: 'PASS', ownedTasteLabels: 2, domains: ['MOVIE', 'BOOK'], exactRetry: 'PASS', subtransactionWrites: 'INELIGIBLE_4_CASES',
       unsupportedReferenceUrl: 'UNAVAILABLE_WITH_NUMERIC_LABELS_RETAINED',
       roundedNumbers: 'UNAVAILABLE_WITH_NUMERIC_LABELS_RETAINED',
+      compoundReferenceIds: 'UNAVAILABLE_WITH_NUMERIC_LABELS_RETAINED',
       sourceCorrection: 'RETIRED', aliasChanges: 'RETIRED', permissionWithdrawal: 'RETIRED', qualityAdmission: 'NONE', servingActivation: 'NONE' };
   });
 }

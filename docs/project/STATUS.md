@@ -71,8 +71,10 @@ required gates before integration.
 Further review reproduced conflicting vectors from fractional JSON numbers that
 JavaScript rounds to integral Q-id/reference values. Native capture now rejects
 those original sources before freezing features. Ordinary finite fractions and
-exact integral decimals remain supported. The 69 source cases and actual fallback
-capture cover this boundary without changing the accepted offline contract.
+exact integral decimals remain supported. Compound reference IDs that can throw
+during JavaScript string coercion are also declined before freezing. The 77 source
+cases and actual fallback capture cover URL, precision and coercion boundaries
+without changing the accepted offline contract.
 
 CI #874's first native attempt stopped at an unchanged owned-Taste lock conflict
 (`55P03`) before Wikidata probes; the competing lock was not identified. CI #875's

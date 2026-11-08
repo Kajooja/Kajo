@@ -420,6 +420,9 @@ Native sources also reject any fractional JSON number that binary64 parsing
 rounds to an integer. Otherwise a raw Q-id or TMDB-reference number could produce
 different eligibility in SQL and JavaScript. Ordinary finite fractions and exact
 integral decimal spellings remain supported; the standalone contract is unchanged.
+Reference `numeric-id` markers must be scalar, optionally nested in single-element
+arrays. Objects and other array shapes make the native source unavailable; they
+must not reach JavaScript's potentially throwing object-to-string coercion.
 
 Only the seven allowlisted claim properties enter the frozen projection. Original
 source SHA-256 and projection-text SHA-256 identify different byte sequences.

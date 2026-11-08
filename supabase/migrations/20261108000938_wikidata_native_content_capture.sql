@@ -94,8 +94,12 @@ begin
   elsif jsonb_typeof(value)='object' then
     marker:=value->'numeric-id';
     while jsonb_typeof(marker)='array' loop
-      if jsonb_array_length(marker)<>1 then exit;end if;marker:=marker->0;
+      if jsonb_array_length(marker)<>1 then raise data_exception;end if;marker:=marker->0;
     end loop;
+    -- A compound numeric-id can invoke object-to-string coercion in JavaScript
+    -- (including malformed own toString values). Decline the whole native source
+    -- before the independent extractor receives such a frozen reference.
+    if jsonb_typeof(marker)='object' then raise data_exception;end if;
     if value?'P4947' or value->>'property'='P4947' or marker='"20828898"'::jsonb
       or (jsonb_typeof(marker)='number' and marker='20828898'::jsonb) then return true;end if;
     for child in select v from jsonb_each(value) x(k,v) loop if private.wikidata_tmdb_reference_v1(child) then return true;end if;end loop;
