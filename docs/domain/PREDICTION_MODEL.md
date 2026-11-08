@@ -520,6 +520,8 @@ sources requiring Unicode/IDNA authority normalization or special URL repair
 remain unavailable before a vector is frozen. The adapter therefore receives an
 explicit unavailable source, not contradictory SQL/JavaScript features that abort
 the capture. Numeric labels remain eligible; DATA_ENRICHMENT owns the exact bounds.
+The same unavailable-source boundary covers fractional JSON numbers that round
+to integers in binary64, preventing inconsistent Q-id/reference eligibility.
 
 The new complete Item dependency references include unavailable feature rows.
 Source/alias insertion, payload correction, reassignment or deletion on those

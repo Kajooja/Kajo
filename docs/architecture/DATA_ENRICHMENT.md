@@ -416,6 +416,11 @@ JavaScript extractor rejects. Plain Unicode reference prose remains eligible.
 The standalone extractor and its mapping digest retain their existing contract;
 numeric labels remain usable when a native content source is unavailable.
 
+Native sources also reject any fractional JSON number that binary64 parsing
+rounds to an integer. Otherwise a raw Q-id or TMDB-reference number could produce
+different eligibility in SQL and JavaScript. Ordinary finite fractions and exact
+integral decimal spellings remain supported; the standalone contract is unchanged.
+
 Only the seven allowlisted claim properties enter the frozen projection. Original
 source SHA-256 and projection-text SHA-256 identify different byte sequences.
 JavaScript reuses the accepted extractor on the projection; it does not claim that

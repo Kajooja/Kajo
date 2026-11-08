@@ -85,6 +85,20 @@ export async function verifyWikidataProjection(exec) {
       P1476: [{ property: 'P1476', snaktype: 'value', datavalue: { type: 'string', value: 'Elokuvan lähde — cinéma' } }],
     } }];
   });
+  for (const kind of ['genre', 'reference']) {
+    const source = wikidataFixture(context);
+    if (kind === 'reference') source.entities[context.entityId].claims.P136[0].references = [{ hash: 'a'.repeat(40), snaks: {
+      P248: [{ property: 'P248', snaktype: 'value', datavalue: { type: 'wikibase-entityid', value: { 'numeric-id': 20828898 } } }],
+    } }];
+    const number = kind === 'genre' ? '471839' : '20828898';
+    const raw = JSON.stringify(source).replace('"numeric-id":' + number, '"numeric-id":' + number + '.00000000000001');
+    assert.ok(extractWikidataFilmEvidence(new TextEncoder().encode(raw), context).evidence);
+    const [native] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(raw)},${literal(context.entityId)},
+      ${literal(context.identity.imdbId)},${literal(context.identity.tmdbMovieId)},${literal(context.retrievedAtMicros)},${literal(context.cutoffMicros)}),'null'::jsonb);`);
+    assert.equal(native, null, 'Rounded ' + kind + ' identifier must not freeze a conflicting vector');
+    cases.push('native rounded ' + kind + ' identifier');
+  }
+  await check('ordinary finite fraction remains eligible', e => { e.extra = { number: 1.5 }; });
   for (const property of ['P31', 'P345', 'P4947']) await check('identity ' + property, e => { e.claims[property][0].mainsnak.snaktype = 'novalue'; });
   for (const mutate of [e => { e.redirect = null; }, e => { e.lastrevid = 1.5; }, e => { e.modified = '2026-02-30T12:00:00Z'; },
     e => { e.modified = '2026-11-09T12:00:00Z'; }, e => { e.claims.P136 = null; }, e => { e.claims.P31 = []; },
@@ -197,12 +211,16 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     unsupported.entities[source.context.entityId].claims.P136[0].references = [{ hash: 'a'.repeat(40), snaks: {
       P854: [{ property: 'P854', snaktype: 'value', datavalue: { type: 'string', value: 'https://ｔｍｄｂ.org/film' } }],
     } }];
-    const unsupportedText = JSON.stringify(unsupported);
-    await exec(`update private.item_sources set source_hash=${literal(sha(unsupportedText))},
-      source_payload=jsonb_set(source_payload,'{sourceText}',${json(unsupportedText)}) where id=${literal(original.id)};`);
-    const unavailableCapture = await captureWikidataContentNumericForecast(withSession, await request());
-    assert.equal(unavailableCapture.preparation.input.contentFeatures.objects.find(o => o.objectId === source.itemId).provenance, null);
-    assert.equal(unavailableCapture.forecast.prefix.support, 2, 'Unsupported URL keeps committed numeric labels');
+    const genreId = unsupported.entities[source.context.entityId].claims.P136[0].mainsnak.datavalue.value['numeric-id'];
+    const unsupportedSources = [JSON.stringify(unsupported), source.sourceText.replace('"numeric-id":' + genreId,
+      '"numeric-id":' + genreId + '.00000000000001')];
+    for (const unsupportedText of unsupportedSources) {
+      await exec(`update private.item_sources set source_hash=${literal(sha(unsupportedText))},
+        source_payload=jsonb_set(source_payload,'{sourceText}',${json(unsupportedText)}) where id=${literal(original.id)};`);
+      const unavailableCapture = await captureWikidataContentNumericForecast(withSession, await request());
+      assert.equal(unavailableCapture.preparation.input.contentFeatures.objects.find(o => o.objectId === source.itemId).provenance, null);
+      assert.equal(unavailableCapture.forecast.prefix.support, 2, 'Unsupported source keeps committed numeric labels');
+    }
     await exec(`update private.item_sources set source_hash=${literal(original.source_hash)},source_payload=${json(original.source_payload)}
       where id=${literal(original.id)};`);
     for (const mutation of ["source_hash='mismatch'", "source_url='https://fixture.invalid/wrong-revision'",
@@ -248,6 +266,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     assert.equal(final.forecast.qualityAdmission, 'NONE');
     return { status: 'PASS', ownedTasteLabels: 2, domains: ['MOVIE', 'BOOK'], exactRetry: 'PASS', subtransactionWrites: 'INELIGIBLE_4_CASES',
       unsupportedReferenceUrl: 'UNAVAILABLE_WITH_NUMERIC_LABELS_RETAINED',
+      roundedNumbers: 'UNAVAILABLE_WITH_NUMERIC_LABELS_RETAINED',
       sourceCorrection: 'RETIRED', aliasChanges: 'RETIRED', permissionWithdrawal: 'RETIRED', qualityAdmission: 'NONE', servingActivation: 'NONE' };
   });
 }

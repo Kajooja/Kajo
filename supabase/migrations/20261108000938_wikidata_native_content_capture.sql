@@ -15,8 +15,14 @@ begin
       union all select value from jsonb_array_elements(case jsonb_typeof(parent.value) when 'array' then parent.value else '[]'::jsonb end)
     ) child where parent.depth<=32
   ), bounded as (select * from walk limit 100001)
+  -- JavaScript parses JSON numbers as binary64. A fractional original that
+  -- rounds to an integer could change Q-id/reference eligibility in the worker.
+  -- Reject that source before deriving any vector; ordinary fractions remain valid.
   select count(*),coalesce(bool_or(depth>32 or case when jsonb_typeof(value)='number'
-    then (value::text)::double precision in('Infinity'::float8,'-Infinity'::float8) else false end),false)
+    then (value::text)::double precision in('Infinity'::float8,'-Infinity'::float8)
+      or ((value::text)::numeric<>trunc((value::text)::numeric)
+        and (value::text)::double precision=trunc((value::text)::double precision))
+    else false end),false)
     into nodes,invalid from bounded;
   if nodes>100000 or invalid then return null;end if;
   return parsed;

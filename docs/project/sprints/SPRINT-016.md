@@ -18,8 +18,10 @@ insertions, corrections and deletion, including originally unavailable vectors.
 Native reference URLs use the narrower envelope in DATA_ENRICHMENT. SQL/JavaScript
 normalization disagreements must produce unavailable source features while
 retaining numeric labels; they must not abort capture or change the accepted
-standalone extraction contract. The 66 source cases include URL normalization
-regressions and eligible Unicode reference prose; actual capture verifies fallback.
+standalone extraction contract. The 69 source cases include URL normalization,
+fractional identifiers that round to integers in binary64, and eligible Unicode
+prose/ordinary fractions. Actual capture verifies unavailable-source fallback
+for both URL and numeric ambiguity without discarding committed ratings.
 
 The append-only forward preserves old v1/v2/v3 capture rows and exact retries.
 Synthetic local/native verification covers vectors, committed identity and time,

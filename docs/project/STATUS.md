@@ -68,6 +68,20 @@ registry retrieval; it is incomplete. CI #874 covers the preceding source and
 cannot accept this correction. Review the linked PR's latest head and all six
 required gates before integration.
 
+Further review reproduced conflicting vectors from fractional JSON numbers that
+JavaScript rounds to integral Q-id/reference values. Native capture now rejects
+those original sources before freezing features. Ordinary finite fractions and
+exact integral decimals remain supported. The 69 source cases and actual fallback
+capture cover this boundary without changing the accepted offline contract.
+
+CI #874's first native attempt stopped at an unchanged owned-Taste lock conflict
+(`55P03`) before Wikidata probes; the competing lock was not identified. CI #875's
+first validation attempt hit PGlite WebAssembly memory failure in the older
+acquisition-preservation fixture (before this forward exists). Its isolated local
+reproduction and unchanged validation rerun passed all 2,640 tests and four exports.
+Both attempts remain evidence; neither accepts the subsequent numeric correction.
+Final-source CI must cover the linked PR's latest head and all six required gates.
+
 **Single next action after #438 source acceptance:** prepare and rehearse the
 exact new forward on retained hosted state, then install and preservation-verify
 it through the existing guarded operational route. The new forward is not installed
