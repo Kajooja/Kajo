@@ -40,10 +40,10 @@ features. #435's handoff and #436 / #437's bounded offline
 Wikidata extraction are accepted. #438 adds the versioned native capture with
 independent SQL/JavaScript vectors, exact identities, permission/availability
 fences, complete dependency retirement and old-generation retry preservation.
-Finish its source checks, then rehearse/install the exact forward through the
-guarded hosted route. This source work alone leaves hosted MOVIE support unchanged.
-Reviewed ingestion and actual support inspection
-then precede a fresh private MOVIE-then-BOOK DEVELOPMENT declaration and
+#438 / #439 is accepted after all six final-source CI gates; its exact forward
+is installed and independently preservation-verified. Source data was not added
+by that installation. Reviewed bounded ingestion and actual support inspection
+now precede a fresh private MOVIE-then-BOOK DEVELOPMENT declaration and
 first-answer evaluation. Do not restart the completed coverage lookup by default.
 Numeric labels and an available fit do not establish usefulness. TMDB feature
 fitting/validation remains
