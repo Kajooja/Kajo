@@ -73,6 +73,19 @@ The native receipt is simulated in an isolated transaction; actual provider API
 atomicity, committed pre-#391 capture runtime, hosted deployment and observed
 DEVELOPMENT collection remain separate. See [ADR-0006](decisions/0006-clean-install-database-baseline.md#private-numeric-forward-preparation--2026-11-04).
 
+## Wikidata film evidence extraction — Sprint 016 / #436
+
+| Responsibility | Implementation |
+| --- | --- |
+| Bounded provider parser, finite mapping and review binding | `packages/catalog-contracts/wikidata-film.js`, optional `@kajo/catalog-contracts/wikidata-film` export and matching `.d.ts`; exact EntityData bytes, rank-before-filter semantics, statement/reference evidence, unresolved origin, retrieval cutoff and complete-snapshot collision checks |
+| Synthetic source regressions | `packages/catalog-contracts/wikidata-film.test.mjs`; joins existing catalogue workspace tests/root check and package lint |
+
+This optional provider module stays outside the portable engine core and default
+presentation export. It performs no network/database operation. Native SQL,
+content/capture workers and fitting support are unchanged; the next versioned
+native integration must prove parity, fences, withdrawal and old-capture retries.
+DATA_ENRICHMENT owns source semantics; STATUS owns the one continuation.
+
 ## Owned Taste numeric capture — Sprint 016 / #432
 
 | Responsibility | Implementation |

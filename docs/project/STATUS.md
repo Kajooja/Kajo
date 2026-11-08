@@ -1,6 +1,6 @@
 # Kajo Current Status
 
-Last updated: **2026-11-07**
+Last updated: **2026-11-08**
 Milestone: **MVP 0.1 — first public Kajo**
 Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; BOOK source support verified; permitted MOVIE features precede fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
@@ -11,7 +11,39 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — Wikidata provider integration before DEVELOPMENT
+## Current handoff — Wikidata evidence extraction, then native capture
+
+**Current source packet:** [#436](https://github.com/Kajooja/Kajo/issues/436) /
+[PR #437](https://github.com/Kajooja/Kajo/pull/437),
+branch `feat/wikidata-content-evidence`, supplies the bounded offline Wikidata
+provider/evidence boundary in `@kajo/catalog-contracts/wikidata-film`. Finish its
+linked PR's final-source acceptance if still open; otherwise continue to the
+native capture successor below. This is the first slice of the existing provider
+integration, not another research lookup or a completed MOVIE fitting path.
+
+The extractor binds exact EntityData bytes, entity/revision/retrieval identity,
+the finite mapping and original bounded statements/references. It applies rank
+selection before semantic filters, quarantines known TMDB-origin genre references,
+rejects redirects/ambiguous JSON and checks both external aliases against the
+complete supplied catalogue snapshot. Synthetic tests cover direct features,
+unsupported gaps, identity collisions, time/hash binding and resource bounds.
+The caller's completeness and retrieval assertions are not native transaction
+evidence or permission. No source was downloaded or ingested by this packet.
+
+Local verification: all 60 new synthetic cases pass, as do the unchanged 450
+catalogue script tests, workspace lint/typecheck and the new declaration file's
+strict TypeScript check. A full `npm run check` reached Deno dependency retrieval
+but did not finish because registry downloads repeatedly stalled; it is not a
+full-check pass. Required final-source CI remains the acceptance boundary.
+
+**Single next implementation after #436 source acceptance:** reuse this extraction
+contract in the new native content/capture generation, with SQL/JavaScript parity,
+permission horizons, relation fences, correction/withdrawal retirement and
+populated old-capture/exact-retry preservation. Native SQL and all v1/v2/v3
+capture workers remain unchanged in #436. Do not enable the observation worker
+or prepare DEVELOPMENT merely because the standalone extractor returns a candidate.
+Reviewed ingestion and actual permitted fitting support still precede a fresh
+MOVIE-then-BOOK declaration. No quality or serving admission is granted.
 
 **Accepted runtime source:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) merged on
 November 7 as `350ce05001f2554971649a9be5872a560a4a4039`. Source
@@ -88,10 +120,12 @@ now confirms permitted BOOK content support and an available content fit. This i
 engineering readiness, not a prospective prediction or evidence of usefulness.
 The repair is complete; do not replay it or reset current answers.
 
-**Continuation entry:** [PR #435](https://github.com/Kajooja/Kajo/pull/435) carries
-this documentation handoff. Check its final-source CI and accepted merge receipt
-before starting the next code packet; if it is still open, finish that acceptance
-first. Its approved public research summary is already published; do not request
+**Accepted continuation entry:** [PR #435](https://github.com/Kajooja/Kajo/pull/435)
+merged as `c43eb22873d5ddce9785d81164a38a4936715cd7` after all six
+[CI #866](https://github.com/Kajooja/Kajo/actions/runs/42415191173) gates passed:
+2,576 tests and four configured exports. Source, tested and accepted tree is
+`5aa127ea623eb5b398127b444e42a4d296dc7472`. Its approved public research
+summary is already published; do not request
 the same publication approval again. Earlier CI #865 failed isolated Supabase
 startup before the platform probe while validation remained unusually long in
 Test. Image-download/port-binding signals do not establish a cause. Preserve that
@@ -107,8 +141,8 @@ prediction-quality result. Do not repeat that completed lookup as the default
 next task. [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md#wikidata-provider-integration--next-source-packet)
 owns the reviewed extraction boundaries and remaining implementation checks.
 
-**One next code packet:** implement the explicit Wikidata provider/evidence
-adapter and finite mapping, with a new source/capture version where required.
+**Remaining provider integration:** #436 supplies the explicit offline evidence
+adapter and finite mapping. Next implement its new native source/capture version.
 Use an append-only migration for database changes; preserve old captures and
 exact retries. Require deterministic SQL/TypeScript feature parity, identity
 collision/redirect refusal, permission/available-at fences, correction/withdrawal

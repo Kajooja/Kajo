@@ -36,10 +36,13 @@ applied and post-commit preservation-verified; separate read-only inspection
 confirms permitted BOOK content support and an available fit. Do not replay the
 repair. The bounded label-blind Wikidata identity/coverage review is complete;
 its direct structured assertions remain candidate inputs, not admitted runtime
-features. After final-source acceptance of the #435 handoff, implement the
-explicit Wikidata provider/evidence adapter and finite mapping with versioned
-capture, deterministic feature parity and identity/permission/availability/
-withdrawal preservation checks. Reviewed ingestion and actual support inspection
+features. #435's handoff is accepted. #436 implements the bounded offline
+Wikidata evidence/finite-mapping contract first, including exact bytes, rank rules,
+retrieval and catalogue-identity checks. After its source acceptance, continue
+the same integration with the versioned native capture, deterministic feature
+parity and identity/permission/availability/withdrawal preservation checks.
+The extraction module alone leaves runtime MOVIE support unchanged.
+Reviewed ingestion and actual support inspection
 then precede a fresh private MOVIE-then-BOOK DEVELOPMENT declaration and
 first-answer evaluation. Do not restart the completed coverage lookup by default.
 Numeric labels and an available fit do not establish usefulness. TMDB feature
