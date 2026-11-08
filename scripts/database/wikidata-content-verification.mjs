@@ -31,8 +31,8 @@ export async function verifyWikidataProjection(exec) {
     const c = { ...context, ...changes }, source = wikidataFixture(c);mutate(source.entities[c.entityId], source);
     const text = raw ?? JSON.stringify(source);
     const js = extractWikidataFilmEvidence(new TextEncoder().encode(text), c);
-    const [sql] = await exec(`select private.project_wikidata_film_v1(${literal(text)},${literal(c.entityId)},
-      ${literal(c.identity.imdbId)},${literal(c.identity.tmdbMovieId)},${literal(c.retrievedAtMicros)},${literal(c.cutoffMicros)});`);
+    const [sql] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(text)},${literal(c.entityId)},
+      ${literal(c.identity.imdbId)},${literal(c.identity.tmdbMovieId)},${literal(c.retrievedAtMicros)},${literal(c.cutoffMicros)}),'null'::jsonb);`);
     if (js.evidence === null) assert.equal(sql, null, name);
     else {
       assert.ok(sql, name);assert.deepEqual(sql.assertions, js.evidence.assertions, name);assert.deepEqual(sql.values, js.evidence.values, name);
@@ -79,8 +79,8 @@ export async function verifyWikidataProjection(exec) {
   // Native projection has a stricter 64 KiB limit, leaving room for the reused
   // extractor's diagnostics inside its immutable 256 KiB evidence contract.
   const large = wikidataFixture(context);large.entities[context.entityId].claims.P1476 = [{ type: 'statement', rank: 'normal', mainsnak: { text: 'x'.repeat(65536) } }];
-  const [bounded] = await exec(`select private.project_wikidata_film_v1(${literal(JSON.stringify(large))},${literal(context.entityId)},
-    ${literal(context.identity.imdbId)},${literal(context.identity.tmdbMovieId)},${literal(context.retrievedAtMicros)},${literal(context.cutoffMicros)});`);
+  const [bounded] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(JSON.stringify(large))},${literal(context.entityId)},
+    ${literal(context.identity.imdbId)},${literal(context.identity.tmdbMovieId)},${literal(context.retrievedAtMicros)},${literal(context.cutoffMicros)}),'null'::jsonb);`);
   assert.equal(bounded, null);cases.push('native projection budget');
   return { status: 'PASS', cases, count: cases.length, qualityAdmission: 'NONE' };
 }

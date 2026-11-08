@@ -49,6 +49,14 @@ checks for released SAVEPOINT source/alias writes in both domains; four real
 subtransaction regressions and old-generation rollback pass locally. Final-source
 CI must cover the corrected head; the earlier failed run remains history.
 
+[CI #873](https://github.com/Kajooja/Kajo/actions/runs/42430638386) passed validation,
+platform, clean installations and the populated forward gate, then the native CLI
+probe exposed SQL NULL omission in the new projection test's psql transport.
+The SQL extractor correctly returned unavailable; the assertion received no JSON
+row. The verifier now explicitly emits JSON null and its local transport test
+reproduces psql's distinction. This correction changes no extraction/eligibility
+rule. Final-source checks must include that correction.
+
 **Single next action after #438 source acceptance:** prepare and rehearse the
 exact new forward on retained hosted state, then install and preservation-verify
 it through the existing guarded operational route. The new forward is not installed

@@ -10,7 +10,10 @@ test('Wikidata SQL and JavaScript agree on bounded source, identity, rank and re
   try {
     const sql = await readFile(new URL('../../supabase/migrations/20261108000938_wikidata_native_content_capture.sql', import.meta.url), 'utf8');
     await db.exec('create schema private;' + sql.slice(0, sql.indexOf('create function private.validate_personal_rating_feature_use_v2')));
-    const exec = async sql => (await db.exec(sql)).flatMap(r => r.rows.map(row => Object.values(row)[0]));
+    // psql emits blank for SQL NULL but literal "null" for JSON null. Preserve
+    // that distinction rather than letting PGlite's decoder hide it.
+    const exec = async sql => (await db.query(`select value::text as wire from (${sql.trim().replace(/;$/, '')}) result(value)`))
+      .rows.filter(row => row.wire !== null).map(row => JSON.parse(row.wire));
     const report = await verifyWikidataProjection(exec);assert.equal(report.status, 'PASS');t.diagnostic(JSON.stringify(report));
   } finally { await db.close(); }
 });
