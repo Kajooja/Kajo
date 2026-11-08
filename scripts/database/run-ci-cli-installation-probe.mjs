@@ -64,6 +64,7 @@ import { verifyOwnedTasteNumericUpgrade } from './owned-taste-numeric-upgrade.mj
 import { verifyWikidataProjection, verifyWikidataContentCapture } from './wikidata-content-verification.mjs';
 import { verifyWikidataContentConcurrency } from './wikidata-content-concurrency.mjs';
 import { verifyWikidataContentUpgrade } from './wikidata-content-upgrade.mjs';
+import { verifyWikidataStatementIds, verifyWikidataStatementIdUpgrade } from './wikidata-statement-id-verification.mjs';
 import { verifyPersonalContentRatingUpgrade } from './personal-content-rating-upgrade.mjs';
 import { verifyPersonalRatingHostedUpgrade } from './personal-rating-hosted-native.mjs';
 import { initializePersonalRatingSqlSession, probePersonalRatingSqlSession } from './personal-rating-connection.mjs';
@@ -133,6 +134,10 @@ try {
     const nativeOwnedTasteNumericConcurrency = await verifyOwnedTasteNumericConcurrency(execConcurrentSql, withSqlSession);
     assert.equal(nativeOwnedTasteNumeric.status, 'PASS');
     assert.equal(nativeOwnedTasteNumericConcurrency.status, 'PASS');
+    const nativeWikidataStatementIds = await verifyWikidataStatementIds(execConcurrentSql);
+    const nativeWikidataCaptureV2 = await verifyWikidataContentCapture(execConcurrentSql, withSqlSession, { successor: true });
+    const nativeWikidataConcurrencyV2 = await verifyWikidataContentConcurrency(execConcurrentSql, withSqlSession, { successor: true });
+    for (const report of [nativeWikidataStatementIds, nativeWikidataCaptureV2, nativeWikidataConcurrencyV2]) assert.equal(report.status, 'PASS');
     const nativeWikidataProjection = await verifyWikidataProjection(execConcurrentSql);
     const nativeWikidataCapture = await verifyWikidataContentCapture(execConcurrentSql, withSqlSession);
     const nativeWikidataConcurrency = await verifyWikidataContentConcurrency(execConcurrentSql, withSqlSession);
@@ -143,6 +148,11 @@ try {
       'Discovery parity changed the installed source');
     // Check the new populated forward/current paths before rehearsing older
     // generations, so a new native-only failure is reported promptly.
+    const statementIdIndex = files.findIndex(file => file.name.endsWith('_wikidata_statement_id_compatibility.sql'));
+    assert.ok(statementIdIndex > 0);
+    await resetFromMigrations(files.slice(0, statementIdIndex));
+    const nativeWikidataStatementIdUpgrade = await verifyWikidataStatementIdUpgrade(execConcurrentSql, withSqlSession, files[statementIdIndex]);
+    assert.equal(nativeWikidataStatementIdUpgrade.status, 'PASS');
     const wikidataIndex = files.findIndex(file => file.name.endsWith('_wikidata_native_content_capture.sql'));
     assert.ok(wikidataIndex > 0);
     await resetFromMigrations(files.slice(0, wikidataIndex));
@@ -576,6 +586,7 @@ try {
       nativePersonalContentRating, nativePersonalContentRatingConcurrency, nativePersonalContentRatingUpgrade, nativePersonalRatingHostedUpgrade,
       nativeOwnedTasteNumeric, nativeOwnedTasteNumericConcurrency, nativeOwnedTasteNumericUpgrade,
       nativeWikidataProjection, nativeWikidataCapture, nativeWikidataConcurrency, nativeWikidataUpgrade,
+      nativeWikidataStatementIds, nativeWikidataCaptureV2, nativeWikidataConcurrencyV2, nativeWikidataStatementIdUpgrade,
       nativePersonalRatingConnection, nativePersonalRatingSessionSettings,
       nativeV4ReceiptUpgrade, nativeV4Receipt, nativeV4ReceiptConcurrency,
       sharedPreparedUpgrade, sharedPreparedConsumption, sharedPreparedConcurrency, sharedPreparedHostedVariant,

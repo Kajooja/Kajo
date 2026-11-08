@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import { setTimeout as delay } from 'node:timers/promises';
 import { withWikidataContentFixture } from './wikidata-content-verification.mjs';
-import { captureWikidataContentNumericForecast } from './wikidata-content-capture.mjs';
+import { captureWikidataContentNumericForecast, captureWikidataContentNumericForecastV2 } from './wikidata-content-capture.mjs';
 import { literal, inspect } from './personal-rating-prospective.mjs';
 
 /** Independent native backends only. Observe actual conflicting relation locks;
  * elapsed time alone is not a serialization witness. Every writer is joined. */
-export async function verifyWikidataContentConcurrency(exec, withSession) {
+export async function verifyWikidataContentConcurrency(exec, withSession, { successor = false } = {}) {
+  const capture = successor ? captureWikidataContentNumericForecastV2 : captureWikidataContentNumericForecast;
   return withWikidataContentFixture(exec, withSession, async ({ one, call, request, questions }) => {
     const proofs = [], writes = [];
     const run = (sql, stage) => exec(sql, { stage: 'wikidata-content-' + stage, timeoutMs: 30_000 });
@@ -18,7 +19,7 @@ export async function verifyWikidataContentConcurrency(exec, withSession) {
         const name = 'kajo_wikidata_content_' + index;
         let writer;
         const selected = await request();
-        const captured = await captureWikidataContentNumericForecast(withSession, selected, {
+        const captured = await capture(withSession, selected, {
           beforeFinalize: async ({ exec: connection }) => {
             const [pid] = await connection('select to_jsonb(pg_backend_pid());', { stage: 'wikidata-content-capture-pid' });
             writer = run(`begin;set local application_name=${literal(name)};lock table ${relation} in row exclusive mode;
@@ -49,7 +50,7 @@ export async function verifyWikidataContentConcurrency(exec, withSession) {
             await connection(`lock table ${relation} in row exclusive mode;`, { stage: 'wikidata-content-writer-lock' });
             const [writerPid] = await connection('select to_jsonb(pg_backend_pid());', { stage: 'wikidata-content-writer-pid' });
             let capturePid;
-            await assert.rejects(captureWikidataContentNumericForecast(withSession, pending, {
+            await assert.rejects(capture(withSession, pending, {
               beforePrepare: async ({ exec: capture }) => {
                 [capturePid] = await capture('select to_jsonb(pg_backend_pid());', { stage: 'wikidata-content-contended-pid' });
                 await capture("set local lock_timeout=0;set local statement_timeout='8s';", { stage: 'wikidata-content-contention-bound' });
@@ -62,7 +63,7 @@ export async function verifyWikidataContentConcurrency(exec, withSession) {
             await connection(mutation + 'commit;', { stage: 'wikidata-content-writer-commit' });
           } catch (error) { await connection('rollback;', { stage: 'wikidata-content-writer-rollback' }).catch(() => {});throw error; }
         });
-        const retry = await captureWikidataContentNumericForecast(withSession, pending);
+        const retry = await capture(withSession, pending);
         assert.equal(retry.forecast.prefix.support, 2);
         await run('begin;' + mutation + 'commit;', 'retire-retry');
       }
@@ -73,5 +74,5 @@ export async function verifyWikidataContentConcurrency(exec, withSession) {
       const failures = results.filter(row => row.error).map(row => row.error);
       if (failures.length) throw new AggregateError(failures, 'Wikidata source writer failure retained');
     }
-  });
+  }, { lowercase: successor });
 }

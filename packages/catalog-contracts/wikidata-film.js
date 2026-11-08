@@ -43,6 +43,13 @@ export const WIKIDATA_FILM_MAPPING = freeze({
     catalogueItems: 10000, catalogueBytes: 8 * 1024 * 1024 },
 });
 export const WIKIDATA_FILM_MAPPING_SHA256 = hash(canonical(WIKIDATA_FILM_MAPPING));
+// StatementGuid preserves legacy lowercase entity prefixes. Keep v1 frozen;
+// v2 equates ASCII Q/q only here, never in entity/value IDs or original bytes.
+export const WIKIDATA_FILM_MAPPING_V2 = freeze({ ...WIKIDATA_FILM_MAPPING,
+  version: 'wikidata-film-direct-genres-v2',
+  statementIdPolicy: 'ASCII_Q_OR_q_EXACT_ENTITY_DIGITS_AND_GUID',
+});
+export const WIKIDATA_FILM_MAPPING_V2_SHA256 = hash(canonical(WIKIDATA_FILM_MAPPING_V2));
 const limits = WIKIDATA_FILM_MAPPING.limits;
 const unavailable = reason => ({ status: 'UNAVAILABLE', reason, evidence: null });
 
@@ -140,9 +147,10 @@ function tmdbReference(value) {
   return object(value) && (WIKIDATA_FILM_MAPPING.tmdbReferenceProperties.some(property => Object.hasOwn(value, property) || value.property === property)
     || WIKIDATA_FILM_MAPPING.tmdbReferenceItems.includes('Q' + value['numeric-id']) || Object.values(value).some(tmdbReference));
 }
-function statementValue(statement, property, entityId) {
+function statementValue(statement, property, entityId, mapping) {
+  const prefix = mapping === WIKIDATA_FILM_MAPPING_V2 ? `[Qq]${entityId.slice(1)}` : entityId;
   if (!object(statement) || statement.type !== 'statement' || typeof statement.id !== 'string'
-    || !new RegExp(`^${entityId}\\$[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`).test(statement.id)
+    || !new RegExp(`^${prefix}\\$[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`).test(statement.id)
     || !object(statement.mainsnak) || statement.mainsnak.property !== property || !referencesValid(statement)
     || statement.qualifiers !== undefined && !snakMap(statement.qualifiers)
     || !orderedKeys(statement['qualifiers-order'], Object.keys(statement.qualifiers ?? {}))) return { reason: 'MALFORMED_STATEMENT' };
@@ -163,10 +171,10 @@ function statementValue(statement, property, entityId) {
       || String(value['numeric-id']) !== value.id.slice(1))) return { reason: 'MALFORMED_STATEMENT' };
   return { value: value.id, reason: null };
 }
-function selectedStatements(statements, property, entityId) {
+function selectedStatements(statements, property, entityId, mapping) {
   const rank = statements.some(s => s?.rank === 'preferred') ? 'preferred' : 'normal';
   return statements.map((statement, index) => ({ index, statementId: typeof statement.id === 'string' ? statement.id : null,
-    ...(statement.rank === rank ? statementValue(statement, property, entityId)
+    ...(statement.rank === rank ? statementValue(statement, property, entityId, mapping)
       : { reason: statement.rank === 'deprecated' ? 'DEPRECATED_STATEMENT' : 'SUPPRESSED_NORMAL_RANK' }) }));
 }
 
@@ -175,6 +183,12 @@ function selectedStatements(statements, property, entityId) {
  * Retain the original bytes privately: sourceSha256 binds them without copying
  * labels, descriptions, links or unrelated claims into the feature envelope. */
 export function extractWikidataFilmEvidence(bytes, context) {
+  return extract(bytes, context, WIKIDATA_FILM_MAPPING, WIKIDATA_FILM_MAPPING_SHA256, 'wikidata-film-evidence-v1');
+}
+export function extractWikidataFilmEvidenceV2(bytes, context) {
+  return extract(bytes, context, WIKIDATA_FILM_MAPPING_V2, WIKIDATA_FILM_MAPPING_V2_SHA256, 'wikidata-film-evidence-v2');
+}
+function extract(bytes, context, mapping, mappingHash, evidenceVersion) {
   if (!(bytes instanceof Uint8Array) || bytes.length < 1 || bytes.length > limits.sourceBytes) return unavailable('SOURCE_SIZE');
   if (!object(context) || !qid(context.entityId) || !clock(context.retrievedAtMicros)
     || !clock(context.cutoffMicros) || !object(context.identity)
@@ -213,7 +227,7 @@ export function extractWikidataFilmEvidence(bytes, context) {
     }
   }
   const selected = Object.fromEntries(['P31', 'P345', 'P4947', 'P136'].map(property =>
-    [property, selectedStatements(claims[property], property, entity.id)]));
+    [property, selectedStatements(claims[property], property, entity.id, mapping)]));
   const current = property => selected[property].filter(row => !['DEPRECATED_STATEMENT', 'SUPPRESSED_NORMAL_RANK'].includes(row.reason));
   for (const [property, expected] of [['P345', context.identity.imdbId], ['P4947', context.identity.tmdbMovieId]]) {
     const values = current(property);
@@ -225,11 +239,11 @@ export function extractWikidataFilmEvidence(bytes, context) {
     reason: row.reason ?? (Object.hasOwn(WIKIDATA_FILM_MAPPING.genreItems, row.value) ? 'MAPPED' : 'UNMAPPED_GENRE') }));
   const concepts = new Set(diagnostics.filter(row => row.reason === 'MAPPED').map(row => WIKIDATA_FILM_MAPPING.genreItems[row.value]));
   const evidence = {
-    version: 'wikidata-film-evidence-v1', providerKey: 'wikidata', evidenceKind: 'wikidata-direct-film-genre',
+    version: evidenceVersion, providerKey: 'wikidata', evidenceKind: 'wikidata-direct-film-genre',
     entityId: entity.id, revisionId: entity.lastrevid, sourceModifiedAt: entity.modified,
     sourceUrl: `https://www.wikidata.org/wiki/Special:EntityData/${entity.id}.json?revision=${entity.lastrevid}`,
     sourceSha256: hash(bytes), retrievedAtMicros: context.retrievedAtMicros,
-    mappingVersion: WIKIDATA_FILM_MAPPING.version, mappingSha256: WIKIDATA_FILM_MAPPING_SHA256,
+    mappingVersion: mapping.version, mappingSha256: mappingHash,
     identity: { imdbId: context.identity.imdbId, tmdbMovieId: context.identity.tmdbMovieId },
     claims, diagnostics, originAssessment: 'UNRESOLVED_REQUIRES_SOURCE_USE_REVIEW',
     assertions: WIKIDATA_FILM_MAPPING.concepts.map(concept => concepts.has(concept) ? 1 : null),
@@ -247,6 +261,12 @@ export function extractWikidataFilmEvidence(bytes, context) {
  * recheck aliases/source identity under its transaction fences. No fuzzy match,
  * automatic merge, catalogue mutation, permission or model admission occurs. */
 export function inspectWikidataFilmBatch(requests, catalogue) {
+  return inspectBatch(requests, catalogue, extractWikidataFilmEvidence);
+}
+export function inspectWikidataFilmBatchV2(requests, catalogue) {
+  return inspectBatch(requests, catalogue, extractWikidataFilmEvidenceV2);
+}
+function inspectBatch(requests, catalogue, extractEvidence) {
   if (!Array.isArray(requests) || requests.length < 1 || requests.length > limits.requests
     || !shape(catalogue, ['version', 'complete', 'cutoffMicros', 'items']) || catalogue.version !== 'wikidata-film-catalogue-review-v1'
     || catalogue.complete !== true || !clock(catalogue.cutoffMicros) || !Array.isArray(catalogue.items)
@@ -300,7 +320,7 @@ export function inspectWikidataFilmBatch(requests, catalogue) {
       if (entities.get(request.entityId).size !== 1 || priorIds.some(id => id !== request.entityId)
         || item.aliases.filter(alias => alias.namespace === WIKIDATA_FILM_MAPPING.identityNamespaces.entity).length > 1
         || item.sources.filter(source => source.providerKey === 'wikidata').length > 1) return unavailable('CATALOGUE_ENTITY_COLLISION');
-      return extractWikidataFilmEvidence(request.bytes, { entityId: request.entityId, identity,
+      return extractEvidence(request.bytes, { entityId: request.entityId, identity,
         retrievedAtMicros: request.retrievedAtMicros, cutoffMicros: catalogue.cutoffMicros });
     })();
     return { itemId: request.itemId, entityId: request.entityId, catalogueSha256, cutoffMicros: catalogue.cutoffMicros, ...result };

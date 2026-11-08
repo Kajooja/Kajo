@@ -7,8 +7,8 @@ import { normalizeKajoPersonalContentRatingPrefix, personalContentFeatureContrac
 import type { KajoPersonalContentRatingPrefix } from './kajo-personal-content-rating.js';
 import { normalizeKajoOwnedTasteRatingPrefix } from './kajo-owned-taste-rating.js';
 import type { KajoOwnedTasteRatingPrefix } from './kajo-owned-taste-rating.js';
-import { normalizeKajoWikidataContentRatingPrefix, wikidataContentFeatureContract } from './kajo-wikidata-content-rating.js';
-import type { KajoWikidataContentRatingPrefix } from './kajo-wikidata-content-rating.js';
+import { normalizeKajoWikidataContentRatingPrefix, normalizeKajoWikidataContentRatingPrefixV2, wikidataContentFeatureContract, wikidataContentFeatureContractV2 } from './kajo-wikidata-content-rating.js';
+import type { KajoWikidataContentRatingPrefix, KajoWikidataContentRatingPrefixV2 } from './kajo-wikidata-content-rating.js';
 
 /** Private native identities stay in the supplied binding, never in the report.
  * A failed attempt is a supplied ledger claim, not inferred from a missing row.
@@ -149,9 +149,10 @@ function retainedForecast(raw: unknown, prefix: KajoPersonalRatingProspectivePre
 /** Validate a retained content forecast's bindings and diagnostic structure.
  * No coefficient fit or historical point forecast is recomputed here. Native
  * finalization is the producer boundary; a file remains a consistency claim. */
-function retainedContentForecast(raw: unknown, prefix: KajoPersonalContentRatingPrefix | KajoOwnedTasteRatingPrefix | KajoWikidataContentRatingPrefix,
+function retainedContentForecast(raw: unknown, prefix: KajoPersonalContentRatingPrefix | KajoOwnedTasteRatingPrefix | KajoWikidataContentRatingPrefix | KajoWikidataContentRatingPrefixV2,
   binding: KajoPersonalRatingEvaluationBinding): PersonalContentRatingForecast {
-  const input = prefix.version === 'kajo-personal-content-rating-prefix-v3' ? normalizeKajoWikidataContentRatingPrefix(prefix)
+  const input = prefix.version === 'kajo-personal-content-rating-prefix-v4' ? normalizeKajoWikidataContentRatingPrefixV2(prefix)
+    : prefix.version === 'kajo-personal-content-rating-prefix-v3' ? normalizeKajoWikidataContentRatingPrefix(prefix)
     : prefix.version === 'kajo-personal-content-rating-prefix-v2'
     ? normalizeKajoOwnedTasteRatingPrefix(prefix) : normalizeKajoPersonalContentRatingPrefix(prefix);
   const dense = (value: unknown): boolean => {
@@ -251,12 +252,13 @@ export function normalizeKajoPersonalRatingEvaluationInventory(binding: KajoPers
   check(binding && ['observed', 'synthetic'].includes(binding.origin) && Number.isInteger(binding.horizonSeconds)
     && binding.horizonSeconds >= 1 && binding.horizonSeconds <= 7776000, 'declaration');
   const contentModel = binding.sourceVersions?.model === 'personal-content-rating-v1';
-  const wikidata = contentModel && binding.sourceVersions.source.startsWith('owned-rating-source-v3:');
+  const wikidataV2 = contentModel && binding.sourceVersions.source.startsWith('owned-rating-source-v4:');
+  const wikidata = wikidataV2 || contentModel && binding.sourceVersions.source.startsWith('owned-rating-source-v3:');
   const ownedTaste = wikidata || contentModel && binding.sourceVersions.source.startsWith('owned-rating-source-v2:');
-  const featureContract = wikidata ? wikidataContentFeatureContract : personalContentFeatureContract;
+  const featureContract = wikidataV2 ? wikidataContentFeatureContractV2 : wikidata ? wikidataContentFeatureContract : personalContentFeatureContract;
   const contentSourceSuffix = `:${featureContract.mappingVersion}:${featureContract.mappingHash}:${featureContract.transformVersion}`;
   check(binding.sourceVersions?.control === versions.control && (contentModel
-    ? (ownedTaste ? /^owned-rating-source-v[23]:[0-9a-f]{32}:[0-9a-f]{32}:/u.test(binding.sourceVersions.source)
+    ? (ownedTaste ? /^owned-rating-source-v[234]:[0-9a-f]{32}:[0-9a-f]{32}:/u.test(binding.sourceVersions.source)
       && binding.sourceVersions.source.length === 'owned-rating-source-v2:'.length + 65 + contentSourceSuffix.length
       : /^personal-content-source-v1:[0-9a-f]{32}:/u.test(binding.sourceVersions.source)
       && binding.sourceVersions.source.length === 'personal-content-source-v1:'.length + 32 + contentSourceSuffix.length)
@@ -333,7 +335,7 @@ export function normalizeKajoPersonalRatingEvaluationInventory(binding: KajoPers
     }
     check(inspection.status === 'AVAILABLE', 'inspection status');
     const prep = record(inspection.preparation, 'preparation');
-    check(prep.version === (wikidata ? 'kajo-personal-content-rating-preparation-v3' : ownedTaste ? 'kajo-personal-content-rating-preparation-v2'
+    check(prep.version === (wikidataV2 ? 'kajo-personal-content-rating-preparation-v4' : wikidata ? 'kajo-personal-content-rating-preparation-v3' : ownedTaste ? 'kajo-personal-content-rating-preparation-v2'
       : contentModel ? 'kajo-personal-content-rating-preparation-v1' : 'kajo-personal-rating-preparation-v1') && prep.forecastId === allocation.id
       && prep.sourcePredictionId === opportunity.sourcePredictionId && prep.targetItemId === opportunity.targetItemId
       && prep.itemType === opportunity.domainId && prep.requestHash === allocation.requestHash
@@ -342,14 +344,14 @@ export function normalizeKajoPersonalRatingEvaluationInventory(binding: KajoPers
       && prep.qualityAdmission === 'NONE' && prep.servingActivation === 'NONE'
       && equal(prep.config, personalRatingProspectiveConfig)
       && (!contentModel || equal(prep.contentConfig, personalContentRatingProspectiveConfig)), 'preparation binding');
-    const prefix = record(prep.input, 'input') as unknown as KajoPersonalRatingProspectivePrefix | KajoPersonalContentRatingPrefix | KajoOwnedTasteRatingPrefix | KajoWikidataContentRatingPrefix;
+    const prefix = record(prep.input, 'input') as unknown as KajoPersonalRatingProspectivePrefix | KajoPersonalContentRatingPrefix | KajoOwnedTasteRatingPrefix | KajoWikidataContentRatingPrefix | KajoWikidataContentRatingPrefixV2;
     check(prefix.actorUserId === opportunity.actorUserId && prefix.profile?.id === opportunity.profileId
       && prefix.evidenceOrigin === binding.origin && prefix.forecastId === allocation.id
       && prefix.sourcePredictionId === opportunity.sourcePredictionId && prefix.targetItemId === opportunity.targetItemId
       && prefix.itemType === opportunity.domainId && prefix.cutoffMicros === prep.cutoffMicros, 'native input binding');
-    check(!contentModel || prefix.version === (wikidata ? 'kajo-personal-content-rating-prefix-v3'
+    check(!contentModel || prefix.version === (wikidataV2 ? 'kajo-personal-content-rating-prefix-v4' : wikidata ? 'kajo-personal-content-rating-prefix-v3'
       : ownedTaste ? 'kajo-personal-content-rating-prefix-v2' : 'kajo-personal-content-rating-prefix-v1'), 'declared source generation');
-    const forecast = contentModel ? retainedContentForecast(prep.forecast, prefix as KajoPersonalContentRatingPrefix | KajoOwnedTasteRatingPrefix | KajoWikidataContentRatingPrefix, binding)
+    const forecast = contentModel ? retainedContentForecast(prep.forecast, prefix as KajoPersonalContentRatingPrefix | KajoOwnedTasteRatingPrefix | KajoWikidataContentRatingPrefix | KajoWikidataContentRatingPrefixV2, binding)
       : retainedForecast(prep.forecast, prefix as KajoPersonalRatingProspectivePrefix, binding);
     check(prefix.candidatePool.items[0]?.id === opportunity.targetItemId, 'first delivered target selection');
     const cutoff = micros(prep.cutoffMicros), horizon = micros(prep.horizonEndMicros), ownerClock = ownerClocks.get(opportunity.profileId)!;

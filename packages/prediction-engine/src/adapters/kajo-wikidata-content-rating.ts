@@ -1,4 +1,4 @@
-import { extractWikidataFilmEvidence } from '@kajo/catalog-contracts/wikidata-film';
+import { extractWikidataFilmEvidence, extractWikidataFilmEvidenceV2 } from '@kajo/catalog-contracts/wikidata-film';
 import type { PersonalContentRatingInput } from '../personal-content-rating.js';
 import { normalizeKajoOwnedTasteRatingLabels } from './kajo-owned-taste-rating.js';
 import type { KajoOwnedTasteRatingPrefix } from './kajo-owned-taste-rating.js';
@@ -15,6 +15,17 @@ export const wikidataContentFeatureContract = Object.freeze({
   transformVersion: 'catalog-assertion-presence-v1' as const,
   concepts: personalContentFeatureContract.concepts,
 });
+export const wikidataContentFeatureContractV2 = Object.freeze({
+  ...wikidataContentFeatureContract,
+  mappingVersion: 'wikidata-open-library-concepts-v2' as const,
+  mappingHash: 'ec790415ce0bc45cfdc5bdf5fb65b9e2c5557f98b07c6f5bf4e88b09812abf1d' as const,
+});
+const generationV1 = Object.freeze({ prefix: 'kajo-personal-content-rating-prefix-v3',
+  features: 'kajo-personal-content-features-v2', snapshot: 'native-wikidata-content:',
+  source: 'owned-rating-source-v3:', contract: wikidataContentFeatureContract, extract: extractWikidataFilmEvidence });
+const generationV2 = Object.freeze({ prefix: 'kajo-personal-content-rating-prefix-v4',
+  features: 'kajo-personal-content-features-v3', snapshot: 'native-wikidata-content-v2:',
+  source: 'owned-rating-source-v4:', contract: wikidataContentFeatureContractV2, extract: extractWikidataFilmEvidenceV2 });
 export interface KajoWikidataFeatureUse extends Omit<KajoPersonalContentFeatureUse, 'version' | 'sources'> {
   readonly version: 'personal-content-feature-use-v2';
   readonly sources: readonly Readonly<{
@@ -42,6 +53,14 @@ export interface KajoWikidataContentRatingPrefix extends Omit<KajoOwnedTasteRati
     })[];
   };
 }
+export interface KajoWikidataContentRatingPrefixV2 extends Omit<KajoWikidataContentRatingPrefix, 'version' | 'contentFeatures'> {
+  readonly version: 'kajo-personal-content-rating-prefix-v4';
+  readonly contentFeatures: Omit<KajoWikidataContentRatingPrefix['contentFeatures'], 'version' | 'mappingVersion' | 'mappingHash'> & {
+    readonly version: 'kajo-personal-content-features-v3';
+    readonly mappingVersion: typeof wikidataContentFeatureContractV2.mappingVersion;
+    readonly mappingHash: typeof wikidataContentFeatureContractV2.mappingHash;
+  };
+}
 function check(value: unknown, message: string): asserts value {
   if (!value) throw new Error(`Invalid Kajo Wikidata content prefix: ${message}`);
 }
@@ -63,11 +82,20 @@ const equal = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b
  * numerical vector. Its SHA binds projection bytes; sourceHash separately binds
  * original EntityData bytes checked by SQL, never a reconstructed original. */
 export function normalizeKajoWikidataContentRatingPrefix(input: KajoWikidataContentRatingPrefix): PersonalContentRatingInput {
-  check(input?.version === 'kajo-personal-content-rating-prefix-v3'
+  return normalize(input, generationV1);
+}
+export function normalizeKajoWikidataContentRatingPrefixV2(input: KajoWikidataContentRatingPrefixV2): PersonalContentRatingInput {
+  return normalize(input, generationV2);
+}
+function normalize(input: KajoWikidataContentRatingPrefix | KajoWikidataContentRatingPrefixV2,
+  generation: typeof generationV1 | typeof generationV2): PersonalContentRatingInput {
+  const contract = generation.contract;
+  check(input?.version === generation.prefix
     && new TextEncoder().encode(JSON.stringify(input)).byteLength <= 4 * 1024 * 1024, 'version/input budget');
-  check(/^native-wikidata-content:[0-9a-f]{32}$/u.test(input.snapshotId)
+  check(typeof input.snapshotId === 'string' && input.snapshotId.startsWith(generation.snapshot)
+    && /^[0-9a-f]{32}$/u.test(input.snapshotId.slice(generation.snapshot.length))
     && input.candidatePool?.snapshotId === input.snapshotId, 'snapshot identity');
-  const labelSnapshot = input.snapshotId.replace('native-wikidata-content:', 'native-owned-content:');
+  const labelSnapshot = input.snapshotId.replace(generation.snapshot, 'native-owned-content:');
   // Only labels pass the predecessor validator; new provider features are never
   // reinterpreted as TMDB. Restore the actual snapshot before content validation.
   const projected = normalizeKajoOwnedTasteRatingLabels({ ...input, version: 'kajo-personal-content-rating-prefix-v2',
@@ -78,10 +106,10 @@ export function normalizeKajoWikidataContentRatingPrefix(input: KajoWikidataCont
   const content = input.contentFeatures, cutoff = micros(input.cutoffMicros), manifest = content.featureUse;
   shape(content, ['version', 'snapshotId', 'cutoffMicros', 'mappingVersion', 'mappingHash', 'transformVersion',
     'semantics', 'featureUse', 'featureIds', 'objects']);
-  check(content.version === 'kajo-personal-content-features-v2' && content.snapshotId === input.snapshotId
-    && content.cutoffMicros === input.cutoffMicros && content.mappingVersion === wikidataContentFeatureContract.mappingVersion
-    && content.mappingHash === wikidataContentFeatureContract.mappingHash
-    && content.transformVersion === wikidataContentFeatureContract.transformVersion && content.semantics === 'ASSERTION_PRESENCE', 'feature identity');
+  check(content.version === generation.features && content.snapshotId === input.snapshotId
+    && content.cutoffMicros === input.cutoffMicros && content.mappingVersion === contract.mappingVersion
+    && content.mappingHash === contract.mappingHash
+    && content.transformVersion === contract.transformVersion && content.semantics === 'ASSERTION_PRESENCE', 'feature identity');
   if (manifest !== null) {
     shape(manifest, ['version', 'purpose', 'origin', 'reviewRef', 'validFromMicros', 'validUntilMicros', 'retention', 'sources']);
     check(manifest.version === 'personal-content-feature-use-v2' && manifest.purpose === 'PRIVATE_NATIVE_EVALUATION'
@@ -109,7 +137,7 @@ export function normalizeKajoWikidataContentRatingPrefix(input: KajoWikidataCont
       objects: content.objects as OldFeatures['objects'] } }, baseline);
   } else {
     check(input.itemType === 'MOVIE', 'domain');
-    const featureIds = wikidataContentFeatureContract.concepts.map(c => `wikidata-direct-film-genre:${c}`);
+    const featureIds = contract.concepts.map(c => `wikidata-direct-film-genre:${c}`);
     check(equal(content.featureIds, featureIds), 'feature vocabulary/order');
     const expected = new Set([...baseline.prefix.ratings.map(r => r.objectId), ...baseline.candidatePool.candidateIds]);
     check(Array.isArray(content.objects) && content.objects.length === expected.size, 'complete object union');
@@ -142,7 +170,7 @@ export function normalizeKajoWikidataContentRatingPrefix(input: KajoWikidataCont
           check(alias.namespace === aliases[index]?.namespace && alias.externalId === aliases[index]?.externalId, 'exact external identity'); });
         shape(p.alias, ['namespace', 'externalId']);
         check(p.alias.namespace === 'wikidata_item' && p.alias.externalId === p.providerItemId, 'entity alias');
-        const extraction = extractWikidataFilmEvidence(new TextEncoder().encode(payload.projectionText), {
+        const extraction = generation.extract(new TextEncoder().encode(payload.projectionText), {
           entityId: p.providerItemId, identity: payload.identity, retrievedAtMicros: payload.retrievedAtMicros, cutoffMicros: input.cutoffMicros });
         const evidence = extraction.evidence;
         check(evidence !== null && p.projectionHash === evidence.sourceSha256 && p.sourceUrl === evidence.sourceUrl
@@ -159,5 +187,5 @@ export function normalizeKajoWikidataContentRatingPrefix(input: KajoWikidataCont
   }
   return { ...normalized, content: { ...normalized.content, sourceVersion }, prefix: { ...normalized.prefix,
     sourceId: 'kajo-owned-native-and-taste-ratings',
-    sourceVersion: `owned-rating-source-v3:${input.trainingSource.bodyMd5}:${input.source.bodyMd5}:${sourceVersion}` } };
+    sourceVersion: `${generation.source}${input.trainingSource.bodyMd5}:${input.source.bodyMd5}:${sourceVersion}` } };
 }

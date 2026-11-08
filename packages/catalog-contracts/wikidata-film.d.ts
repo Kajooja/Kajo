@@ -54,3 +54,20 @@ export function inspectWikidataFilmBatch(requests: readonly Readonly<{
 }>[], catalogue: WikidataFilmCatalogueReview): readonly (WikidataFilmResult & Readonly<{
   itemId: string; entityId: string; catalogueSha256: string; cutoffMicros: string;
 }>)[];
+
+export const WIKIDATA_FILM_MAPPING_V2: Omit<typeof WIKIDATA_FILM_MAPPING, 'version'> & Readonly<{
+  version: 'wikidata-film-direct-genres-v2';
+  statementIdPolicy: 'ASCII_Q_OR_q_EXACT_ENTITY_DIGITS_AND_GUID';
+}>;
+export const WIKIDATA_FILM_MAPPING_V2_SHA256: string;
+export interface WikidataFilmEvidenceV2 extends Omit<WikidataFilmEvidence, 'version'> {
+  readonly version: 'wikidata-film-evidence-v2';
+}
+export type WikidataFilmResultV2 = Omit<WikidataFilmResult, 'evidence'> & Readonly<{
+  evidence: WikidataFilmEvidenceV2 | null;
+}>;
+export function extractWikidataFilmEvidenceV2(bytes: Uint8Array, context: WikidataFilmContext): WikidataFilmResultV2;
+export function inspectWikidataFilmBatchV2(requests: Parameters<typeof inspectWikidataFilmBatch>[0],
+  catalogue: WikidataFilmCatalogueReview): readonly (WikidataFilmResultV2 & Readonly<{
+    itemId: string; entityId: string; catalogueSha256: string; cutoffMicros: string;
+  }>)[];

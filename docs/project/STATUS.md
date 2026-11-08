@@ -63,13 +63,25 @@ case difference; derived diagnostic bytes are never ingestion evidence.
 Separate qualified identity statements and unsupported film types remain
 unavailable under the accepted policy and must not be silently widened.
 
-**Single next action:** [#442](https://github.com/Kajooja/Kajo/issues/442) — add a
-versioned extraction/mapping contract and native capture successor for legacy
-statement-ID case. Accept only `Q`/`q` equivalence for the same exact entity digits
-and existing GUID suffix; preserve original bytes and all old capture/extraction
-contracts. The installed forward is immutable. Require SQL/JavaScript parity,
-negative identity cases, old-generation retry/preservation/rollback and complete
-CI before a new guarded installation. DATA_ENRICHMENT owns this scope.
+**Active source implementation:** [#442](https://github.com/Kajooja/Kajo/issues/442),
+branch `fix/wikidata-statement-id-v2`. Explicit offline extraction/mapping **v2**
+and native prepare/finalize **v5** implement the narrow statement-prefix correction.
+Input/preparation **v4**, feature snapshot **v3** and `owned-rating-source-v4`
+separate new captures from every predecessor. Old source bytes, contracts and
+unavailable results remain unchanged. The installed migration is immutable; a new
+append-only migration creates five private functions and extends training-source
+retirement to the new generation. No source ingestion or worker activation is
+part of this code change.
+
+**Single next action:** complete final-source validation and review/merge #442,
+then rehearse and perform its guarded installation with independent postflight.
+Synthetic verification covers the existing 77 extraction cases, 58 additional
+same-byte old/new identity cases, MOVIE/BOOK captures, cross-generation rejection,
+source/permission/training retirement, populated v1-v4 exact retries and rollback.
+Native concurrency and full CI remain required before acceptance. A private
+candidate review also checks the retained original bytes through independent
+SQL/JavaScript extraction; this is local source eligibility, not hosted fitting
+support, quality admission or a new DEVELOPMENT observation.
 
 After that dependency, recheck the retained original-source packet, review bounded
 ingestion and inspect actual permitted MOVIE fitting support before a fresh

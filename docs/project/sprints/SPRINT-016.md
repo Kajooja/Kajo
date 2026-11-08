@@ -39,6 +39,20 @@ reviewed bounded ingestion, actual fitting support and a fresh private DEVELOPME
 comparison remain sequential acceptance work. No worker activation, account reset,
 external-rating import or serving admission occurs.
 
+## Statement-ID compatibility — #442
+
+The active `fix/wikidata-statement-id-v2` source introduces extraction/mapping v2,
+native capture v5, input/preparation v4 and feature snapshot v3. It accepts only
+ASCII Q/q statement entity-prefix equivalence and preserves every earlier
+contract, original byte hash and unavailable result. The append-only migration
+adds five private helpers and a narrowly guarded training-retirement extension.
+Both generations share unchanged mean/ridge computation, BOOK mapping and v2
+permission scope. Tests retain old behavior and cover the existing 77 extraction
+cases, 58 old/new identity cases, populated v1-v4 retries/rollback, source and
+training withdrawal, and new capture/concurrency checks in the native CLI gate.
+Source acceptance, guarded installation and observed ingestion/support remain
+separate pending gates; STATUS owns the exact current action.
+
 ## Wikidata provider evidence — #436
 
 The first source slice of the current provider integration adds bounded offline

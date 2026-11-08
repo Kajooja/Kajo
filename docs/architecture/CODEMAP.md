@@ -96,6 +96,19 @@ DATA_ENRICHMENT owns source semantics; STATUS owns the one continuation.
 | Extraction/capture/upgrade/lock proofs | `scripts/database/wikidata-content{,-upgrade}.test.mjs`, `wikidata-content-{verification,upgrade,concurrency}.mjs`; native CLI gate retains distinct-backend witnesses and old v1/v2/v3 rollback/retries |
 | Evaluation continuity | `kajo-personal-rating-evaluation.ts` explicitly binds `owned-rating-source-v3` and rejects cross-generation declaration reuse |
 
+
+### Statement-ID successor — #442
+
+The same contract and adapter modules expose explicit v2 exports; old exports
+retain their original versions. The append-only
+`20261108195957_wikidata_statement_id_compatibility.sql` creates the private v5
+prepare/finalize generation and frozen v2 projection. The capture worker selects
+v4/v5 explicitly, and the evaluation adapter verifies the matching versions.
+`wikidata-statement-id-verification.mjs` / `wikidata-statement-id.test.mjs` add
+same-byte identity parity and populated v1-v4 preservation/rollback. Existing
+capture/concurrency verifiers exercise both generations; the native CLI report
+retains separate successor fields and real backend lock witnesses.
+
 ## Owned Taste numeric capture — Sprint 016 / #432
 
 | Responsibility | Implementation |

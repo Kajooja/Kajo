@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { extractWikidataFilmEvidence, WIKIDATA_FILM_MAPPING } from '@kajo/catalog-contracts/wikidata-film';
+import { extractWikidataFilmEvidence, extractWikidataFilmEvidenceV2, WIKIDATA_FILM_MAPPING } from '@kajo/catalog-contracts/wikidata-film';
 import { withOwnedTasteNumericFixture } from './owned-taste-numeric-verification.mjs';
-import { captureWikidataContentNumericForecast, finalizeWikidataContent } from './wikidata-content-capture.mjs';
+import { captureWikidataContentNumericForecast, captureWikidataContentNumericForecastV2, finalizeWikidataContent, finalizeWikidataContentV2 } from './wikidata-content-capture.mjs';
 import { json, literal, inspect, answer } from './personal-rating-prospective.mjs';
 import { inspectPersonalRatingOwnerCensus } from './personal-rating-evaluation.mjs';
 
@@ -29,19 +29,21 @@ export function wikidataFixture(context, genres = ['Q471839']) {
 }
 
 /** Independent SQL/JS extraction from identical bytes, reusable on native PG. */
-export async function verifyWikidataProjection(exec) {
+export async function verifyWikidataProjection(exec, { successor = false } = {}) {
+  const extract = successor ? extractWikidataFilmEvidenceV2 : extractWikidataFilmEvidence;
+  const project = successor ? 'project_wikidata_film_v2' : 'project_wikidata_film_v1';
   const cases = [];
   const check = async (name, mutate = () => {}, changes = {}, raw) => {
     const c = { ...context, ...changes }, source = wikidataFixture(c);mutate(source.entities[c.entityId], source);
     const text = raw ?? JSON.stringify(source);
-    const js = extractWikidataFilmEvidence(new TextEncoder().encode(text), c);
-    const [sql] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(text)},${literal(c.entityId)},
+    const js = extract(new TextEncoder().encode(text), c);
+    const [sql] = await exec(`select coalesce(private.${project}(${literal(text)},${literal(c.entityId)},
       ${literal(c.identity.imdbId)},${literal(c.identity.tmdbMovieId)},${literal(c.retrievedAtMicros)},${literal(c.cutoffMicros)}),'null'::jsonb);`);
     if (js.evidence === null) assert.equal(sql, null, name);
     else {
       assert.ok(sql, name);assert.deepEqual(sql.assertions, js.evidence.assertions, name);assert.deepEqual(sql.values, js.evidence.values, name);
       assert.equal(sql.sourceHash, sha(text), name);assert.equal(sql.projectionHash, sha(sql.projectionText));
-      const projected = extractWikidataFilmEvidence(new TextEncoder().encode(sql.projectionText), c);
+      const projected = extract(new TextEncoder().encode(sql.projectionText), c);
       assert.deepEqual(projected.evidence?.claims, js.evidence.claims, name);
       assert.deepEqual(projected.evidence?.values, js.evidence.values, name);
       assert.equal(sql.projectionText.includes('do not retain'), false);
@@ -78,9 +80,9 @@ export async function verifyWikidataProjection(exec) {
       P854: [{ property: 'P854', snaktype: 'value', datavalue: { type: 'string', value: marker } }],
     } }];
     const raw = JSON.stringify(source);
-    assert.ok(extractWikidataFilmEvidence(new TextEncoder().encode(raw), context).evidence,
+    assert.ok(extract(new TextEncoder().encode(raw), context).evidence,
       'Standalone extraction retains its accepted URL contract');
-    const [native] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(raw)},${literal(context.entityId)},
+    const [native] = await exec(`select coalesce(private.${project}(${literal(raw)},${literal(context.entityId)},
       ${literal(context.identity.imdbId)},${literal(context.identity.tmdbMovieId)},${literal(context.retrievedAtMicros)},${literal(context.cutoffMicros)}),'null'::jsonb);`);
     assert.equal(native, null, marker);cases.push('native unsupported reference URL ' + cases.length);
   }
@@ -96,8 +98,8 @@ export async function verifyWikidataProjection(exec) {
     } }];
     const number = kind === 'genre' ? '471839' : '20828898';
     const raw = JSON.stringify(source).replace('"numeric-id":' + number, '"numeric-id":' + number + '.00000000000001');
-    assert.ok(extractWikidataFilmEvidence(new TextEncoder().encode(raw), context).evidence);
-    const [native] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(raw)},${literal(context.entityId)},
+    assert.ok(extract(new TextEncoder().encode(raw), context).evidence);
+    const [native] = await exec(`select coalesce(private.${project}(${literal(raw)},${literal(context.entityId)},
       ${literal(context.identity.imdbId)},${literal(context.identity.tmdbMovieId)},${literal(context.retrievedAtMicros)},${literal(context.cutoffMicros)}),'null'::jsonb);`);
     assert.equal(native, null, 'Rounded ' + kind + ' identifier must not freeze a conflicting vector');
     cases.push('native rounded ' + kind + ' identifier');
@@ -109,7 +111,7 @@ export async function verifyWikidataProjection(exec) {
     source.entities[context.entityId].claims.P136[0].references = [{ hash: 'a'.repeat(40), snaks: {
       P248: [{ property: 'P248', snaktype: 'value', datavalue: { type: 'wikibase-entityid', value: { 'numeric-id': marker } } }],
     } }];
-    const [native] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(JSON.stringify(source))},${literal(context.entityId)},
+    const [native] = await exec(`select coalesce(private.${project}(${literal(JSON.stringify(source))},${literal(context.entityId)},
       ${literal(context.identity.imdbId)},${literal(context.identity.tmdbMovieId)},${literal(context.retrievedAtMicros)},${literal(context.cutoffMicros)}),'null'::jsonb);`);
     assert.equal(native, null, 'Unsupported compound reference ID must not reach worker coercion');
     cases.push('native compound reference identifier ' + cases.length);
@@ -131,20 +133,23 @@ export async function verifyWikidataProjection(exec) {
   // Native projection has a stricter 64 KiB limit, leaving room for the reused
   // extractor's diagnostics inside its immutable 256 KiB evidence contract.
   const large = wikidataFixture(context);large.entities[context.entityId].claims.P1476 = [{ type: 'statement', rank: 'normal', mainsnak: { text: 'x'.repeat(65536) } }];
-  const [bounded] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(JSON.stringify(large))},${literal(context.entityId)},
+  const [bounded] = await exec(`select coalesce(private.${project}(${literal(JSON.stringify(large))},${literal(context.entityId)},
     ${literal(context.identity.imdbId)},${literal(context.identity.tmdbMovieId)},${literal(context.retrievedAtMicros)},${literal(context.cutoffMicros)}),'null'::jsonb);`);
   assert.equal(bounded, null);cases.push('native projection budget');
   return { status: 'PASS', cases, count: cases.length, qualityAdmission: 'NONE' };
 }
 
-export async function withWikidataContentFixture(exec, withSession, run) {
+export async function withWikidataContentFixture(exec, withSession, run, { lowercase = false } = {}) {
   return withOwnedTasteNumericFixture(exec, withSession, async ctx => {
     const { f, one, contentSources, questions } = ctx;
     const retrievedAtMicros = String(BigInt(await one('select to_jsonb((extract(epoch from clock_timestamp())*1000000)::bigint::text);')) - 2_000_000n);
     const movieSources = contentSources.filter(s => s.providerKey === 'tmdb').map((s, n) => {
       const context = { entityId: 'Q' + (900000001 + n), identity: { imdbId: 'tt' + (9000001 + n), tmdbMovieId: s.providerItemId } };
       const index = questions.findIndex(q => q.itemId === s.itemId);
-      const sourceText = JSON.stringify(wikidataFixture(context, [Object.keys(WIKIDATA_FILM_MAPPING.genreItems)[(index < 0 ? n : index) % 6]]));
+      const fixture = wikidataFixture(context, [Object.keys(WIKIDATA_FILM_MAPPING.genreItems)[(index < 0 ? n : index) % 6]]);
+      if (lowercase) for (const statements of Object.values(fixture.entities[context.entityId].claims))
+        for (const statement of statements) statement.id = 'q' + statement.id.slice(1);
+      const sourceText = JSON.stringify(fixture);
       return { ...s, context, sourceText };
     });
     await exec(`begin;${movieSources.map(s => `insert into private.item_sources(item_id,provider_key,provider_item_id,source_payload,source_hash,
@@ -162,8 +167,12 @@ export async function withWikidataContentFixture(exec, withSession, run) {
   });
 }
 
-export async function verifyWikidataContentCapture(exec, withSession) {
-  return withWikidataContentFixture(exec, withSession, async ({ f, call, one, request, movieSources, featureUse, command }) => {
+export async function verifyWikidataContentCapture(exec, withSession, { successor = false } = {}) {
+  const capture = successor ? captureWikidataContentNumericForecastV2 : captureWikidataContentNumericForecast;
+  const finalize = successor ? finalizeWikidataContentV2 : finalizeWikidataContent;
+  const featureCapture = successor ? 'capture_personal_rating_content_v3' : 'capture_personal_rating_content_v2';
+  const sourceVersion = successor ? 'owned-rating-source-v4:' : 'owned-rating-source-v3:';
+  return withWikidataContentFixture(exec, withSession, async ({ f, call, one, request, movieSources, featureUse, command, state, questions, rpc, cmd }) => {
     const subtransaction = async captured => {
       const input = captured.preparation.input, object = input.contentFeatures.objects.find(o => o.status === 'AVAILABLE');
       assert.ok(object);
@@ -175,7 +184,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
         const result = await one(`begin;savepoint source_write;update ${table} set ${column}=clock_timestamp() where ${predicate};
           release savepoint source_write;lock table public.items,private.item_sources,private.item_external_ids in share mode nowait;
           select jsonb_build_object('child',(select xmin::text from ${table} where ${predicate}),'parent',pg_current_xact_id()::text,
-            'features',private.capture_personal_rating_content_v2(${json(input)}||jsonb_build_object('cutoffMicros',
+            'features',private.${featureCapture}(${json(input)}||jsonb_build_object('cutoffMicros',
               (extract(epoch from clock_timestamp())*1000000)::bigint::text),${json(featureUse)}));rollback;`);
         assert.notEqual(result.child, result.parent, 'Exercise actual released subtransaction xmin');
         assert.equal(result.features.objects.find(o => o.objectId === object.objectId).provenance, null, input.itemType + '/' + kind);
@@ -183,14 +192,16 @@ export async function verifyWikidataContentCapture(exec, withSession) {
       }
     };
     const selected = await request();
-    await assert.rejects(captureWikidataContentNumericForecast(withSession, { ...selected, featureUse: {
+    await assert.rejects(capture(withSession, { ...selected, featureUse: {
       ...featureUse, validUntilMicros: String(BigInt(featureUse.validFromMicros) + 1n) } }), sqlstate('22023'));
-    const captured = await captureWikidataContentNumericForecast(withSession, selected);
-    assert.equal(captured.preparation.version, 'kajo-personal-content-rating-preparation-v3');
+    const captured = await capture(withSession, selected);
+    assert.equal(captured.preparation.version, successor ? 'kajo-personal-content-rating-preparation-v4' : 'kajo-personal-content-rating-preparation-v3');
     assert.equal(captured.forecast.contentFit.status, 'FITTED');assert.equal(captured.forecast.prefix.support, 2);
     assert.equal(captured.forecast.location.personalMean, 5);assert.equal(captured.forecast.servingActivation, 'NONE');
     assert.equal(captured.preparation.input.contentFeatures.objects.some(o => o.provenance?.providerKey === 'tmdb'), false);
-    assert.deepEqual((await captureWikidataContentNumericForecast(withSession, selected)).stored, captured.stored);
+    assert.deepEqual((await capture(withSession, selected)).stored, captured.stored);
+    const otherCapture = successor ? captureWikidataContentNumericForecast : captureWikidataContentNumericForecastV2;
+    await assert.rejects(otherCapture(withSession, selected), sqlstate('22023'));
     await subtransaction(captured);
     const { normalizeKajoPersonalRatingEvaluationInventory } = await import('../../packages/prediction-engine/dist/adapters/kajo-personal-rating-evaluation.js');
     const member = { actorUserId: f.actor, profileId: f.profile, subjectId: 'native:wikidata-subject' };
@@ -203,23 +214,26 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     const census = { version: 'kajo-personal-rating-census-v1', observedAtMicros: owner.observedAtMicros, owners: [owner] };
     normalizeKajoPersonalRatingEvaluationInventory(binding, census);
     assert.throws(() => normalizeKajoPersonalRatingEvaluationInventory({ ...binding,
-      sourceVersions: { ...binding.sourceVersions, source: binding.sourceVersions.source.replace('owned-rating-source-v3:', 'owned-rating-source-v2:') } }, census));
-    const { normalizeKajoWikidataContentRatingPrefix } = await import('../../packages/prediction-engine/dist/adapters/kajo-wikidata-content-rating.js');
+      sourceVersions: { ...binding.sourceVersions, source: binding.sourceVersions.source.replace(sourceVersion, 'owned-rating-source-v2:') } }, census));
+    const adapter = await import('../../packages/prediction-engine/dist/adapters/kajo-wikidata-content-rating.js');
+    const normalize = successor ? adapter.normalizeKajoWikidataContentRatingPrefixV2 : adapter.normalizeKajoWikidataContentRatingPrefix;
+    const other = successor ? adapter.normalizeKajoWikidataContentRatingPrefix : adapter.normalizeKajoWikidataContentRatingPrefixV2;
+    assert.throws(() => other(captured.preparation.input), /version/);
     for (const mutate of [p => { p.contentFeatures.objects[0].values[0] = 9; },
       p => { p.contentFeatures.objects[0].provenance.projectionHash = 'a'.repeat(64); },
       p => { p.contentFeatures.objects[0].provenance.aliases[0].externalId = 'tt9999999'; },
       p => { p.contentFeatures.featureUse.sources[0].providerKey = 'tmdb'; }, p => { p.version = 'kajo-personal-content-rating-prefix-v2'; }]) {
-      const changed = structuredClone(captured.preparation.input);mutate(changed);assert.throws(() => normalizeKajoWikidataContentRatingPrefix(changed));
+      const changed = structuredClone(captured.preparation.input);mutate(changed);assert.throws(() => normalize(changed));
     }
     const source = movieSources.find(s => s.itemId === captured.preparation.input.labels[0].itemId);
     assert.ok(source);
     // Payload-only correction leaves old identity keys unchanged, but must retire v4.
     await exec(`update private.item_sources set source_payload=source_payload||'{"correction":true}' where provider_key='wikidata' and item_id=${literal(source.itemId)};`);
     assert.equal((await call(inspect(selected.id))).status, 'WITHDRAWN');
-    await assert.rejects(captureWikidataContentNumericForecast(withSession, selected), sqlstate('55000'));
+    await assert.rejects(capture(withSession, selected), sqlstate('55000'));
     await exec(`update private.item_sources set source_payload=source_payload-'correction' where provider_key='wikidata' and item_id=${literal(source.itemId)};`);
     const readFeatures = () => one(`begin;lock table public.items,private.item_sources,private.item_external_ids in share mode nowait;
-      select private.capture_personal_rating_content_v2(${json(captured.preparation.input)}||jsonb_build_object('cutoffMicros',
+      select private.${featureCapture}(${json(captured.preparation.input)}||jsonb_build_object('cutoffMicros',
         (extract(epoch from clock_timestamp())*1000000)::bigint::text),${json(featureUse)});rollback;`);
     const original = await one(`select to_jsonb(s) from private.item_sources s where provider_key='wikidata' and item_id=${literal(source.itemId)};`);
     const unsupported = JSON.parse(source.sourceText);
@@ -236,7 +250,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     for (const unsupportedText of unsupportedSources) {
       await exec(`update private.item_sources set source_hash=${literal(sha(unsupportedText))},
         source_payload=jsonb_set(source_payload,'{sourceText}',${json(unsupportedText)}) where id=${literal(original.id)};`);
-      const unavailableCapture = await captureWikidataContentNumericForecast(withSession, await request());
+      const unavailableCapture = await capture(withSession, await request());
       assert.equal(unavailableCapture.preparation.input.contentFeatures.objects.find(o => o.objectId === source.itemId).provenance, null);
       assert.equal(unavailableCapture.forecast.prefix.support, 2, 'Unsupported source keeps committed numeric labels');
     }
@@ -257,36 +271,44 @@ export async function verifyWikidataContentCapture(exec, withSession) {
       ['alias insertion', `insert into private.item_external_ids(namespace,external_id,item_id) values('imdb_title','tt9999999999',${literal(source.itemId)})`, "delete from private.item_external_ids where namespace='imdb_title' and external_id='tt9999999999'"],
       ['alias removal', `delete from private.item_external_ids where namespace='imdb_title' and item_id=${literal(source.itemId)}`, `insert into private.item_external_ids(namespace,external_id,item_id) values('imdb_title',${literal(source.context.identity.imdbId)},${literal(source.itemId)})`],
     ]) {
-      const r = await request();await captureWikidataContentNumericForecast(withSession, r);await exec(mutation + ';');
+      const r = await request();await capture(withSession, r);await exec(mutation + ';');
       assert.equal((await call(inspect(r.id))).status, 'WITHDRAWN', name);await exec(cleanup + ';');
     }
     const fallbackRequest = { ...await request(), featureUse: null };
-    const fallback = await captureWikidataContentNumericForecast(withSession, fallbackRequest);
+    const fallback = await capture(withSession, fallbackRequest);
     assert.equal(fallback.forecast.contentFit.status, 'INSUFFICIENT_FEATURE_SUPPORT');
     assert.ok(fallback.preparation.input.contentFeatures.objects.every(o => o.values === null));
     await exec(`update private.item_sources set synced_at=clock_timestamp() where provider_key='wikidata' and item_id=${literal(source.itemId)};`);
     assert.equal((await call(inspect(fallbackRequest.id))).status, 'WITHDRAWN', 'unavailable source union is still frozen');
     const bookRequest = await request('BOOK', f.targets[1]);
-    const book = await captureWikidataContentNumericForecast(withSession, bookRequest);
+    const book = await capture(withSession, bookRequest);
     assert.equal(book.forecast.contentFit.status, 'FITTED');
     await subtransaction(book);
     const tamper = await request();
-    await assert.rejects(captureWikidataContentNumericForecast(withSession, tamper, { beforeFinalize: async ({ exec: connection, forecast }) => {
+    await assert.rejects(capture(withSession, tamper, { beforeFinalize: async ({ exec: connection, forecast }) => {
       const changed = structuredClone(forecast);changed.content.objects[0].values[0] = 9;
-      await connection(`select ${finalizeWikidataContent(tamper.id, changed)};`);
+      await connection(`select ${finalize(tamper.id, changed)};`);
     } }), sqlstate('22023'));
     assert.equal(await one(`select count(*)::integer from private.personal_rating_allocations where id=${literal(tamper.id)};`), 0);
-    const final = await captureWikidataContentNumericForecast(withSession, tamper);
+    const final = await capture(withSession, tamper);
     const first = await command(tamper.target, 6, { source: tamper.source });
     assert.equal((await call(answer(tamper.id, first))).coverage, 'MEASURED_FIRST_RATING');
     await call(`private.withdraw_personal_rating_content_review_v1(${literal(featureUse.reviewRef)})`);
     assert.equal((await call(inspect(tamper.id))).firstAnswer, null);
     assert.equal((await call(inspect(bookRequest.id))).status, 'WITHDRAWN');
+    if (successor) {
+      const trainingRequest = { ...await request(), featureUse: null };
+      await capture(withSession, trainingRequest);
+      state = await rpc(cmd(state, 'CORRECT', { questionId: questions[0].questionId, answer: { kind: 'RATING', value: 4 } }));
+      assert.equal((await call(inspect(trainingRequest.id))).status, 'WITHDRAWN', 'v5 depends on the original Taste labels');
+      await assert.rejects(capture(withSession, trainingRequest), sqlstate('55000'));
+    }
     assert.equal(final.forecast.qualityAdmission, 'NONE');
-    return { status: 'PASS', ownedTasteLabels: 2, domains: ['MOVIE', 'BOOK'], exactRetry: 'PASS', subtransactionWrites: 'INELIGIBLE_4_CASES',
+    return { status: 'PASS', generation: successor ? 5 : 4, crossGeneration: 'REJECTED',
+      trainingCorrection: successor ? 'RETIRED' : 'PREDECESSOR_SEPARATELY_VERIFIED', ownedTasteLabels: 2, domains: ['MOVIE', 'BOOK'], exactRetry: 'PASS', subtransactionWrites: 'INELIGIBLE_4_CASES',
       unsupportedReferenceUrl: 'UNAVAILABLE_WITH_NUMERIC_LABELS_RETAINED',
       roundedNumbers: 'UNAVAILABLE_WITH_NUMERIC_LABELS_RETAINED',
       compoundReferenceIds: 'UNAVAILABLE_WITH_NUMERIC_LABELS_RETAINED',
       sourceCorrection: 'RETIRED', aliasChanges: 'RETIRED', permissionWithdrawal: 'RETIRED', qualityAdmission: 'NONE', servingActivation: 'NONE' };
-  });
+  }, { lowercase: successor });
 }

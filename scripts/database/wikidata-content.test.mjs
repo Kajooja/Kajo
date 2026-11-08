@@ -18,7 +18,7 @@ test('Wikidata SQL and JavaScript agree on bounded source, identity, rank and re
   } finally { await db.close(); }
 });
 
-for (const transport of ['driver-code', 'redacted-psql']) test(`native Wikidata capture fits independent content, preserves retries and retires changed dependencies (${transport})`, { timeout: 240_000 }, async t => {
+for (const successor of [false, true]) for (const transport of ['driver-code', 'redacted-psql']) test(`native Wikidata capture fits independent content, preserves retries and retires changed dependencies (${transport}, successor=${successor})`, { timeout: 240_000 }, async t => {
   const db = new PGlite();
   try {
     await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema auth;
@@ -39,7 +39,7 @@ for (const transport of ['driver-code', 'redacted-psql']) test(`native Wikidata 
         throw new Error(`Isolated SQL persistent-sql/${options?.stage ?? 'query'}: process exited before a clean acknowledgement (SQLSTATE ${error.code})`);
       }
     };
-    const report = await verifyWikidataContentCapture(exec, callback => callback(sessionExec));
+    const report = await verifyWikidataContentCapture(exec, callback => callback(sessionExec), { successor });
     assert.equal(report.status, 'PASS');t.diagnostic(JSON.stringify(report));
   } finally { await db.close(); }
 });
