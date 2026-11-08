@@ -1,4 +1,5 @@
 import type { PersonalContentRatingInput } from '../personal-content-rating.js';
+import type { PersonalRatingBaselineInput } from '../personal-rating.js';
 import type { KajoPersonalContentRatingPrefix } from './kajo-personal-content-rating.js';
 import { normalizeKajoPersonalContentFeatures } from './kajo-personal-content-rating.js';
 import { normalizeKajoPersonalRatingProspectivePrefix } from './kajo-personal-rating-prospective.js';
@@ -42,7 +43,7 @@ function shape(value: unknown, keys: readonly string[]): void {
 /** Shape checks are not database authorization. Only the locked trusted capture
  * supplies committed source lineage. Accepted-at is a report clock, never an
  * invented experience date; retained raw bootstrap provenance makes that explicit. */
-export function normalizeKajoOwnedTasteRatingPrefix(input: KajoOwnedTasteRatingPrefix): PersonalContentRatingInput {
+export function normalizeKajoOwnedTasteRatingLabels(input: KajoOwnedTasteRatingPrefix): PersonalRatingBaselineInput {
   check(input?.version === 'kajo-personal-content-rating-prefix-v2'
     && new TextEncoder().encode(JSON.stringify(input)).byteLength <= 4 * 1024 * 1024, 'version/input budget');
   check(input.trainingSource?.signature === 'private.personal_rating_training_sources_v2(uuid,text,timestamp with time zone)'
@@ -84,7 +85,11 @@ export function normalizeKajoOwnedTasteRatingPrefix(input: KajoOwnedTasteRatingP
   const baseline = { ...projected,
     prefix: { ...projected.prefix, snapshotId: input.snapshotId, ratings: [...projected.prefix.ratings, ...taste] },
     candidatePool: { ...projected.candidatePool, snapshotId: input.snapshotId } };
-  const content = normalizeKajoPersonalContentFeatures(input, baseline);
+  return baseline;
+}
+
+export function normalizeKajoOwnedTasteRatingPrefix(input: KajoOwnedTasteRatingPrefix): PersonalContentRatingInput {
+  const content = normalizeKajoPersonalContentFeatures(input, normalizeKajoOwnedTasteRatingLabels(input));
   return { ...content, prefix: { ...content.prefix, sourceId: 'kajo-owned-native-and-taste-ratings',
     sourceVersion: `owned-rating-source-v2:${input.trainingSource.bodyMd5}:${input.source.bodyMd5}:${content.content.sourceVersion}` } };
 }

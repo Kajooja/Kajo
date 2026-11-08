@@ -126,6 +126,10 @@
     "./research-response": {
       "types": "./dist/research-response.d.ts",
       "import": "./dist/research-response.js"
+    },
+    "./adapters/kajo-wikidata-content-rating": {
+      "types": "./dist/adapters/kajo-wikidata-content-rating.d.ts",
+      "import": "./dist/adapters/kajo-wikidata-content-rating.js"
     }
   },
   "scripts": {
@@ -144,5 +148,8 @@
     "eslint": "^9.39.1",
     "typescript": "~6.0.3",
     "vitest": "4.1.12"
+  },
+  "dependencies": {
+    "@kajo/catalog-contracts": "0.1.0"
   }
 }

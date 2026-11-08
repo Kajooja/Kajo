@@ -9,6 +9,7 @@ import * as core from '@kajo/prediction-engine';
 import { forecastPersonalRatingBaseline } from '@kajo/prediction-engine/personal-rating';
 import { forecastPersonalContentRating } from '@kajo/prediction-engine/personal-content-rating';
 import { normalizeKajoPersonalContentRatingPrefix } from '@kajo/prediction-engine/adapters/kajo-personal-content-rating';
+import { normalizeKajoWikidataContentRatingPrefix } from '@kajo/prediction-engine/adapters/kajo-wikidata-content-rating';
 import { normalizeKajoOwnedTasteRatingPrefix } from '@kajo/prediction-engine/adapters/kajo-owned-taste-rating';
 import { validatePersonalRatingEvaluationDeclaration, buildPersonalRatingEvaluationReport }
   from '@kajo/prediction-engine/personal-rating-evaluation';
@@ -48,6 +49,8 @@ assert.equal(core.forecastPersonalContentRating, undefined);
 assert.equal(core.normalizeKajoPersonalContentRatingPrefix, undefined);
 assert.equal(typeof normalizeKajoOwnedTasteRatingPrefix, 'function');
 assert.equal(core.normalizeKajoOwnedTasteRatingPrefix, undefined);
+assert.equal(typeof normalizeKajoWikidataContentRatingPrefix, 'function');
+assert.equal(core.normalizeKajoWikidataContentRatingPrefix, undefined);
 for (const fn of [validatePersonalRatingEvaluationDeclaration, buildPersonalRatingEvaluationReport,
   normalizeKajoPersonalRatingEvaluationInventory]) assert.equal(typeof fn, 'function');
 assert.equal(core.buildPersonalRatingEvaluationReport, undefined);
@@ -111,9 +114,10 @@ async function inspect(path) {
 await inspect(join(root, 'index.js'));
 assert.ok((await readdir(root)).includes('index.d.ts'));
 // Optional computation and adapter graphs stay separate from the root and
-// contain no app or provider runtime dependency.
+// contain no app or network runtime dependency. The Kajo-only Wikidata adapter
+// explicitly imports its pure offline catalogue contract; the core stays independent.
 for (const file of ['research-response.js', 'research-static.js', 'adapters/book-genome.js', 'personal-content-rating.js', 'adapters/kajo-personal-content-rating.js', 'adapters/kajo-owned-taste-rating.js',
-  'personal-rating-evaluation.js', 'adapters/kajo-personal-rating-evaluation.js',
+  'personal-rating-evaluation.js', 'adapters/kajo-personal-rating-evaluation.js', 'adapters/kajo-wikidata-content-rating.js',
   'adapters/kajo-personal-rating-prospective.js', 'personal-rating.js', 'adapters/kajo-personal-rating.js', 'ordinal.js', 'adapters/kajo-ordinal.js', 'working-state.js', 'adapters/kajo-working-state.js',
   'ranking-conformance.js', 'adapters/kajo-native-prediction.js',
   'working-evaluation.js', 'adapters/kajo-working-evaluation.js', 'adapters/kajo-working-outcomes.js',
@@ -129,7 +133,8 @@ for (const file of ['research-response.js', 'research-static.js', 'adapters/book
     'adapters/kajo-personal-content-rating.js': ['./kajo-personal-rating-prospective.js'],
     'adapters/kajo-owned-taste-rating.js': ['./kajo-personal-content-rating.js', './kajo-personal-rating-prospective.js'],
     'adapters/kajo-personal-rating-evaluation.js': ['../personal-rating.js', '../personal-content-rating.js',
-      './kajo-personal-rating-prospective.js', './kajo-personal-content-rating.js', './kajo-owned-taste-rating.js'],
+      './kajo-personal-rating-prospective.js', './kajo-personal-content-rating.js', './kajo-owned-taste-rating.js', './kajo-wikidata-content-rating.js'],
+    'adapters/kajo-wikidata-content-rating.js': ['@kajo/catalog-contracts/wikidata-film', './kajo-owned-taste-rating.js', './kajo-personal-content-rating.js'],
     'personal-rating.js': ['./rating-location.js'],
     'adapters/kajo-personal-rating-prospective.js': [],
     'adapters/kajo-personal-rating.js': ['../personal-rating.js'],

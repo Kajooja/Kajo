@@ -327,9 +327,9 @@ not change them or admit a source/model.
 
 The first source slice, [#436](https://github.com/Kajooja/Kajo/issues/436), provides
 the offline `@kajo/catalog-contracts/wikidata-film` contract. Source/CI acceptance
-belongs to STATUS and the linked PR. Its candidate output is not admitted to the
-native content adapter or capture: that remaining integration must use a new
-generation, not a manifest-only toggle or relabeling of retained TMDB features.
+belongs to STATUS and the linked PR. Its candidate output alone grants no native
+capture admission. The #438 successor below uses a new generation, not a
+manifest-only toggle or relabeling of retained TMDB features.
 The bounded direct mapping into the existing six concepts is:
 
 | Concept | Direct P136 value |
@@ -392,17 +392,41 @@ the source-use review relies on the publisher's structured-data CC0 dedication
 and retains unresolved/reference-free origins. Do not fetch prose or external
 rating histories from statement reference links as a side effect.
 
-The next native source packet must consume this explicit contract. Before
-ingestion or fitting, review the provider/evidence identity and finite mapping
-digest, append-only source/capture version, exact alias collision and
-redirect/merge handling, permission horizon and available-at cutoff. Require
-SQL/TypeScript parity and concurrent-writer/lifecycle tests: source or alias
-correction/deletion and explicit review withdrawal must retire dependent copies,
-while old v1/v2/v3 capture meanings and exact retries stay unchanged. A source's
-earlier modified time cannot backdate Kajo's knowledge or refill an old forecast.
-Bound payloads, statements, references and requests; retain safe unsupported
-fallback. Only actual permitted runtime support can precede a new DEVELOPMENT
-declaration, and measured native usefulness still precedes model admission.
+The native successor [#438](https://github.com/Kajooja/Kajo/issues/438) consumes
+this contract through a new private capture generation. Its source rows use
+`provider_key = wikidata` and the closed `wikidata-entitydata-source-v1` payload
+with original UTF-8 `sourceText` and actual `retrievedAtMicros`. Native capture
+checks original-byte SHA-256, revision-addressed URL, modified time and committed
+row/alias availability. PostgreSQL's unique-key JSON predicate precedes conversion
+to JSONB ([PostgreSQL 17 JSON predicates](https://www.postgresql.org/docs/17/functions-json.html));
+node/depth, statement and reference limits remain bounded. PostgreSQL
+UTF-8 representability and a stricter **64 KiB claims projection** limit are native
+eligibility conditions; the latter leaves room for re-extracted diagnostics inside
+the offline contract's 256 KiB evidence limit. The complete retained preparation
+remains capped at 4 MiB. Over-budget sources stay unavailable; no silent truncation.
+
+Only the seven allowlisted claim properties enter the frozen projection. Original
+source SHA-256 and projection-text SHA-256 identify different byte sequences.
+JavaScript reuses the accepted extractor on the projection; it does not claim that
+reconstructed JSON is the original response. SQL independently computes the same
+six assertion-presence values. Missing mapped assertions remain unavailable.
+BOOK retains its finite Open Library mapping. The new combined mapping digest
+pins both source contracts; no provider feature is renamed to bypass source use.
+
+All three exact catalogue aliases are required under Item/source/alias relation
+fences. Global constraints plus complete per-Item source/alias counts reject
+collisions and redirects. The explicit v2 manifest covers capture plus answer
+horizon and source-bound retention. New Item dependency references cover the
+complete training/candidate union, including unavailable rows, so source/alias
+insertions, corrections and withdrawal retire dependent copies. Old capture
+meaning/retry preservation, populated rollback and native concurrent-writer
+proofs are required before source acceptance.
+
+STATUS and the linked PR own CI acceptance. This source packet does not install
+the forward or ingest observed sources. Guarded retained-state rehearsal and
+installation, reviewed bounded ingestion and actual permitted fitting support
+still precede a new DEVELOPMENT declaration. Preserve current answers. No quality
+or serving admission follows from successful source fixtures.
 
 ## 5. Isolated research storage and execution
 

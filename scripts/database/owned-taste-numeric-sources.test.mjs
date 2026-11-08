@@ -28,7 +28,8 @@ test('owned Taste numeric sources require committed lineage and preserve native 
       create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}',is_anonymous boolean default false);
       create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
       grant usage on schema public,auth to anon,authenticated,service_role;`);
-    const files = (await buildFreshInstallation()).files;
+    const all = (await buildFreshInstallation()).files;
+    const files = all.slice(0, all.findIndex(file => file.name.endsWith('_owned_taste_numeric_sources.sql')) + 1);
     for (const file of files.slice(0, -1)) await db.exec(`begin;${file.sql}commit;`);
     await db.exec(await personalTasteSessionFixtureSql());
     const { id: profile } = await one("select id from public.profiles where owner_user_id=$1 and profile_type='PERSONAL'", [owner]);

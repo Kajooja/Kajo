@@ -81,10 +81,20 @@ DEVELOPMENT collection remain separate. See [ADR-0006](decisions/0006-clean-inst
 | Synthetic source regressions | `packages/catalog-contracts/wikidata-film.test.mjs`; joins existing catalogue workspace tests/root check and package lint |
 
 This optional provider module stays outside the portable engine core and default
-presentation export. It performs no network/database operation. Native SQL,
-content/capture workers and fitting support are unchanged; the next versioned
-native integration must prove parity, fences, withdrawal and old-capture retries.
+presentation export. It performs no network/database operation. The native
+successor below uses it through the optional Kajo adapter; the portable core has
+no provider dependency.
 DATA_ENRICHMENT owns source semantics; STATUS owns the one continuation.
+
+## Native Wikidata content capture — Sprint 016 / #438
+
+| Responsibility | Implementation |
+| --- | --- |
+| Independent source projection, v4 capture and complete catalogue retirement | `supabase/migrations/20261108000938_wikidata_native_content_capture.sql`; original/projection byte hashes, exact three-alias binding, closed v2 manifest and Item dependency references |
+| Versioned Kajo input validation | `packages/prediction-engine/src/adapters/kajo-wikidata-content-rating.ts`, optional `./adapters/kajo-wikidata-content-rating`; reused offline extractor and unchanged BOOK mapping/numeric core |
+| Dedicated transaction | `scripts/database/wikidata-content-capture.mjs`; prepare v4 → compiled core → finalize v4; no public RPC or automatic worker activation |
+| Extraction/capture/upgrade/lock proofs | `scripts/database/wikidata-content{,-upgrade}.test.mjs`, `wikidata-content-{verification,upgrade,concurrency}.mjs`; native CLI gate retains distinct-backend witnesses and old v1/v2/v3 rollback/retries |
+| Evaluation continuity | `kajo-personal-rating-evaluation.ts` explicitly binds `owned-rating-source-v3` and rejects cross-generation declaration reuse |
 
 ## Owned Taste numeric capture — Sprint 016 / #432
 

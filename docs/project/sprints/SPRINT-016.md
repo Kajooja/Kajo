@@ -5,6 +5,24 @@ Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
 
+## Native Wikidata content capture — #438
+
+A new private v4 prepare/finalize path freezes v3 owned-rating prefixes with v2
+content/permission envelopes. MOVIE uses the explicit Wikidata contract; BOOK
+retains the Open Library mapping. SQL independently parses/hashes original bytes
+and projects claims; the Kajo adapter re-extracts the frozen projection with the
+accepted JavaScript contract. Numerical model math and original rating lineage
+remain unchanged. Complete catalogue Item dependencies cover source/alias
+insertions, corrections and deletion, including originally unavailable vectors.
+
+The append-only forward preserves old v1/v2/v3 capture rows and exact retries.
+Synthetic local/native verification covers vectors, committed identity and time,
+permission horizon, evaluation source binding, source retirement, concurrent
+catalogue writers, populated upgrade and rollback. STATUS/linked PR own final
+source CI. Hosted installation, reviewed ingestion, actual fitting support and a
+fresh private DEVELOPMENT comparison remain sequential acceptance work. No worker
+activation, account reset, external-rating import or serving admission occurs.
+
 ## Wikidata provider evidence — #436
 
 The first source slice of the current provider integration adds bounded offline
@@ -16,10 +34,8 @@ known TMDB-origin genre references cannot supply features. Candidate output keep
 origin unresolved and grants no permission or model admission.
 
 The optional catalogue-contract export and deterministic synthetic tests are
-source work only. STATUS/the linked PR own final CI acceptance. The single next
-implementation is its native content/capture generation, SQL/JavaScript parity,
-permission/fence/withdrawal and old-generation preservation proofs. Then reviewed
-ingestion and actual fitting support precede DEVELOPMENT. This does not complete
+source work only. STATUS/the linked PR own final CI acceptance. Its native successor is #438 above. After source acceptance and guarded
+installation, reviewed ingestion and actual fitting support precede DEVELOPMENT. This does not complete
 the Wikidata integration, Sprint 016 or any quality/serving gate.
 
 ## Owned Taste numeric source — #432
@@ -48,8 +64,7 @@ content fit; the repair must not be replayed. MOVIE feature support remains
 insufficient. The bounded label-blind Wikidata identity/coverage inspection is
 complete and supplies candidate assertions with explicit unsupported gaps and
 origin uncertainty. #435 is accepted; #436 supplies the offline evidence/finite
-mapping source slice above. Its native source/capture version, SQL/JavaScript
-parity and identity/availability/withdrawal preservation checks remain next.
+mapping source slice above. The versioned native successor and its preservation checks are in #438 above.
 Reviewed ingestion and actual fitting support precede a fresh private
 MOVIE-then-BOOK DEVELOPMENT declaration. Keep the prepared worker inactive and TMDB
 features unlisted under the [November 7 source-use review](../../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07).

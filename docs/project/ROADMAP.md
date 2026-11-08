@@ -36,12 +36,12 @@ applied and post-commit preservation-verified; separate read-only inspection
 confirms permitted BOOK content support and an available fit. Do not replay the
 repair. The bounded label-blind Wikidata identity/coverage review is complete;
 its direct structured assertions remain candidate inputs, not admitted runtime
-features. #435's handoff is accepted. #436 implements the bounded offline
-Wikidata evidence/finite-mapping contract first, including exact bytes, rank rules,
-retrieval and catalogue-identity checks. After its source acceptance, continue
-the same integration with the versioned native capture, deterministic feature
-parity and identity/permission/availability/withdrawal preservation checks.
-The extraction module alone leaves runtime MOVIE support unchanged.
+features. #435's handoff and #436 / #437's bounded offline
+Wikidata extraction are accepted. #438 adds the versioned native capture with
+independent SQL/JavaScript vectors, exact identities, permission/availability
+fences, complete dependency retirement and old-generation retry preservation.
+Finish its source checks, then rehearse/install the exact forward through the
+guarded hosted route. This source work alone leaves hosted MOVIE support unchanged.
 Reviewed ingestion and actual support inspection
 then precede a fresh private MOVIE-then-BOOK DEVELOPMENT declaration and
 first-answer evaluation. Do not restart the completed coverage lookup by default.
