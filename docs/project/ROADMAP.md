@@ -44,8 +44,9 @@ fences, complete dependency retirement and old-generation retry preservation.
 is installed and independently preservation-verified. Source data was not added
 by that installation. The retained original-source review now identifies #442:
 a versioned compatibility correction for legacy statement GUID entity-prefix case,
-without rewriting original bytes or changing older capture meanings. Complete that
-source/guarded installation, then reviewed bounded ingestion and actual support
+without rewriting original bytes or changing older capture meanings. Its active
+source implementation adds explicit extraction v2 and capture v5. Complete final
+source validation/acceptance and guarded installation, then reviewed bounded ingestion and actual support
 inspection before a fresh private MOVIE-then-BOOK DEVELOPMENT declaration and
 first-answer evaluation. Do not restart the completed coverage lookup by default.
 Numeric labels and an available fit do not establish usefulness. TMDB feature

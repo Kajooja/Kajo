@@ -397,14 +397,23 @@ source review reproduces rejection of legacy statement GUIDs whose entity prefix
 uses lowercase `q`. The [Wikibase GUID contract](https://doc.wikimedia.org/Wikibase/REL1_40/php/classWikibase_1_1DataModel_1_1Statement_1_1StatementGuid.html)
 notes that the stored prefix can differ in case from its parsed serialization.
 The existing v1 extraction/native v4 contracts remain frozen. The next source
-packet must introduce an explicit new mapping/extraction and capture generation
-for `Q`/`q` equivalence in the statement prefix only. Compare the same exact
-entity digits and existing GUID suffix, keep case-insensitive duplicate detection,
-and preserve the original statement spelling and raw source/projection hashes.
+packet implements explicit offline mapping/extraction **v2** and native capture
+**v5** for `Q`/`q` equivalence in the statement prefix only. Entity digits and the
+existing GUID suffix must match exactly; duplicate detection remains case
+insensitive. Original statement spelling and raw source/projection hashes remain
+bound. `WIKIDATA_FILM_MAPPING_V2` / `extractWikidataFilmEvidenceV2` /
+`inspectWikidataFilmBatchV2` select the successor explicitly; the old exports
+retain v1 meaning. The new mapping is `wikidata-film-direct-genres-v2`, SHA-256
+`bea2d4096349cba6c4f16d16d3cae245fcd08bf3cbf35849176bca9d8ca69a3d`.
 Do not normalize raw source bytes, relax external/entity IDs, admit qualified
 identity statements, broaden film types or weaken provenance/availability rules.
-This is a required compatibility dependency before reviewed ingestion; it is not
-an implemented successor or model admission.
+The append-only migration creates five private functions and extends only shared
+training-source retirement to the new preparation version. It changes no source
+rows or earlier extractor/capture bodies. Populated preservation proves exact
+v1-v4 retries, including a retained v4 unavailable lowercase source, and rollback.
+The successor repeats the existing extraction/capture/lock checks and adds
+independent old/new statement identity cases. STATUS and the PR own source/CI
+acceptance and hosted installation; these are required before reviewed ingestion.
 
 The native successor [#438](https://github.com/Kajooja/Kajo/issues/438) consumes
 this contract through a new private capture generation. Its source rows use

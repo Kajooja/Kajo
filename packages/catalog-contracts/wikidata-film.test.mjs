@@ -255,3 +255,41 @@ test('catalogue byte limit covers the complete envelope and separators', () => {
   assert.ok(snapshot.items.reduce((sum, row) => sum + bytes(row).length, 0) < maxBytes);
   assert.throws(() => inspectWikidataFilmBatch([request()], snapshot), /catalogue byte budget/);
 });
+
+test('v2 accepts ASCII Q/q statement prefixes while v1 preserves its original byte contract', async t => {
+  const { extractWikidataFilmEvidenceV2, inspectWikidataFilmBatchV2, WIKIDATA_FILM_MAPPING_V2,
+    WIKIDATA_FILM_MAPPING_V2_SHA256 } = await import('@kajo/catalog-contracts/wikidata-film');
+  assert.equal(WIKIDATA_FILM_MAPPING_V2_SHA256, 'bea2d4096349cba6c4f16d16d3cae245fcd08bf3cbf35849176bca9d8ca69a3d');
+  assert.deepEqual(WIKIDATA_FILM_MAPPING_V2, { ...WIKIDATA_FILM_MAPPING,
+    version: 'wikidata-film-direct-genres-v2', statementIdPolicy: 'ASCII_Q_OR_q_EXACT_ENTITY_DIGITS_AND_GUID' });
+  for (const property of ['P31', 'P345', 'P4947', 'P136']) await t.test(property, () => {
+    const raw = source(), statement = raw.entities[entityId].claims[property][0];
+    statement.id = 'q' + statement.id.slice(1);
+    const original = bytes(JSON.stringify(raw, null, 2)), v1 = extractWikidataFilmEvidence(original, context);
+    const v2 = extractWikidataFilmEvidenceV2(original, context);
+    assert.equal(v1.status, 'UNAVAILABLE'); assert.equal(v2.status, 'CANDIDATE');
+    assert.equal(v2.evidence.version, 'wikidata-film-evidence-v2');
+    assert.equal(v2.evidence.sourceSha256, sha(original));
+    assert.deepEqual(v2.evidence.claims[property], raw.entities[entityId].claims[property]);
+    assert.deepEqual(extractWikidataFilmEvidence(original, context), v1, 'No shared mutable policy');
+    const reviewed = inspectWikidataFilmBatchV2([{ ...request(), bytes: original }], catalogue([item()]));
+    assert.equal(reviewed[0].status, 'CANDIDATE');
+    assert.equal(inspectWikidataFilmBatch([{ ...request(), bytes: original }], catalogue([item()]))[0].status, 'UNAVAILABLE');
+  });
+  for (const prefix of ['q900000002', 'Q900000002', 'q0900000001', 'qq900000001', 'Ｑ900000001', 'ℚ900000001', 'q900000001 ', 'q900000001\n']) {
+    const raw = source(); raw.entities[entityId].claims.P345[0].id = prefix + '$00000000-0000-4000-8000-000000000002';
+    assert.equal(extractWikidataFilmEvidenceV2(bytes(raw), context).reason, 'EXTERNAL_IDENTITY_MISMATCH', prefix);
+  }
+  const duplicate = source(), row = duplicate.entities[entityId].claims.P136[0];
+  duplicate.entities[entityId].claims.P136.push({ ...row, id: 'q' + row.id.slice(1) });
+  assert.equal(extractWikidataFilmEvidenceV2(bytes(duplicate), context).reason, 'DUPLICATE_STATEMENT');
+  const lowerEntity = source(); lowerEntity.entities[entityId].id = entityId.toLowerCase();
+  assert.equal(extractWikidataFilmEvidenceV2(bytes(lowerEntity), context).reason, 'ENTITY_OR_REDIRECT_MISMATCH');
+  const lowerValue = source();lowerValue.entities[entityId].claims.P136[0].mainsnak.datavalue.value.id = 'q471839';
+  assert.equal(extractWikidataFilmEvidenceV2(bytes(lowerValue), context).status, 'UNAVAILABLE');
+  const upper = bytes(source());
+  const v1 = extractWikidataFilmEvidence(upper, context).evidence, v2 = extractWikidataFilmEvidenceV2(upper, context).evidence;
+  assert.deepEqual(v2, { ...v1, version: 'wikidata-film-evidence-v2', mappingVersion: WIKIDATA_FILM_MAPPING_V2.version,
+    mappingSha256: WIKIDATA_FILM_MAPPING_V2_SHA256, evidenceSha256: v2.evidenceSha256 });
+  assert.notEqual(v1.evidenceSha256, v2.evidenceSha256);
+});

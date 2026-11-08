@@ -502,6 +502,21 @@ reinterpret retained TMDB features as Wikidata. The combined mapping identity is
 The mean/ridge equations, response scale, native/owned-Taste label semantics and
 model version remain unchanged; this is a source generation, not a model promotion.
 
+The #442 successor is opt-in **v5** prepare/finalize with input/preparation
+**v4**, feature snapshot **v3**, `owned-rating-source-v4` and snapshot namespace
+`native-wikidata-content-v2:`. The combined mapping is
+`wikidata-open-library-concepts-v2`, SHA-256
+`ec790415ce0bc45cfdc5bdf5fb65b9e2c5557f98b07c6f5bf4e88b09812abf1d`.
+Its offline mapping/extraction v2 accepts ASCII `Q` or `q` only in the statement
+GUID entity prefix, with identical entity digits and the existing GUID suffix.
+Entity/value QIDs and external identities remain exact. Original source bytes,
+statement spelling and projection hashes are retained. The old v4 path still
+uses extraction v1, including its earlier unavailable-source result; an upgrade
+or retry never refills an old prefix. Evaluation validation dispatches by explicit
+source/input/preparation generation and rejects cross-generation bindings.
+The v2 permission manifest, BOOK mapping, numerical core and model version remain
+unchanged. STATUS owns source acceptance and guarded installation.
+
 Native SQL validates bounded unique-key original JSON, direct film/external-ID
 statements, rank-before-filter rules and reference exclusions. It freezes only a
 bounded claims projection. The adapter independently re-extracts that projection
@@ -527,9 +542,9 @@ they cannot turn one bad content source into a failed numeric capture.
 
 The new complete Item dependency references include unavailable feature rows.
 Source/alias insertion, payload correction, reassignment or deletion on those
-Items retires v4 inputs, forecasts and first-answer copies. Relevant Item identity
+Items retires v4/v5 inputs, forecasts and first-answer copies. Relevant Item identity
 changes and review/source withdrawal have the same bounded lifecycle. Historical
-v1/v2/v3 payloads, calculation meanings and exact retries are preserved. New source
+v1/v2/v3/v4 payloads, calculation meanings and exact retries are preserved. New source
 fences retain existing NOWAIT/atomic rollback ordering. Source acceptance and
 native synthetic fixtures do not establish hosted source support or usefulness;
 DATA_ENRICHMENT owns ingestion/source-use gates and STATUS owns deployment.
