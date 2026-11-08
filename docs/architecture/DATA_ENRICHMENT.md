@@ -392,6 +392,20 @@ the source-use review relies on the publisher's structured-data CC0 dedication
 and retains unresolved/reference-free origins. Do not fetch prose or external
 rating histories from statement reference links as a side effect.
 
+**Original-source compatibility follow-up — November 8 (#442):** the retained
+source review reproduces rejection of legacy statement GUIDs whose entity prefix
+uses lowercase `q`. The [Wikibase GUID contract](https://doc.wikimedia.org/Wikibase/REL1_40/php/classWikibase_1_1DataModel_1_1Statement_1_1StatementGuid.html)
+notes that the stored prefix can differ in case from its parsed serialization.
+The existing v1 extraction/native v4 contracts remain frozen. The next source
+packet must introduce an explicit new mapping/extraction and capture generation
+for `Q`/`q` equivalence in the statement prefix only. Compare the same exact
+entity digits and existing GUID suffix, keep case-insensitive duplicate detection,
+and preserve the original statement spelling and raw source/projection hashes.
+Do not normalize raw source bytes, relax external/entity IDs, admit qualified
+identity statements, broaden film types or weaken provenance/availability rules.
+This is a required compatibility dependency before reviewed ingestion; it is not
+an implemented successor or model admission.
+
 The native successor [#438](https://github.com/Kajooja/Kajo/issues/438) consumes
 this contract through a new private capture generation. Its source rows use
 `provider_key = wikidata` and the closed `wikidata-entitydata-source-v1` payload

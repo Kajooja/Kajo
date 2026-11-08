@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-08**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; BOOK source support verified; native Wikidata capture #438 / #439 accepted and installed; reviewed MOVIE ingestion precedes fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; BOOK source support verified; native Wikidata capture #438 / #439 accepted and installed; statement-ID compatibility precedes reviewed MOVIE ingestion and fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,7 +11,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — reviewed Wikidata source ingestion
+## Current handoff — versioned Wikidata statement-ID compatibility
 
 **Native source accepted and installed:** [#438](https://github.com/Kajooja/Kajo/issues/438)
 / [PR #439](https://github.com/Kajooja/Kajo/pull/439) is merged. The source, tested
@@ -49,15 +49,32 @@ history match the expected result; the new private dependency table is empty.
 Existing answers and forecasts are preserved. Execution records remain private.
 Do not replay this forward, the owned-Taste forward or the completed BOOK repair.
 
-**Single next action:** review the bounded original-source ingestion packet, then
-inspect actual permitted MOVIE fitting support before a fresh private
-MOVIE-then-BOOK DEVELOPMENT declaration. The prior identity/coverage review is
-complete. Reuse its retained original bytes where available; any necessary new
-retrieval must record its actual retrieval time and newly checked revision/hash,
-without reconstructing or backdating missing evidence. Review the complete
-catalogue identity census, exact source payloads, source-use permission and
-post-commit availability before capture. Keep the observation worker inactive
-until that scope is supported. Preserve current answers and accepted forwards;
+**Original-source review completed — November 8:** retained EntityData bytes and
+retrieval receipts were recovered and verified against the earlier coverage
+report. A fresh complete catalogue identity census was checked without reading
+rating values. The accepted offline extractor and native SQL agree on the
+remaining source eligibility. No source rows were inserted.
+
+The review exposed a compatibility gap: Wikibase can retain a lowercase entity
+prefix in a statement GUID, while both current extractors require uppercase.
+The [publisher's GUID documentation](https://doc.wikimedia.org/Wikibase/REL1_40/php/classWikibase_1_1DataModel_1_1Statement_1_1StatementGuid.html)
+explicitly notes this representation. A private causal diagnostic isolates that
+case difference; derived diagnostic bytes are never ingestion evidence.
+Separate qualified identity statements and unsupported film types remain
+unavailable under the accepted policy and must not be silently widened.
+
+**Single next action:** [#442](https://github.com/Kajooja/Kajo/issues/442) — add a
+versioned extraction/mapping contract and native capture successor for legacy
+statement-ID case. Accept only `Q`/`q` equivalence for the same exact entity digits
+and existing GUID suffix; preserve original bytes and all old capture/extraction
+contracts. The installed forward is immutable. Require SQL/JavaScript parity,
+negative identity cases, old-generation retry/preservation/rollback and complete
+CI before a new guarded installation. DATA_ENRICHMENT owns this scope.
+
+After that dependency, recheck the retained original-source packet, review bounded
+ingestion and inspect actual permitted MOVIE fitting support before a fresh
+private MOVIE-then-BOOK DEVELOPMENT declaration. Do not repeat source discovery
+or recreate old retrieval timestamps. Keep the observation worker inactive;
 no reset, old declaration refill, quality admission or serving activation.
 
 ### Retained native implementation attempts

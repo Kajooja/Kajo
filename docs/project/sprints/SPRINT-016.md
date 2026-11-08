@@ -31,7 +31,11 @@ catalogue writers, populated upgrade and rollback. All six final-source CI gates
 passed and #439 is merged. The exact forward is installed, with independent
 post-commit source/security, retained-row and history verification. Existing
 answers and forecasts remain intact; operational evidence stays private.
-Reviewed bounded ingestion, actual fitting support and a fresh private DEVELOPMENT
+The original-source review identifies legacy statement GUID entity-prefix case
+as the next compatibility dependency (#442). A new versioned contract/capture must
+preserve the earlier generations and original source bytes. Qualified identity
+statements and unsupported film types stay unavailable. After that correction,
+reviewed bounded ingestion, actual fitting support and a fresh private DEVELOPMENT
 comparison remain sequential acceptance work. No worker activation, account reset,
 external-rating import or serving admission occurs.
 
