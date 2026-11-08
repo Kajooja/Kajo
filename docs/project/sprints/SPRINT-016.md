@@ -27,10 +27,17 @@ without discarding committed ratings.
 The append-only forward preserves old v1/v2/v3 capture rows and exact retries.
 Synthetic local/native verification covers vectors, committed identity and time,
 permission horizon, evaluation source binding, source retirement, concurrent
-catalogue writers, populated upgrade and rollback. STATUS/linked PR own final
-source CI. Hosted installation, reviewed ingestion, actual fitting support and a
-fresh private DEVELOPMENT comparison remain sequential acceptance work. No worker
-activation, account reset, external-rating import or serving admission occurs.
+catalogue writers, populated upgrade and rollback. All six final-source CI gates
+passed and #439 is merged. The exact forward is installed, with independent
+post-commit source/security, retained-row and history verification. Existing
+answers and forecasts remain intact; operational evidence stays private.
+The original-source review identifies legacy statement GUID entity-prefix case
+as the next compatibility dependency (#442). A new versioned contract/capture must
+preserve the earlier generations and original source bytes. Qualified identity
+statements and unsupported film types stay unavailable. After that correction,
+reviewed bounded ingestion, actual fitting support and a fresh private DEVELOPMENT
+comparison remain sequential acceptance work. No worker activation, account reset,
+external-rating import or serving admission occurs.
 
 ## Wikidata provider evidence — #436
 
@@ -43,8 +50,9 @@ known TMDB-origin genre references cannot supply features. Candidate output keep
 origin unresolved and grants no permission or model admission.
 
 The optional catalogue-contract export and deterministic synthetic tests are
-source work only. STATUS/the linked PR own final CI acceptance. Its native successor is #438 above. After source acceptance and guarded
-installation, reviewed ingestion and actual fitting support precede DEVELOPMENT. This does not complete
+source work only. STATUS/the linked PR own final CI acceptance. The native
+successor #438 / #439 above is accepted and installed. Reviewed ingestion and
+actual fitting support still precede DEVELOPMENT. This does not complete
 the Wikidata integration, Sprint 016 or any quality/serving gate.
 
 ## Owned Taste numeric source — #432
