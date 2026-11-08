@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-08**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; BOOK source support verified; native Wikidata capture #438 / #439 accepted and installed; statement-ID compatibility precedes reviewed MOVIE ingestion and fresh private DEVELOPMENT preparation. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; native Wikidata capture #438 / #439 and statement-ID successor #442 / #443 accepted and installed; reviewed MOVIE ingestion and actual BOOK/MOVIE training support verified; not-yet-rated candidate feature coverage is the next blocker before private runner readiness and fresh DEVELOPMENT. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,7 +11,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — versioned Wikidata statement-ID compatibility
+## Current handoff — eligible first-answer candidate feature coverage
 
 **Native source accepted and installed:** [#438](https://github.com/Kajooja/Kajo/issues/438)
 / [PR #439](https://github.com/Kajooja/Kajo/pull/439) is merged. The source, tested
@@ -53,41 +53,95 @@ Do not replay this forward, the owned-Taste forward or the completed BOOK repair
 retrieval receipts were recovered and verified against the earlier coverage
 report. A fresh complete catalogue identity census was checked without reading
 rating values. The accepted offline extractor and native SQL agree on the
-remaining source eligibility. No source rows were inserted.
+remaining source eligibility. That review itself inserted no source rows.
 
 The review exposed a compatibility gap: Wikibase can retain a lowercase entity
-prefix in a statement GUID, while both current extractors require uppercase.
+prefix in a statement GUID, while the frozen v1 extractors require uppercase.
 The [publisher's GUID documentation](https://doc.wikimedia.org/Wikibase/REL1_40/php/classWikibase_1_1DataModel_1_1Statement_1_1StatementGuid.html)
 explicitly notes this representation. A private causal diagnostic isolates that
 case difference; derived diagnostic bytes are never ingestion evidence.
 Separate qualified identity statements and unsupported film types remain
 unavailable under the accepted policy and must not be silently widened.
 
-**Active source implementation:** [#442](https://github.com/Kajooja/Kajo/issues/442),
-branch `fix/wikidata-statement-id-v2`. Explicit offline extraction/mapping **v2**
-and native prepare/finalize **v5** implement the narrow statement-prefix correction.
-Input/preparation **v4**, feature snapshot **v3** and `owned-rating-source-v4`
-separate new captures from every predecessor. Old source bytes, contracts and
-unavailable results remain unchanged. The installed migration is immutable; a new
-append-only migration creates five private functions and extends training-source
-retirement to the new generation. No source ingestion or worker activation is
-part of this code change.
+**Statement-ID successor accepted:** [#442](https://github.com/Kajooja/Kajo/issues/442)
+/ [PR #443](https://github.com/Kajooja/Kajo/pull/443) merged as
+`f1d7aee841565750571b3e353b8af543051a3878`. Source
+`c027eea80400bdd6c7c8e97f97afd2d7dd2e3e22`, tested merge
+`5218621af1cffaf8f7126d189ead4fe07b6ecb3d` and accepted main share tree
+`0157656771f064ca477eb276d718c825ff89e533`. All six required
+[CI #884](https://github.com/Kajooja/Kajo/actions/runs/42518618193) gates passed:
+2,651 tests, four configured exports, lint/typecheck and no unmitigated dependency
+findings. All five artifacts were independently checked against the final source
+and canonical migration list; native cleanup completed. Optional APK was skipped.
+The retained local full-check limitation remains historical; final-source CI
+supplies the complete checks.
 
-**Single next action:** complete final-source validation and review/merge #442,
-then rehearse and perform its guarded installation with independent postflight.
-Synthetic verification covers the existing 77 extraction cases, 58 additional
-same-byte old/new identity cases, MOVIE/BOOK captures, cross-generation rejection,
-source/permission/training retirement, populated v1-v4 exact retries and rollback.
-Native concurrency and full CI remain required before acceptance. A private
-candidate review also checks the retained original bytes through independent
-SQL/JavaScript extraction; this is local source eligibility, not hosted fitting
-support, quality admission or a new DEVELOPMENT observation.
+Explicit extraction/mapping **v2**, native prepare/finalize **v5**,
+input/preparation **v4**, feature snapshot **v3** and `owned-rating-source-v4`
+preserve the meaning and exact retries of every predecessor. Only ASCII Q/q in
+the statement GUID prefix is equivalent. Original bytes, exact entity digits,
+external identities, rank/qualifier restrictions and source-use controls remain
+bound. Source acceptance changes no numerical model math and promotes no model.
 
-After that dependency, recheck the retained original-source packet, review bounded
-ingestion and inspect actual permitted MOVIE fitting support before a fresh
-private MOVIE-then-BOOK DEVELOPMENT declaration. Do not repeat source discovery
-or recreate old retrieval timestamps. Keep the observation worker inactive;
-no reset, old declaration refill, quality admission or serving activation.
+The optional performance comparison retains the pair-1 and pair-3 off-catalogue
+Taste exact-retry regressions under the original criteria. Complete diagnostics
+and a passing required gate do not admit that optimization: performance admission
+remains **NONE**, separately from source correctness and prediction usefulness.
+
+**Hosted successor installed — November 8:** the exact accepted append-only
+forward was rehearsed on a disposable populated predecessor, then installed
+through the guarded operational route and independently verified after commit.
+Source/security metadata, retained rows and migration history match the expected
+result. Existing answers and forecasts are preserved. The installation is complete;
+do not replay it. Operational execution evidence remains private.
+
+**Original-source ingestion completed — November 8:** the reviewed EntityData
+records and exact aliases were inserted in bounded, separately committed batches.
+Each committed batch and the complete final state were independently verified.
+Original bytes, retrieval times and provider revisions remain exact; native
+availability uses each batch's actual insertion clock. Prior catalogue rows,
+other retained tables and source/trigger inventories are unchanged. Unsupported
+identities and film types remain excluded. Existing answers and forecasts are
+preserved. Do not repeat the ingestion or source discovery. Operational identities,
+counts, bytes and execution evidence remain private.
+
+**Actual training support verified — November 8:** a separate read-only inspection
+under an explicitly reviewed finite feature-use manifest found available content
+fits and varied mapped features for both BOOK and MOVIE. Original-source and native
+projection identity, hash and availability checks passed; the unchanged numerical
+core was used. This diagnostic created no targets, allocations or forecasts and
+activated no worker. It is engineering support evidence, not a prospective
+prediction-quality result or a new declaration. Its diagnostic permission interval
+does not supply a future capture/answer horizon.
+
+**Single next action:** define the canonical eligible first-answer candidate scope,
+inspect its complete source coverage label-blind, and prepare any necessary bounded
+reviewed feature acquisition/linkage before a new comparison. The retained complete
+catalogue census, final preservation checks and rating-presence-only comparison
+show that current Wikidata sources belong to already-rated training Items;
+not-yet-rated catalogue MOVIEs have no Wikidata source support. No rating values or
+model scores were used to establish this gap. An available training fit therefore
+does not establish useful target coverage.
+
+Preselect the bounded acquisition scope independently of numeric rating values,
+model scores and outcomes. Verify exact identities, permitted features and committed
+availability for eligible targets before a useful comparison. Preserve the complete
+candidate/attempt census, including unavailable outcomes.
+An unavailable, already-rated or unexperienced first target consumes its attempt
+and must never be replaced.
+
+The disabled private runner also needs a reviewed v5/source-v4 successor and
+consumed-attempt continuation. Reconcile all prior attempts and allocations,
+including empty, unsupported, unexperienced, failed, expired and withdrawn
+outcomes; advance within the MOVIE-then-BOOK caps without replacement or refill.
+Rerunning initial capture is not continuation. Keep current and retired workflows
+disabled through source review and exact accepted-source validation.
+
+Only after those dependencies pass, obtain a fresh authenticated database clock
+and retain a new pre-window MOVIE-then-BOOK DEVELOPMENT declaration with its
+explicit finite feature-use horizon and genuine first-answer route. Preserve
+current answers and the retired #427 window; no account reset, old declaration
+refill, historical forecast backfill, quality admission or serving activation.
 
 ### Retained native implementation attempts
 
@@ -216,15 +270,19 @@ and titles, retaining statement/revision/hash/retrieval evidence. The preselecte
 direct mapping has usable candidate assertions and unsupported gaps. This is
 private engineering evidence, not an admitted provider, fitted MOVIE model or
 prediction-quality result. Do not repeat that completed lookup as the default
-next task. [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md#wikidata-provider-integration--next-source-packet)
+next task. [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md#wikidata-provider-integration)
 owns the reviewed extraction boundaries and remaining implementation checks.
 
-**Remaining provider acceptance:** #436 / #437 supplies the accepted offline
-contract; #438 / #439 supplies the accepted and installed native successor above.
-Reviewed ingestion remains necessary before actual fitting-support inspection and
-a new DEVELOPMENT declaration. Current hosted MOVIE support remains insufficient;
-installing the capture path alone does not add source data. Keep operational
-identities, counts, source bytes and execution records private.
+**Remaining provider operations:** #436 / #437 supplies the accepted offline
+contract; #438 / #439 and #442 / #443 supply the installed native generations.
+Reviewed original-source ingestion, independent final preservation verification
+and actual permitted BOOK/MOVIE training-support inspection are complete. The
+remaining not-yet-rated MOVIE source-coverage gap requires a canonical eligible
+candidate scope and bounded reviewed acquisition/linkage. Then the disabled
+v5/source-v4 runner successor with consumed-attempt continuation precedes a fresh
+DEVELOPMENT declaration. An available training fit is neither target-coverage nor
+prediction-quality evidence. Keep operational identities, counts, source bytes and
+execution records private.
 
 The November 7 [provider-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
 keeps TMDB features unlisted: its full standard API terms restrict ML/AI use and
@@ -232,8 +290,9 @@ explicitly cover training or validation. No applicable separate agreement was
 reviewed. Mean fallback is not clearance for other provider-content use in the
 wider pipeline; keep that scope review separate from numerical support.
 
-After source support is established, retain a new pre-window declaration with
-explicit owned-Taste source version, reviewed feature-use horizon and genuine
+After candidate coverage and private runner continuation are verified, retain a
+new pre-window declaration with explicit owned-Taste source version, reviewed
+feature-use horizon and genuine
 first-answer opportunities. Source linkage and an available fit are engineering
 readiness, not an observed numerical comparison or quality admission.
 
@@ -344,11 +403,17 @@ rating writer is not the private numeric first-answer route: its accepted use ca
 retire a pending evaluation target. Do not tell an owner to rate through that
 route while claiming to measure the private frozen forecast.
 
-For the new owned-Taste source generation, reuse `captureOwnedTasteNumericForecast`
-in `scripts/database/owned-taste-numeric-capture.mjs` for one held BEGIN → prepare
-v3 → TypeScript → finalize v3 → COMMIT transaction. Prior-generation retries
-retain their original worker/contracts. Only afterward submit the owner's
-actual integer rating through `private.commit_personal_rating_answer_v1`.
+The disabled private runner requires a reviewed successor before using the new
+Wikidata generation. Use `captureWikidataContentNumericForecastV2` in
+`scripts/database/wikidata-content-capture.mjs` for one held BEGIN → prepare v5
+→ TypeScript → finalize v5 → COMMIT transaction. Bind the explicit input,
+preparation, feature and source versions in the new declaration. Reconcile
+consumed attempts and allocations before advancing the MOVIE-then-BOOK sequence;
+rerunning the first-opportunity runner is not continuation. Earlier captures
+retain their original workers/contracts for exact retries. Keep private workflows
+disabled until the successor and concrete activation scope are accepted. Only
+after capture commits may the owner's actual integer rating be submitted through
+`private.commit_personal_rating_answer_v1`.
 Use `inspectPersonalRatingOwnerCensus` for every declared owner and the existing
 declaration/report CLI. A missing feature-use permission uses the documented
 mean fallback; it does not establish content-model usefulness. No new public RPC,

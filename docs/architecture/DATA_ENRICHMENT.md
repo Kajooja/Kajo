@@ -262,7 +262,7 @@ The requested documentation change does not approve any license interpretation, 
 
 ### Private frozen catalogue features — Sprint 016 / #405
 
-The active Personal content-rating implementation reuses only the existing six
+The original #405 generation of Personal content-rating reuses the existing six
 `catalog-concepts-v1` structured concepts, with TMDB genre IDs for MOVIE and
 allowlisted Open Library subject labels for BOOK. An explicit
 `personal-content-feature-use-v1` trusted operator manifest names the private
@@ -313,17 +313,21 @@ provider content in ranking, capture or the wider application. Any later use
 needs a complete scope review or an independently permitted alternative source;
 this documentation neither changes serving nor approves a broader pipeline.
 
-Wikidata structured film data is a **research candidate only**, under its
-[CC0 licensing policy](https://www.wikidata.org/wiki/Wikidata:Licensing) and
+Wikidata structured film data is limited to **reviewed private research and
+evaluation**, under its [CC0 licensing policy](https://www.wikidata.org/wiki/Wikidata:Licensing) and
 [documented data access](https://www.wikidata.org/wiki/Wikidata:Data_access).
 The bounded label-blind inspection of independently retrieved `P136` genre
 statements and `P345`/`P4947` identity corroboration is complete. It found direct
 candidate support and unsupported gaps, retaining raw revisions, statement
 metadata and actual retrieval times. Detailed operational evidence remains
-private. Current SQL and TypeScript bind MOVIE features to TMDB; the review does
-not change them or admit a source/model.
+private. The accepted opt-in native generations below bind MOVIE features to
+explicit Wikidata assertions under a separately reviewed private-evaluation scope.
+Earlier TMDB-bound captures retain their original contracts; their data is not
+relabeled or cleared by this provider path. STATUS owns source linkage, current
+training support and remaining candidate/runner readiness; no production model
+admission follows.
 
-#### Wikidata provider integration — next source packet
+#### Wikidata provider integration
 
 The first source slice, [#436](https://github.com/Kajooja/Kajo/issues/436), provides
 the offline `@kajo/catalog-contracts/wikidata-film` contract. Source/CI acceptance
@@ -396,8 +400,8 @@ rating histories from statement reference links as a side effect.
 source review reproduces rejection of legacy statement GUIDs whose entity prefix
 uses lowercase `q`. The [Wikibase GUID contract](https://doc.wikimedia.org/Wikibase/REL1_40/php/classWikibase_1_1DataModel_1_1Statement_1_1StatementGuid.html)
 notes that the stored prefix can differ in case from its parsed serialization.
-The existing v1 extraction/native v4 contracts remain frozen. The next source
-packet implements explicit offline mapping/extraction **v2** and native capture
+The existing v1 extraction/native v4 contracts remain frozen. The accepted #443
+source implements explicit offline mapping/extraction **v2** and native capture
 **v5** for `Q`/`q` equivalence in the statement prefix only. Entity digits and the
 existing GUID suffix must match exactly; duplicate detection remains case
 insensitive. Original statement spelling and raw source/projection hashes remain
@@ -416,8 +420,8 @@ independent old/new statement identity cases. STATUS and the PR own source/CI
 acceptance and hosted installation; these are required before reviewed ingestion.
 
 The native successor [#438](https://github.com/Kajooja/Kajo/issues/438) consumes
-this contract through a new private capture generation. Its source rows use
-`provider_key = wikidata` and the closed `wikidata-entitydata-source-v1` payload
+the original v1 contract through a new private capture generation. Its source rows
+use `provider_key = wikidata` and the closed `wikidata-entitydata-source-v1` payload
 with original UTF-8 `sourceText` and actual `retrievedAtMicros`. Native capture
 checks original-byte SHA-256, revision-addressed URL, modified time and committed
 row/alias availability, including released SAVEPOINT writes whose child XIDs
@@ -464,11 +468,20 @@ insertions, corrections and withdrawal retire dependent copies. Old capture
 meaning/retry preservation, populated rollback and native concurrent-writer
 proofs are required before source acceptance.
 
-STATUS and the linked PR own CI acceptance. This source packet does not install
-the forward or ingest observed sources. Guarded retained-state rehearsal and
-installation, reviewed bounded ingestion and actual permitted fitting support
-still precede a new DEVELOPMENT declaration. Preserve current answers. No quality
-or serving admission follows from successful source fixtures.
+STATUS records final source acceptance, guarded installation and the completed
+bounded original-source linkage with independent final preservation verification.
+Separate read-only inspection now verifies actual permitted BOOK/MOVIE training
+support. Source fixtures and available training fits do not establish eligible
+first-answer target feature coverage or prospective prediction usefulness.
+The current linked Wikidata sources cover already-rated training Items; STATUS
+owns the observed not-yet-rated candidate coverage gap, canonical eligible scope
+and bounded reviewed acquisition/linkage independent of numeric ratings, model
+scores and outcomes. The disabled runner successor/consumed-attempt continuation
+remains a later dependency. After those are verified, a fresh database clock,
+new pre-window DEVELOPMENT declaration,
+explicit finite source-use horizon and genuine first-answer route remain required.
+Completed installed forwards and source insertions must not be replayed; quality
+and serving admission stay separate.
 
 ## 5. Isolated research storage and execution
 

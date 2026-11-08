@@ -1,6 +1,6 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 / #424 and catalogue/admission audit #425 / #426 accepted; Taste recovery #428 / #429 installed and resumed completion observed; preservation diagnostics #430 / #431 accepted after six CI gates; owned-Taste numeric source #432 / #433 accepted after all six CI #859 gates and installed November 7; #434 query/rollback diagnostics accepted after all six CI #862 gates; native preflight #427 reconciled; BOOK source support verified; permitted MOVIE features precede fresh owned DEVELOPMENT preparation; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 / #424 and catalogue/admission audit #425 / #426 accepted; Taste recovery #428 / #429 installed and resumed completion observed; preservation diagnostics #430 / #431 accepted after six CI gates; owned-Taste numeric source #432 / #433 accepted after all six CI #859 gates and installed November 7; #434 query/rollback diagnostics accepted after all six CI #862 gates; native preflight #427 reconciled; #443 accepted and installed; reviewed MOVIE ingestion and actual BOOK/MOVIE training support verified; not-yet-rated candidate feature coverage is the next blocker before private runner readiness and fresh DEVELOPMENT; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
@@ -31,17 +31,19 @@ catalogue writers, populated upgrade and rollback. All six final-source CI gates
 passed and #439 is merged. The exact forward is installed, with independent
 post-commit source/security, retained-row and history verification. Existing
 answers and forecasts remain intact; operational evidence stays private.
-The original-source review identifies legacy statement GUID entity-prefix case
-as the next compatibility dependency (#442). A new versioned contract/capture must
-preserve the earlier generations and original source bytes. Qualified identity
-statements and unsupported film types stay unavailable. After that correction,
-reviewed bounded ingestion, actual fitting support and a fresh private DEVELOPMENT
-comparison remain sequential acceptance work. No worker activation, account reset,
-external-rating import or serving admission occurs.
+The original-source review identified legacy statement GUID entity-prefix case;
+#442 / #443 below supplies the accepted and installed versioned successor while
+preserving earlier generations and original bytes. Qualified identity statements
+and unsupported film types remain unavailable. Reviewed bounded ingestion and
+independent final preservation verification are complete. Actual BOOK/MOVIE
+training support is verified. Not-yet-rated candidate feature coverage and private
+runner readiness remain dependencies before fresh DEVELOPMENT.
+No worker activation, account reset, external-rating import or serving admission
+occurs.
 
 ## Statement-ID compatibility — #442
 
-The active `fix/wikidata-statement-id-v2` source introduces extraction/mapping v2,
+The accepted #443 source introduces extraction/mapping v2,
 native capture v5, input/preparation v4 and feature snapshot v3. It accepts only
 ASCII Q/q statement entity-prefix equivalence and preserves every earlier
 contract, original byte hash and unavailable result. The append-only migration
@@ -50,8 +52,23 @@ Both generations share unchanged mean/ridge computation, BOOK mapping and v2
 permission scope. Tests retain old behavior and cover the existing 77 extraction
 cases, 58 old/new identity cases, populated v1-v4 retries/rollback, source and
 training withdrawal, and new capture/concurrency checks in the native CLI gate.
-Source acceptance, guarded installation and observed ingestion/support remain
-separate pending gates; STATUS owns the exact current action.
+All six final-source CI gates passed; #443 is merged and its exact forward is
+installed with independent preservation verification. Reviewed original-source
+ingestion is complete through bounded, separately committed batches, each checked
+after commit and followed by independent final-state verification. Original bytes
+and retrieval times are preserved; new native availability uses actual insertion
+clocks. Existing answers, forecasts and retained state remain unchanged.
+Separate read-only inspection under an explicit finite feature-use manifest now
+verifies available BOOK/MOVIE content fits with varied mapped features through the
+unchanged numerical core. It creates no targets, allocations or forecasts.
+Current Wikidata sources cover already-rated training Items; the not-yet-rated
+catalogue MOVIE source-coverage gap remains. Define the canonical eligible
+first-answer candidate scope, inspect complete coverage label-blind and perform
+any needed bounded reviewed acquisition/linkage independently of numeric ratings,
+model scores and outcomes. Then accept the disabled v5/source-v4 runner successor
+with consumed-attempt continuation. These dependencies precede a fresh pre-window
+MOVIE-then-BOOK DEVELOPMENT declaration and genuine first-answer observation.
+STATUS owns exact receipts; Sprint 016 quality and serving admission remain open.
 
 ## Wikidata provider evidence — #436
 
@@ -65,9 +82,11 @@ origin unresolved and grants no permission or model admission.
 
 The optional catalogue-contract export and deterministic synthetic tests are
 source work only. STATUS/the linked PR own final CI acceptance. The native
-successor #438 / #439 above is accepted and installed. Reviewed ingestion and
-actual fitting support still precede DEVELOPMENT. This does not complete
-the Wikidata integration, Sprint 016 or any quality/serving gate.
+successors #438 / #439 and #442 / #443 above are accepted and installed.
+Reviewed linkage and independent final preservation verification are complete;
+actual BOOK/MOVIE training support is verified. Not-yet-rated candidate coverage
+and the disabled runner successor/continuation still precede genuine DEVELOPMENT.
+This does not complete Sprint 016 or any quality/serving gate.
 
 ## Owned Taste numeric source — #432
 
@@ -91,12 +110,12 @@ catalogue source-support packet. The explicitly authorized bounded BOOK
 source/alias repair is now applied. Post-commit readback verifies exact additions,
 fresh provenance and preservation of existing catalogue rows and answers.
 Separate read-only inspection confirms permitted BOOK support and an available
-content fit; the repair must not be replayed. MOVIE feature support remains
-insufficient. The bounded label-blind Wikidata identity/coverage inspection is
-complete and supplies candidate assertions with explicit unsupported gaps and
-origin uncertainty. #435 is accepted; #436 supplies the offline evidence/finite
-mapping source slice above. The versioned native successor and its preservation checks are in #438 above.
-Reviewed ingestion and actual fitting support precede a fresh private
+content fit; the repair must not be replayed. The accepted and installed Wikidata
+successors above establish the source path; reviewed MOVIE ingestion and final
+preservation verification are complete. Current read-only inspection verifies
+BOOK/MOVIE training support. Not-yet-rated candidate feature coverage and the
+disabled v5/source-v4 runner successor/consumed-attempt
+continuation are subsequent dependencies before a fresh private
 MOVIE-then-BOOK DEVELOPMENT declaration. Keep the prepared worker inactive and TMDB
 features unlisted under the [November 7 source-use review](../../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07).
 An eligible numeric prefix, source linkage or fitted coefficients do not establish
@@ -510,9 +529,12 @@ broader adaptive state, transfer and Shared work retain their later sprint scope
   gates, 2,477 tests and four configured exports. Native probe/session checks pass,
   all 43 subchecks and the 56-entry manifest remain intact. Private operational
   execution and observed prediction usefulness remain separate evidence.
-- Current handoff: owned numeric DEVELOPMENT preparation through the existing
-  connection, capture, dedicated first-answer, complete census and report APIs;
-  #415 reconciles the source acceptance and preserves the private/public boundary.
+- Current handoff: canonical eligible first-answer candidate scope and bounded
+  reviewed feature acquisition for the observed coverage gap, then the disabled
+  v5/source-v4 runner successor/continuation
+  described above. Reuse the existing connection, dedicated first-answer,
+  complete census and report APIs. #415 retains the historical source-acceptance
+  and private/public-boundary receipt; it is not the active preparation packet.
 - Quality / runtime admission: open.
 - Evidence, exact source versions, installed artifacts and known issues: record
   in this sprint and STATUS as each bounded packet finishes.
