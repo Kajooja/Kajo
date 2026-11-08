@@ -52,6 +52,7 @@ end;$$;
 create function private.wikidata_tmdb_reference_v1(value jsonb)
 returns boolean language plpgsql immutable security invoker set search_path='' as $$
 declare child jsonb;marker jsonb;literal text;decoded text;host text;bytes bytea;pos integer;
+  url_text text;authority text;
 begin
   if jsonb_typeof(value)='string' then
     literal:=value#>>'{}';if upper(literal)='Q20828898' then return true;end if;
@@ -66,7 +67,22 @@ begin
       end loop;
       decoded:=convert_from(bytes,'UTF8');
     exception when data_exception then decoded:=literal;end;
-    host:=lower(rtrim(substring(decoded from '^(?:[A-Za-z][A-Za-z0-9+.-]*:)?//(?:[^/@]*@)?([^/:?#]+)'),'.'));
+    -- The portable extractor uses WHATWG URL parsing. SQL does not implement
+    -- IDNA or special-URL repair: decline those original sources before freezing
+    -- any vector, rather than disagreeing with the independent worker later.
+    -- Plain Unicode reference prose is still allowed; this fence is URL-only.
+    url_text:=regexp_replace(regexp_replace(decoded,E'[\\t\\r\\n]','','g'),'^[[:cntrl:] ]+|[[:cntrl:] ]+$','','g');
+    if url_text~'^(?:[A-Za-z][A-Za-z0-9+.-]*:)?//' or url_text~*'^(?:https?|ftp|wss?|file):' then
+      authority:=substring(url_text from '^(?:[A-Za-z][A-Za-z0-9+.-]*:)?//([^/?#]*)');
+      if authority is null or authority='' or url_text is distinct from decoded
+        or octet_length(authority)<>char_length(authority)
+        or authority~'[[:cntrl:][:space:]%]' or position(chr(92) in authority)>0
+        or lower(authority)~'(^|[.@])xn--' then
+        raise data_exception; -- project_wikidata_film_v1 returns unavailable.
+      end if;
+    end if;
+    -- WHATWG removes at most one terminal dot for this marker check.
+    host:=lower(regexp_replace(substring(decoded from '^(?:[A-Za-z][A-Za-z0-9+.-]*:)?//(?:[^/@]*@)?([^/:?#]+)'),'\.$',''));
     return coalesce(host in('themoviedb.org','tmdb.org') or host like '%.themoviedb.org' or host like '%.tmdb.org',false)
       or decoded~*'(^|[^a-z0-9-])(themoviedb|tmdb)\.org($|[^a-z0-9.-])';
   elsif jsonb_typeof(value)='object' then

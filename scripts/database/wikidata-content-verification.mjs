@@ -59,8 +59,31 @@ export async function verifyWikidataProjection(exec) {
     s => { s.mainsnak.datavalue.value['numeric-id'] = 1; }, s => { s['qualifiers-order'] = ['P580']; },
     s => { s.id = 'wrong'; }, s => { s.type = 'claim'; }]) await check('ineligible statement ' + cases.length, e => mutate(e.claims.P136[0]));
   for (const marker of ['Q20828898', 'q20828898', '//api.themoviedb.org./film', 'https://TMDB.ORG/a',
-    'https%3A%2F%2Fapi.themoviedb.org%2Ffilm', { 'numeric-id': '20828898' }, { 'numeric-id': [['20828898']] }, { P4947: [] }]) await check('TMDB marker ' + cases.length, e => {
+    'https%3A%2F%2Fapi.themoviedb.org%2Ffilm', 'https://tmdb.org../film',
+    { 'numeric-id': '20828898' }, { 'numeric-id': [['20828898']] }, { P4947: [] }]) await check('TMDB marker ' + cases.length, e => {
     e.claims.P136[0].references = [{ hash: 'a'.repeat(40), snaks: { P854: [{ property: 'P854', snaktype: 'value', datavalue: { type: 'string', value: marker } }] } }];
+  });
+  // Native SQL deliberately has a narrower URL envelope than the standalone
+  // WHATWG extractor. Unsupported authority/repair encodings make the whole
+  // native source unavailable, never a mismatched vector or a worker exception.
+  for (const marker of ['https://ｔｍｄｂ.org/film', 'https://tmdb。org/film', 'https://tm\tdb.org/film',
+    'https://t\u00admdb.org/film', 'https://xn--tmdb-.org/film', 'https://%2574mdb.org/film',
+    'https:\\\\tmdb.org/film', 'https:tmdb.org./film', ' https://example.org/film', '\u0001https://ｔｍｄｂ.org/film']) {
+    const source = wikidataFixture(context);
+    source.entities[context.entityId].claims.P136[0].references = [{ hash: 'a'.repeat(40), snaks: {
+      P854: [{ property: 'P854', snaktype: 'value', datavalue: { type: 'string', value: marker } }],
+    } }];
+    const raw = JSON.stringify(source);
+    assert.ok(extractWikidataFilmEvidence(new TextEncoder().encode(raw), context).evidence,
+      'Standalone extraction retains its accepted URL contract');
+    const [native] = await exec(`select coalesce(private.project_wikidata_film_v1(${literal(raw)},${literal(context.entityId)},
+      ${literal(context.identity.imdbId)},${literal(context.identity.tmdbMovieId)},${literal(context.retrievedAtMicros)},${literal(context.cutoffMicros)}),'null'::jsonb);`);
+    assert.equal(native, null, marker);cases.push('native unsupported reference URL ' + cases.length);
+  }
+  await check('Unicode reference prose remains eligible', e => {
+    e.claims.P136[0].references = [{ hash: 'a'.repeat(40), snaks: {
+      P1476: [{ property: 'P1476', snaktype: 'value', datavalue: { type: 'string', value: 'Elokuvan lähde — cinéma' } }],
+    } }];
   });
   for (const property of ['P31', 'P345', 'P4947']) await check('identity ' + property, e => { e.claims[property][0].mainsnak.snaktype = 'novalue'; });
   for (const mutate of [e => { e.redirect = null; }, e => { e.lastrevid = 1.5; }, e => { e.modified = '2026-02-30T12:00:00Z'; },
@@ -170,6 +193,18 @@ export async function verifyWikidataContentCapture(exec, withSession) {
       select private.capture_personal_rating_content_v2(${json(captured.preparation.input)}||jsonb_build_object('cutoffMicros',
         (extract(epoch from clock_timestamp())*1000000)::bigint::text),${json(featureUse)});rollback;`);
     const original = await one(`select to_jsonb(s) from private.item_sources s where provider_key='wikidata' and item_id=${literal(source.itemId)};`);
+    const unsupported = JSON.parse(source.sourceText);
+    unsupported.entities[source.context.entityId].claims.P136[0].references = [{ hash: 'a'.repeat(40), snaks: {
+      P854: [{ property: 'P854', snaktype: 'value', datavalue: { type: 'string', value: 'https://ｔｍｄｂ.org/film' } }],
+    } }];
+    const unsupportedText = JSON.stringify(unsupported);
+    await exec(`update private.item_sources set source_hash=${literal(sha(unsupportedText))},
+      source_payload=jsonb_set(source_payload,'{sourceText}',${json(unsupportedText)}) where id=${literal(original.id)};`);
+    const unavailableCapture = await captureWikidataContentNumericForecast(withSession, await request());
+    assert.equal(unavailableCapture.preparation.input.contentFeatures.objects.find(o => o.objectId === source.itemId).provenance, null);
+    assert.equal(unavailableCapture.forecast.prefix.support, 2, 'Unsupported URL keeps committed numeric labels');
+    await exec(`update private.item_sources set source_hash=${literal(original.source_hash)},source_payload=${json(original.source_payload)}
+      where id=${literal(original.id)};`);
     for (const mutation of ["source_hash='mismatch'", "source_url='https://fixture.invalid/wrong-revision'",
       "source_updated_at='2026-11-02T12:00:00Z'", "provider_item_id='Q999999999999'",
       "source_payload=jsonb_set(source_payload,'{retrievedAtMicros}','\"253402300799999999\"')",
@@ -212,6 +247,7 @@ export async function verifyWikidataContentCapture(exec, withSession) {
     assert.equal((await call(inspect(bookRequest.id))).status, 'WITHDRAWN');
     assert.equal(final.forecast.qualityAdmission, 'NONE');
     return { status: 'PASS', ownedTasteLabels: 2, domains: ['MOVIE', 'BOOK'], exactRetry: 'PASS', subtransactionWrites: 'INELIGIBLE_4_CASES',
+      unsupportedReferenceUrl: 'UNAVAILABLE_WITH_NUMERIC_LABELS_RETAINED',
       sourceCorrection: 'RETIRED', aliasChanges: 'RETIRED', permissionWithdrawal: 'RETIRED', qualityAdmission: 'NONE', servingActivation: 'NONE' };
   });
 }

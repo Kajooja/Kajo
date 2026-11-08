@@ -407,6 +407,15 @@ eligibility conditions; the latter leaves room for re-extracted diagnostics insi
 the offline contract's 256 KiB evidence limit. The complete retained preparation
 remains capped at 4 MiB. Over-budget sources stay unavailable; no silent truncation.
 
+Native reference URLs also require a literal ASCII authority after the existing
+single URI decode. Unicode/IDNA or punycode authorities, residual percent escapes,
+backslashes and URLs needing whitespace/special-scheme repair are unavailable as
+whole native sources. SQL does not approximate WHATWG URL normalization: a source
+outside this narrower envelope must not freeze a vector that the independent
+JavaScript extractor rejects. Plain Unicode reference prose remains eligible.
+The standalone extractor and its mapping digest retain their existing contract;
+numeric labels remain usable when a native content source is unavailable.
+
 Only the seven allowlisted claim properties enter the frozen projection. Original
 source SHA-256 and projection-text SHA-256 identify different byte sequences.
 JavaScript reuses the accepted extractor on the projection; it does not claim that

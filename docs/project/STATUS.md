@@ -57,6 +57,17 @@ row. The verifier now explicitly emits JSON null and its local transport test
 reproduces psql's distinction. This correction changes no extraction/eligibility
 rule. Final-source checks must include that correction.
 
+Continuation review reproduced SQL/JavaScript URL normalization disagreement on
+Unicode authorities, embedded tabs and multiple trailing dots. The uninstalled
+forward now rejects native sources needing unsupported URL normalization, while
+retaining the standalone extractor contract and numeric labels. The trailing-dot
+marker check removes exactly one dot. All 66 extraction cases, actual capture
+with an unavailable URL source, MOVIE/BOOK lifecycle and three-generation populated
+upgrade/rollback pass locally. The local full check was stopped at stalled Deno
+registry retrieval; it is incomplete. CI #874 covers the preceding source and
+cannot accept this correction. Review the linked PR's latest head and all six
+required gates before integration.
+
 **Single next action after #438 source acceptance:** prepare and rehearse the
 exact new forward on retained hosted state, then install and preservation-verify
 it through the existing guarded operational route. The new forward is not installed

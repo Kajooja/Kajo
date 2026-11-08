@@ -515,6 +515,12 @@ modified time cannot replace retrieval/native availability. The v2 permission
 manifest covers the full horizon, retains an explicit source-use review and
 excludes TMDB. Null permission retains the full-label mean fallback.
 
+The native reference-URL envelope is narrower than the standalone extractor:
+sources requiring Unicode/IDNA authority normalization or special URL repair
+remain unavailable before a vector is frozen. The adapter therefore receives an
+explicit unavailable source, not contradictory SQL/JavaScript features that abort
+the capture. Numeric labels remain eligible; DATA_ENRICHMENT owns the exact bounds.
+
 The new complete Item dependency references include unavailable feature rows.
 Source/alias insertion, payload correction, reassignment or deletion on those
 Items retires v4 inputs, forecasts and first-answer copies. Relevant Item identity
