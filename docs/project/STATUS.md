@@ -11,39 +11,120 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — Wikidata evidence extraction, then native capture
+## Current handoff — native Wikidata content capture
 
-**Current source packet:** [#436](https://github.com/Kajooja/Kajo/issues/436) /
-[PR #437](https://github.com/Kajooja/Kajo/pull/437),
-branch `feat/wikidata-content-evidence`, supplies the bounded offline Wikidata
-provider/evidence boundary in `@kajo/catalog-contracts/wikidata-film`. Finish its
-linked PR's final-source acceptance if still open; otherwise continue to the
-native capture successor below. This is the first slice of the existing provider
-integration, not another research lookup or a completed MOVIE fitting path.
+**Current source packet:** [#438](https://github.com/Kajooja/Kajo/issues/438) /
+[PR #439](https://github.com/Kajooja/Kajo/pull/439),
+branch `feat/wikidata-native-capture`. Finish the linked PR's final-source checks
+and integration if still open. This implements private prepare/finalize **v4**,
+preparation/input **v3**, feature snapshot/permission manifest **v2**. MOVIE uses
+explicit Wikidata assertions; BOOK retains the Open Library subject mapping.
+The numerical mean/ridge core and old v1/v2/v3 capture meanings remain unchanged.
 
-The extractor binds exact EntityData bytes, entity/revision/retrieval identity,
-the finite mapping and original bounded statements/references. It applies rank
-selection before semantic filters, quarantines known TMDB-origin genre references,
-rejects redirects/ambiguous JSON and checks both external aliases against the
-complete supplied catalogue snapshot. Synthetic tests cover direct features,
-unsupported gaps, identity collisions, time/hash binding and resource bounds.
-The caller's completeness and retrieval assertions are not native transaction
-evidence or permission. No source was downloaded or ingested by this packet.
+The append-only `20261108000938_wikidata_native_content_capture.sql` validates
+bounded original EntityData bytes before projecting claims. SQL and the existing
+JavaScript extractor independently derive the vectors. Original-byte and claims-
+projection hashes are distinct. Native capture verifies all three exact aliases,
+committed availability, permission through the answer horizon and catalogue
+relation fences. New complete Item dependency references also retire unavailable
+captures when sources/aliases change. Payload-only corrections, inserted ambiguous
+aliases and explicit review withdrawal cannot leave dependent frozen copies alive.
 
-Local verification: all 60 new synthetic cases pass, as do the unchanged 450
-catalogue script tests, workspace lint/typecheck and the new declaration file's
-strict TypeScript check. A full `npm run check` reached Deno dependency retrieval
-but did not finish because registry downloads repeatedly stalled; it is not a
-full-check pass. Required final-source CI remains the acceptance boundary.
+Local tests exercise the new MOVIE/BOOK path, source/version tampering, first
+answers, source retirement and retained evaluation inventory. A populated-forward
+rehearsal verifies all three old capture generations, exact retries, private
+ACL/RLS, unchanged predecessor rows/functions except the reviewed lifecycle
+extensions, and rollback. Required CI also runs these against native PostgreSQL
+with distinct-backend catalogue writer witnesses. Fixture success is source
+verification, not actual source ingestion, rights clearance or prediction quality.
 
-**Single next implementation after #436 source acceptance:** reuse this extraction
-contract in the new native content/capture generation, with SQL/JavaScript parity,
-permission horizons, relation fences, correction/withdrawal retirement and
-populated old-capture/exact-retry preservation. Native SQL and all v1/v2/v3
-capture workers remain unchanged in #436. Do not enable the observation worker
-or prepare DEVELOPMENT merely because the standalone extractor returns a candidate.
-Reviewed ingestion and actual permitted fitting support still precede a fresh
-MOVIE-then-BOOK declaration. No quality or serving admission is granted.
+Local `npm run check` passes lint/typecheck and the dependency/mobile/catalogue
+tests, then fails during Deno dependency retrieval with a refused registry
+connection. It is not a full-check pass. Independent focused database/engine
+checks are recorded in the linked PR; complete final-source CI remains required. First
+[CI #872](https://github.com/Kajooja/Kajo/actions/runs/42430155601) rejected the
+new test's Node-specific crypto type import. It is replaced by standard Web
+Crypto without adding a dependency. Review also added explicit commit-status
+checks for released SAVEPOINT source/alias writes in both domains; four real
+subtransaction regressions and old-generation rollback pass locally. Final-source
+CI must cover the corrected head; the earlier failed run remains history.
+
+[CI #873](https://github.com/Kajooja/Kajo/actions/runs/42430638386) passed validation,
+platform, clean installations and the populated forward gate, then the native CLI
+probe exposed SQL NULL omission in the new projection test's psql transport.
+The SQL extractor correctly returned unavailable; the assertion received no JSON
+row. The verifier now explicitly emits JSON null and its local transport test
+reproduces psql's distinction. This correction changes no extraction/eligibility
+rule. Final-source checks must include that correction.
+
+Continuation review reproduced SQL/JavaScript URL normalization disagreement on
+Unicode authorities, embedded tabs and multiple trailing dots. The uninstalled
+forward now rejects native sources needing unsupported URL normalization, while
+retaining the standalone extractor contract and numeric labels. The trailing-dot
+marker check removes exactly one dot. All 66 extraction cases, actual capture
+with an unavailable URL source, MOVIE/BOOK lifecycle and three-generation populated
+upgrade/rollback pass locally. The local full check was stopped at stalled Deno
+registry retrieval; it is incomplete. CI #874 covers the preceding source and
+cannot accept this correction. Review the linked PR's latest head and all six
+required gates before integration.
+
+Further review reproduced conflicting vectors from fractional JSON numbers that
+JavaScript rounds to integral Q-id/reference values. Native capture now rejects
+those original sources before freezing features. Ordinary finite fractions and
+exact integral decimals remain supported. Compound reference IDs that can throw
+during JavaScript string coercion are also declined before freezing. The 77 source
+cases and actual fallback capture cover URL, precision and coercion boundaries
+without changing the accepted offline contract.
+
+CI #874's first native attempt stopped at an unchanged owned-Taste lock conflict
+(`55P03`) before Wikidata probes; the competing lock was not identified. CI #875's
+first validation attempt hit PGlite WebAssembly memory failure in the older
+acquisition-preservation fixture (before this forward exists). Its isolated local
+reproduction and unchanged validation rerun passed all 2,640 tests and four exports.
+Both attempts remain evidence; neither accepts the subsequent numeric correction.
+Final-source CI must cover the linked PR's latest head and all six required gates.
+
+[CI #875](https://github.com/Kajooja/Kajo/actions/runs/42433194973) attempt 2 passes validation
+(including all 529 database tests), platform, clean installs and the populated
+forward gate. Its native Wikidata capture test receives the correct `22023`
+rejection but incorrectly expects server exception prose, which the isolated
+psql transport deliberately redacts. All three new capture rejection assertions
+now require exact SQLSTATE (`22023` or `55000`), matching both driver and redacted
+transport diagnostics. The complete capture/lifecycle verifier also runs locally
+through the redacted error shape as a regression. No SQL or eligibility rule
+changes in this correction. The new source still needs all six required CI gates;
+the failed attempt is retained and cannot be counted as native acceptance.
+
+[CI #878](https://github.com/Kajooja/Kajo/actions/runs/42435812023) passes validation
+(2,641 tests and four exports), platform, clean installations and populated
+forward upgrade. Its CLI job reaches reset 39 and final verification, then the
+30-minute job limit cancels active SQL work without an assertion failure. The
+bounded job budget is now 45 minutes; every probe and per-statement deadline is
+unchanged. Cleanup/report upload did not complete on that attempt, so it is not
+native acceptance. All six gates must pass on the final source including this
+workflow correction.
+
+**Single next action after #438 source acceptance:** prepare and rehearse the
+exact new forward on retained hosted state, then install and preservation-verify
+it through the existing guarded operational route. The new forward is not installed
+by this source packet. Review bounded original-source ingestion and inspect actual
+permitted MOVIE fitting support before a fresh private MOVIE-then-BOOK DEVELOPMENT
+declaration. Keep the observation worker inactive until that scope is supported.
+Preserve current answers and all previously accepted forwards; no reinstall/reset,
+old declaration refill, quality admission or serving activation.
+
+**Accepted offline predecessor:** [PR #437](https://github.com/Kajooja/Kajo/pull/437)
+merged as `aa95f7650f9321d1fc35b74932e7d9cf49df905a`. Source
+`fbb88de44181ea8f4c02b2c333d0436b08ad254b`, tested merge
+`6d82279a58b1aede16d480291bf165149f0fc335` and accepted main share tree
+`e1333df41bfdb2729435bf7de50d523594d93e69`. All six required
+[CI #870](https://github.com/Kajooja/Kajo/actions/runs/42424765702) gates passed:
+2,636 tests, four configured exports, lint/typecheck and no unmitigated audit
+findings. All five artifacts were independently verified. The performance gate
+retains its failed reference comparison and grants no optimization/quality
+admission. Optional APK was skipped. Earlier CI #869 remained unusually long in
+Test with no confirmed cause; do not recast that attempt as a successful check.
+The local full check stalled retrieving Deno dependencies and was not a full pass.
 
 **Accepted runtime source:** [PR #434](https://github.com/Kajooja/Kajo/pull/434) merged on
 November 7 as `350ce05001f2554971649a9be5872a560a4a4039`. Source
@@ -141,16 +222,12 @@ prediction-quality result. Do not repeat that completed lookup as the default
 next task. [DATA_ENRICHMENT](../architecture/DATA_ENRICHMENT.md#wikidata-provider-integration--next-source-packet)
 owns the reviewed extraction boundaries and remaining implementation checks.
 
-**Remaining provider integration:** #436 supplies the explicit offline evidence
-adapter and finite mapping. Next implement its new native source/capture version.
-Use an append-only migration for database changes; preserve old captures and
-exact retries. Require deterministic SQL/TypeScript feature parity, identity
-collision/redirect refusal, permission/available-at fences, correction/withdrawal
-retirement and concurrent-writer preservation tests before hosted ingestion.
-Then inspect actual permitted fitting support and prepare a fresh private
-MOVIE-then-BOOK DEVELOPMENT declaration. Current runtime MOVIE feature support
-remains insufficient. Keep the prepared observation worker inactive until the
-scope is supported. Operational identities, counts and evidence stay private.
+**Remaining provider acceptance:** #436 / #437 supplies the accepted offline
+contract; #438 supplies its versioned native successor above. Complete source
+acceptance, guarded installation and reviewed ingestion before actual fitting
+support inspection and a new DEVELOPMENT declaration. Current hosted MOVIE
+support remains insufficient. Keep operational identities, counts, source bytes
+and execution records private.
 
 The November 7 [provider-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
 keeps TMDB features unlisted: its full standard API terms restrict ML/AI use and

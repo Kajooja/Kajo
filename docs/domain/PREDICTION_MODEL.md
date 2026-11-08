@@ -444,7 +444,7 @@ the unclipped numerical relationship; clipping is reported separately.
 | Candidate has no nonzero feature in a training-varied dimension | Full-prefix mean; `NO_SUPPORTED_CONTENT_FEATURE` |
 | Supported fitted candidate | Bounded ridge point, raw point, clipping and support retained; zero coefficients and genuine ties remain valid |
 
-The native adapter freezes the complete training/candidate union using the six
+The original v1 feature adapter freezes the complete training/candidate union using the six
 existing `catalog-concepts-v1` concepts: fantasy, horror, mystery, romance,
 science-fiction and thriller. BOOK uses allowlisted Open Library subject
 assertions; MOVIE uses TMDB genre IDs. The original audit remains **1 or null**:
@@ -491,6 +491,48 @@ authority to delete/reassign sources without granting evaluation-data access.
 Old generation APIs reject cross-generation use. SQL checks frozen bindings,
 support, modes and numerical bounds; the trusted compiled TypeScript worker
 owns the ridge solve.
+
+The #438 opt-in **v4** prepare/finalize generation uses input/preparation **v3**
+and `owned-rating-source-v3`. Its `kajo-personal-content-features-v2` and
+`personal-content-feature-use-v2` permit explicit `wikidata-direct-film-genre`
+MOVIE evidence and the unchanged `provider-subject` BOOK mapping. They never
+reinterpret retained TMDB features as Wikidata. The combined mapping identity is
+`wikidata-open-library-concepts-v1`, SHA-256
+`34292c63cb0f2ee2e26df033fdf2bc0ea9628b552b4c62fe2eba82ec56a203fb`.
+The mean/ridge equations, response scale, native/owned-Taste label semantics and
+model version remain unchanged; this is a source generation, not a model promotion.
+
+Native SQL validates bounded unique-key original JSON, direct film/external-ID
+statements, rank-before-filter rules and reference exclusions. It freezes only a
+bounded claims projection. The adapter independently re-extracts that projection
+with the #436 contract and verifies vectors and projection SHA-256; the separately
+retained source hash identifies the original bytes checked by SQL. Both IMDb/TMDB
+identifiers and the Wikidata Q identity require exact committed catalogue aliases,
+with global uniqueness and no competing source or alias on that Item. Commit
+status excludes source/alias writes from the active transaction, including
+released SAVEPOINT children; equality with only the top-level XID is insufficient. Provider
+modified time cannot replace retrieval/native availability. The v2 permission
+manifest covers the full horizon, retains an explicit source-use review and
+excludes TMDB. Null permission retains the full-label mean fallback.
+
+The native reference-URL envelope is narrower than the standalone extractor:
+sources requiring Unicode/IDNA authority normalization or special URL repair
+remain unavailable before a vector is frozen. The adapter therefore receives an
+explicit unavailable source, not contradictory SQL/JavaScript features that abort
+the capture. Numeric labels remain eligible; DATA_ENRICHMENT owns the exact bounds.
+The same unavailable-source boundary covers fractional JSON numbers that round
+to integers in binary64, preventing inconsistent Q-id/reference eligibility.
+Unsupported compound reference IDs are also rejected before worker coercion;
+they cannot turn one bad content source into a failed numeric capture.
+
+The new complete Item dependency references include unavailable feature rows.
+Source/alias insertion, payload correction, reassignment or deletion on those
+Items retires v4 inputs, forecasts and first-answer copies. Relevant Item identity
+changes and review/source withdrawal have the same bounded lifecycle. Historical
+v1/v2/v3 payloads, calculation meanings and exact retries are preserved. New source
+fences retain existing NOWAIT/atomic rollback ordering. Source acceptance and
+native synthetic fixtures do not establish hosted source support or usefulness;
+DATA_ENRICHMENT owns ingestion/source-use gates and STATUS owns deployment.
 
 Each accepted label/correction/withdrawal change requires a newly resolved
 complete prefix and deterministic full refit. There is no persistent incremental
