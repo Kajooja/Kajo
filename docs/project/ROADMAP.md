@@ -47,17 +47,30 @@ are accepted and installed, preserving earlier captures and original source-byte
 contracts. Reviewed bounded original-source ingestion is complete through
 separately committed batches and independent final preservation verification.
 Read-only inspection now verifies actual permitted BOOK/MOVIE training support.
-Current Wikidata sources belong to already-rated training Items; not-yet-rated
-catalogue MOVIE source coverage remains absent. Next define the canonical eligible
-first-answer candidate scope and inspect complete feature coverage label-blind,
-then perform any necessary bounded reviewed acquisition/linkage independently of
-numeric ratings, model scores and outcomes. Before a fresh private MOVIE-then-BOOK
-DEVELOPMENT declaration, accept the disabled v5/source-v4 runner successor and
-consumed-attempt continuation, then use a fresh
-database clock to retain the declaration before its window. Do not replay
-installed forwards or restart the completed coverage lookup by default. Numeric
-labels and an available training fit do not establish target coverage or
-usefulness. TMDB feature fitting/validation remains
+The reviewed candidate expansion is now committed and independently verified,
+including every bounded batch and the complete final preservation proof. Prior
+accepted originals remain unchanged; missing, ambiguous and unsupported source
+outcomes are retained without replacement. The actual read-only feature
+diagnostic verified current candidate support and remaining unavailable outcomes
+across the complete MOVIE census under one cutoff and a new finite manifest.
+BOOK/MOVIE training fits remain available through the unchanged numerical core;
+numeric rating values do not filter candidate scope. This private diagnostic does not
+establish prediction quality or a future capture/answer horizon.
+
+The dormant private v5/source-v4 runner successor and complete consumed-attempt
+ledger are accepted after independent source review and exact-source Node 22 CI.
+Next implement and review the trusted retained-bundle import, durable
+acknowledgement and activation wrapper, preserving authenticated artifact
+identity, original chronology and expiry. Keep current and retired operational workflows
+disabled until that wrapper and the concrete operational scope pass. Reconcile
+every prior attempt and allocation, including empty, unavailable, failed, expired
+and withdrawn outcomes; never replace a target or refill a consumed attempt.
+Only then use a fresh authenticated database clock to retain a new MOVIE-then-BOOK
+DEVELOPMENT declaration before its window, with an explicit finite feature-use
+horizon and genuine first-answer route. Do not replay installed forwards,
+accepted source intake, completed coverage lookup or accepted runner source work.
+Numeric labels, source support and an available fit do not establish usefulness.
+TMDB feature fitting/validation remains
 excluded under the [November 7 source-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
 unless an applicable separate written agreement is reviewed. The underlying
 CI #861 portal failure remains unreproduced locally; diagnostics do not establish

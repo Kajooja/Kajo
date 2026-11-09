@@ -324,7 +324,7 @@ private. The accepted opt-in native generations below bind MOVIE features to
 explicit Wikidata assertions under a separately reviewed private-evaluation scope.
 Earlier TMDB-bound captures retain their original contracts; their data is not
 relabeled or cleared by this provider path. STATUS owns source linkage, current
-training support and remaining candidate/runner readiness; no production model
+training support, candidate expansion and remaining trusted runner activation; no production model
 admission follows.
 
 #### Wikidata provider integration
@@ -468,20 +468,39 @@ insertions, corrections and withdrawal retire dependent copies. Old capture
 meaning/retry preservation, populated rollback and native concurrent-writer
 proofs are required before source acceptance.
 
-STATUS records final source acceptance, guarded installation and the completed
-bounded original-source linkage with independent final preservation verification.
-Separate read-only inspection now verifies actual permitted BOOK/MOVIE training
-support. Source fixtures and available training fits do not establish eligible
-first-answer target feature coverage or prospective prediction usefulness.
-The current linked Wikidata sources cover already-rated training Items; STATUS
-owns the observed not-yet-rated candidate coverage gap, canonical eligible scope
-and bounded reviewed acquisition/linkage independent of numeric ratings, model
-scores and outcomes. The disabled runner successor/consumed-attempt continuation
-remains a later dependency. After those are verified, a fresh database clock,
-new pre-window DEVELOPMENT declaration,
-explicit finite source-use horizon and genuine first-answer route remain required.
-Completed installed forwards and source insertions must not be replayed; quality
-and serving admission stay separate.
+STATUS records final source acceptance, guarded installation, completed training
+and candidate-source linkage, and independent final preservation verification.
+The actual complete-census feature diagnostic establishes engineering support
+only, retaining unsupported and unavailable outcomes.
+Candidate expansion uses the complete canonical MOVIE census and a frozen bounded
+acquisition scope selected independently of numeric rating values, model scores
+and outcomes. Exact public external identifiers drive lookup; missing, ambiguous
+and unsupported identities stay unresolved. Previously accepted originals are
+reused without refetching or reinserting them.
+
+A fresh complete BOOK/MOVIE catalogue after retrieval supplies collision checks
+across the whole selected scope before bounded extraction partitions. Offline
+eligibility does not establish native eligibility: every original must also pass
+the installed projection contract. A native null without a demonstrated cause
+remains unavailable, with its original and exclusion retained. No rejected source
+is replaced to improve coverage. Intake preserves original bytes and retrieval
+times, uses actual batch insertion clocks for native availability, and requires
+independent committed readback for every batch and the complete final state.
+Unexpected source/alias retirement effects or unrelated-row changes stop intake.
+
+The subsequent private read-only diagnostic binds that complete intake proof to
+a new explicit finite feature-use manifest. One cutoff covers the complete MOVIE
+census, native feature availability and BOOK/MOVIE training support. All ineligible
+and unavailable outcomes remain visible; numeric rating values do not filter potential
+first-answer eligibility. Available vectors must match retained original and
+projection hashes, identities and clocks. Source fixtures, linked originals and
+available fits do not establish prospective prediction usefulness or authorize
+a future capture/answer horizon. STATUS owns actual operation and diagnostic
+completion. The dormant runner's private source acceptance is complete; trusted
+retained-bundle import, acknowledgement and activation remain separate. A fresh pre-window DEVELOPMENT declaration, explicit finite
+source-use horizon and genuine first-answer route are still required. Completed
+installed forwards and source insertions must not be replayed; quality and serving
+admission stay separate.
 
 ## 5. Isolated research storage and execution
 
