@@ -1,8 +1,8 @@
 # Kajo Current Status
 
-Last updated: **2026-11-08**
+Last updated: **2026-11-09**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; native Wikidata capture #438 / #439 and statement-ID successor #442 / #443 accepted and installed; reviewed MOVIE ingestion and actual BOOK/MOVIE training support verified; not-yet-rated candidate feature coverage is the next blocker before private runner readiness and fresh DEVELOPMENT. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; native Wikidata capture #438 / #439 and statement-ID successor #442 / #443 accepted and installed; reviewed MOVIE ingestion and actual BOOK/MOVIE training support verified; candidate-source expansion and complete private feature diagnostic verified; dormant runner successor accepted after exact-source Node 22 CI; trusted retained-bundle import, acknowledgement and activation wrapper is the next dependency before fresh DEVELOPMENT. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,7 +11,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — eligible first-answer candidate feature coverage
+## Current handoff — trusted private runner activation wrapper
 
 **Native source accepted and installed:** [#438](https://github.com/Kajooja/Kajo/issues/438)
 / [PR #439](https://github.com/Kajooja/Kajo/pull/439) is merged. The source, tested
@@ -114,28 +114,48 @@ activated no worker. It is engineering support evidence, not a prospective
 prediction-quality result or a new declaration. Its diagnostic permission interval
 does not supply a future capture/answer horizon.
 
-**Single next action:** define the canonical eligible first-answer candidate scope,
-inspect its complete source coverage label-blind, and prepare any necessary bounded
-reviewed feature acquisition/linkage before a new comparison. The retained complete
-catalogue census, final preservation checks and rating-presence-only comparison
-show that current Wikidata sources belong to already-rated training Items;
-not-yet-rated catalogue MOVIEs have no Wikidata source support. No rating values or
-model scores were used to establish this gap. An available training fit therefore
-does not establish useful target coverage.
+**Candidate-source expansion completed — November 9:** the canonical native
+first-answer census and bounded acquisition scope were frozen independently of
+numeric rating values, model scores and outcomes. Exact-identity acquisition,
+original-byte review and accepted offline/native source checks preceded intake.
+Every separately committed bounded batch and the complete final state passed
+independent preservation verification. Original bytes and retrieval times remain
+exact; native availability uses actual insertion clocks. Previously accepted
+sources were reused without reinsertion or refetching. Existing answers,
+forecasts and unrelated retained rows remain unchanged. Missing, ambiguous,
+unsupported and native-unavailable acquisition outcomes remain in the complete
+scope; no replacement or unsupported causal explanation was introduced.
 
-Preselect the bounded acquisition scope independently of numeric rating values,
-model scores and outcomes. Verify exact identities, permitted features and committed
-availability for eligible targets before a useful comparison. Preserve the complete
-candidate/attempt census, including unavailable outcomes.
-An unavailable, already-rated or unexperienced first target consumes its attempt
-and must never be replaced.
+**Complete private feature diagnostic verified — November 9:** the actual
+read-only inspection retained every MOVIE Item, including ineligible and
+unavailable outcomes, and checked native features against the verified originals
+at one cutoff. Some potential first-answer candidates now have verified source
+support; remaining unsupported catalogue Items stay unavailable. Numeric rating values did
+not filter potential eligibility. BOOK/MOVIE training fits remain available through
+the unchanged numerical core. The new explicit finite manifest covered this
+diagnostic only. It created no targets, declarations, allocations or forecasts
+and activated no worker. Current support is engineering evidence, not prospective
+prediction quality, future delivery eligibility or a capture/answer horizon.
+Operational counts, identities, vectors and detailed results remain private.
 
-The disabled private runner also needs a reviewed v5/source-v4 successor and
-consumed-attempt continuation. Reconcile all prior attempts and allocations,
-including empty, unsupported, unexperienced, failed, expired and withdrawn
-outcomes; advance within the MOVIE-then-BOOK caps without replacement or refill.
-Rerunning initial capture is not continuation. Keep current and retired workflows
-disabled through source review and exact accepted-source validation.
+**Dormant private runner successor accepted — November 9:** the v5/source-v4
+successor and complete consumed-attempt ledger passed independent source review
+and exact-source Node 22 CI, then merged in the private repository. Source
+implementation and acceptance are complete; do not repeat them. Current and
+retired operational workflows stay disabled and operational bindings remain unset. Source
+acceptance does not establish authenticated artifact identity, actual retention
+or operational activation.
+
+**Single next action:** implement and independently review the trusted retained-
+bundle import, durable acknowledgement and activation wrapper. Bind the actual
+retained bytes and authenticated run/artifact identity, original chronology and
+expiry; callback interfaces or supplied hashes alone are insufficient. Reconcile
+all consumed attempts and allocations, including empty, unsupported,
+unexperienced, failed, expired and withdrawn outcomes. Advance within the
+MOVIE-then-BOOK caps without replacement or refill; an unavailable, already-rated
+or unexperienced first target still consumes its attempt. Rerunning initial
+capture is not continuation. Uncertain commits or unacknowledged retention require
+separate recovery review and must not trigger automatic retry or a new expiry.
 
 Only after those dependencies pass, obtain a fresh authenticated database clock
 and retain a new pre-window MOVIE-then-BOOK DEVELOPMENT declaration with its
@@ -277,12 +297,13 @@ owns the reviewed extraction boundaries and remaining implementation checks.
 contract; #438 / #439 and #442 / #443 supply the installed native generations.
 Reviewed original-source ingestion, independent final preservation verification
 and actual permitted BOOK/MOVIE training-support inspection are complete. The
-remaining not-yet-rated MOVIE source-coverage gap requires a canonical eligible
-candidate scope and bounded reviewed acquisition/linkage. Then the disabled
-v5/source-v4 runner successor with consumed-attempt continuation precedes a fresh
-DEVELOPMENT declaration. An available training fit is neither target-coverage nor
-prediction-quality evidence. Keep operational identities, counts, source bytes and
-execution records private.
+candidate-source expansion, complete final preservation proof and full-census
+feature diagnostic are also verified. The dormant v5/source-v4 runner successor
+is accepted after exact-source Node 22 CI. Its trusted retained-bundle import,
+acknowledgement and activation wrapper is the current handoff above before a
+fresh DEVELOPMENT declaration. An available training fit is neither
+target-coverage nor prediction-quality evidence. Keep
+operational identities, counts, source bytes and execution records private.
 
 The November 7 [provider-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
 keeps TMDB features unlisted: its full standard API terms restrict ML/AI use and
@@ -290,10 +311,10 @@ explicitly cover training or validation. No applicable separate agreement was
 reviewed. Mean fallback is not clearance for other provider-content use in the
 wider pipeline; keep that scope review separate from numerical support.
 
-After candidate coverage and private runner continuation are verified, retain a
-new pre-window declaration with explicit owned-Taste source version, reviewed
-feature-use horizon and genuine
-first-answer opportunities. Source linkage and an available fit are engineering
+After the trusted wrapper and concrete private runner scope are verified, retain
+a new pre-window declaration with explicit owned-Taste source version, reviewed
+feature-use horizon and genuine first-answer opportunities. Source linkage and
+an available fit are engineering
 readiness, not an observed numerical comparison or quality admission.
 
 The retired #427 window stays retired. No account reset, observed capture,
@@ -403,16 +424,19 @@ rating writer is not the private numeric first-answer route: its accepted use ca
 retire a pending evaluation target. Do not tell an owner to rate through that
 route while claiming to measure the private frozen forecast.
 
-The disabled private runner requires a reviewed successor before using the new
-Wikidata generation. Use `captureWikidataContentNumericForecastV2` in
+The dormant private v5/source-v4 runner successor is accepted after independent
+source review and exact-source Node 22 CI. Implement and review the trusted
+retained-bundle import, acknowledgement and activation wrapper before use.
+Do not repeat source implementation or enable a workflow from source acceptance.
+Use `captureWikidataContentNumericForecastV2` in
 `scripts/database/wikidata-content-capture.mjs` for one held BEGIN → prepare v5
 → TypeScript → finalize v5 → COMMIT transaction. Bind the explicit input,
 preparation, feature and source versions in the new declaration. Reconcile
 consumed attempts and allocations before advancing the MOVIE-then-BOOK sequence;
 rerunning the first-opportunity runner is not continuation. Earlier captures
-retain their original workers/contracts for exact retries. Keep private workflows
-disabled until the successor and concrete activation scope are accepted. Only
-after capture commits may the owner's actual integer rating be submitted through
+retain their original workers/contracts for exact retries. Keep private operational workflows
+disabled until the trusted wrapper and concrete activation scope are accepted.
+Only after capture commits may the owner's actual integer rating be submitted through
 `private.commit_personal_rating_answer_v1`.
 Use `inspectPersonalRatingOwnerCensus` for every declared owner and the existing
 declaration/report CLI. A missing feature-use permission uses the documented

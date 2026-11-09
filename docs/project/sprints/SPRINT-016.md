@@ -1,9 +1,51 @@
 # Sprint 016 — Expected ratings and each user's rating style
 
-Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 / #424 and catalogue/admission audit #425 / #426 accepted; Taste recovery #428 / #429 installed and resumed completion observed; preservation diagnostics #430 / #431 accepted after six CI gates; owned-Taste numeric source #432 / #433 accepted after all six CI #859 gates and installed November 7; #434 query/rollback diagnostics accepted after all six CI #862 gates; native preflight #427 reconciled; #443 accepted and installed; reviewed MOVIE ingestion and actual BOOK/MOVIE training support verified; not-yet-rated candidate feature coverage is the next blocker before private runner readiness and fresh DEVELOPMENT; quality and serving admission remain open**
+Status: **IN PROGRESS — baseline #398, prospective capture #400, declared evaluation #402 and content-preference challenger #405 accepted; guarded forward source #407 accepted; explicit operator connection #409 accepted; session-pooler/private-runner #411 accepted; bounded private-probe diagnostics #413 accepted through #414; isolated BOOK/MOVIE research integration #417 accepted through #418; disjoint book comparison #419 accepted through #420; regularized response comparison #421 accepted through #423; scalable individual-rating training #422 / #424 and catalogue/admission audit #425 / #426 accepted; Taste recovery #428 / #429 installed and resumed completion observed; preservation diagnostics #430 / #431 accepted after six CI gates; owned-Taste numeric source #432 / #433 accepted after all six CI #859 gates and installed November 7; #434 query/rollback diagnostics accepted after all six CI #862 gates; native preflight #427 reconciled; #443 accepted and installed; reviewed MOVIE ingestion and actual BOOK/MOVIE training support verified; candidate source expansion and complete feature diagnostic verified; dormant runner successor accepted after exact-source Node 22 CI; trusted retained-bundle import, acknowledgement and activation wrapper remains before fresh DEVELOPMENT; quality and serving admission remain open**
 Milestone: **Engine V1 — first useful expected-rating engine**
 Dependency: [Sprint 015](SPRINT-015.md) frozen inputs/evaluation; canonical
 [PREDICTION_MODEL](../../domain/PREDICTION_MODEL.md) owns the objective.
+
+## Candidate source expansion and dormant runner acceptance
+
+Reviewed candidate acquisition and intake are complete. Every bounded committed
+batch and the separate final state passed independent preservation verification.
+The complete native MOVIE census and independently selected acquisition scope
+remain retained, including missing, ambiguous, extractor-rejected and native-
+unusable outcomes. Previously accepted originals were not re-fetched or
+reinserted. Original bytes and retrieval clocks are exact; native availability
+uses actual insertion clocks. Existing answers, forecasts and unrelated retained
+rows remain unchanged. Numeric rating values, model scores and outcomes did not select
+the acquisition scope or replacement targets; unknown rejection causes remain
+unresolved.
+
+The actual read-only feature diagnostic passed under a new finite manifest,
+retaining every MOVIE Item and unavailable/ineligible outcome at one cutoff.
+Source identity, hashes, clocks and native vectors match the verified originals.
+It verifies current candidate support while retaining unsupported catalogue
+Items. BOOK/MOVIE training fits remain available through the unchanged numerical
+core. No targets, declarations, allocations or forecasts were created. These
+private engineering results do not certify prediction quality, future delivery
+eligibility or a capture/answer permission interval. Operational counts,
+identities, vectors and detailed results remain private.
+
+The dormant private v5/source-v4 runner successor and complete attempt ledger
+passed independent source review and exact-source Node 22 CI and merged in the
+private repository. Source implementation and acceptance are complete. The
+trusted retained-bundle import, durable acknowledgement and activation wrapper
+still needs implementation and review: supplied hashes and callback interfaces
+alone cannot establish authenticated artifact identity, original chronology,
+acknowledgement or expiry. Current and retired operational workflows remain disabled, with
+operational bindings unset; source acceptance did not activate a worker.
+
+Finish that wrapper and reconcile every prior attempt and allocation before a
+fresh pre-window MOVIE-then-BOOK DEVELOPMENT declaration. Empty, unsupported,
+unexperienced, failed, expired and withdrawn outcomes consume their declared
+attempts without replacement or refill. Uncertain commits and missing retention
+acknowledgements block continuation. Reuse the original contracts and expiry on
+continuation; restarting initial capture is not continuation. A new declaration
+requires a fresh authenticated database clock, its own explicit finite permission
+horizon and the genuine first-answer route. STATUS owns the exact next action;
+quality and serving admission remain open.
 
 ## Native Wikidata content capture — #438
 
@@ -36,8 +78,9 @@ The original-source review identified legacy statement GUID entity-prefix case;
 preserving earlier generations and original bytes. Qualified identity statements
 and unsupported film types remain unavailable. Reviewed bounded ingestion and
 independent final preservation verification are complete. Actual BOOK/MOVIE
-training support is verified. Not-yet-rated candidate feature coverage and private
-runner readiness remain dependencies before fresh DEVELOPMENT.
+training support was verified in the earlier training-only inspection. The
+candidate expansion and dormant runner section above records the subsequent
+verified intake/diagnostic and accepted source, with trusted activation still open.
 No worker activation, account reset, external-rating import or serving admission
 occurs.
 
@@ -61,12 +104,11 @@ clocks. Existing answers, forecasts and retained state remain unchanged.
 Separate read-only inspection under an explicit finite feature-use manifest now
 verifies available BOOK/MOVIE content fits with varied mapped features through the
 unchanged numerical core. It creates no targets, allocations or forecasts.
-Current Wikidata sources cover already-rated training Items; the not-yet-rated
-catalogue MOVIE source-coverage gap remains. Define the canonical eligible
-first-answer candidate scope, inspect complete coverage label-blind and perform
-any needed bounded reviewed acquisition/linkage independently of numeric ratings,
-model scores and outcomes. Then accept the disabled v5/source-v4 runner successor
-with consumed-attempt continuation. These dependencies precede a fresh pre-window
+That training-only inspection exposed the not-yet-rated candidate coverage gap.
+The reviewed candidate expansion and complete diagnostic above now verify current
+source support and retain remaining unavailable outcomes. The dormant runner
+successor is accepted; its trusted import/acknowledgement/activation wrapper must
+still pass before a fresh pre-window
 MOVIE-then-BOOK DEVELOPMENT declaration and genuine first-answer observation.
 STATUS owns exact receipts; Sprint 016 quality and serving admission remain open.
 
@@ -84,8 +126,9 @@ The optional catalogue-contract export and deterministic synthetic tests are
 source work only. STATUS/the linked PR own final CI acceptance. The native
 successors #438 / #439 and #442 / #443 above are accepted and installed.
 Reviewed linkage and independent final preservation verification are complete;
-actual BOOK/MOVIE training support is verified. Not-yet-rated candidate coverage
-and the disabled runner successor/continuation still precede genuine DEVELOPMENT.
+the earlier BOOK/MOVIE training support inspection is verified. The candidate
+expansion, complete diagnostic and dormant runner acceptance above are complete;
+the trusted activation wrapper still precedes genuine DEVELOPMENT.
 This does not complete Sprint 016 or any quality/serving gate.
 
 ## Owned Taste numeric source — #432
@@ -113,9 +156,9 @@ Separate read-only inspection confirms permitted BOOK support and an available
 content fit; the repair must not be replayed. The accepted and installed Wikidata
 successors above establish the source path; reviewed MOVIE ingestion and final
 preservation verification are complete. Current read-only inspection verifies
-BOOK/MOVIE training support. Not-yet-rated candidate feature coverage and the
-disabled v5/source-v4 runner successor/consumed-attempt
-continuation are subsequent dependencies before a fresh private
+BOOK/MOVIE training support. The subsequent candidate expansion and complete
+feature diagnostic are verified, and the dormant v5/source-v4 runner source is
+accepted. The trusted activation wrapper above remains required before a fresh private
 MOVIE-then-BOOK DEVELOPMENT declaration. Keep the prepared worker inactive and TMDB
 features unlisted under the [November 7 source-use review](../../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07).
 An eligible numeric prefix, source linkage or fitted coefficients do not establish
@@ -529,10 +572,10 @@ broader adaptive state, transfer and Shared work retain their later sprint scope
   gates, 2,477 tests and four configured exports. Native probe/session checks pass,
   all 43 subchecks and the 56-entry manifest remain intact. Private operational
   execution and observed prediction usefulness remain separate evidence.
-- Current handoff: canonical eligible first-answer candidate scope and bounded
-  reviewed feature acquisition for the observed coverage gap, then the disabled
-  v5/source-v4 runner successor/continuation
-  described above. Reuse the existing connection, dedicated first-answer,
+- Current handoff: implement and independently review trusted retained-bundle
+  import, durable acknowledgement and the private runner activation wrapper.
+  Candidate intake, complete feature diagnostic and dormant runner source
+  acceptance are complete. Reuse the existing connection, dedicated first-answer,
   complete census and report APIs. #415 retains the historical source-acceptance
   and private/public-boundary receipt; it is not the active preparation packet.
 - Quality / runtime admission: open.
