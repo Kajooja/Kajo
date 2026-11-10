@@ -2,7 +2,7 @@
 
 Last updated: **2026-11-10**
 Milestone: **MVP 0.1 — first public Kajo**
-Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; native Wikidata capture #438 / #439 and statement-ID successor #442 / #443 accepted and installed; reviewed MOVIE ingestion and actual BOOK/MOVIE training support verified; candidate-source expansion and complete private feature diagnostic verified; dormant runner successor accepted after exact-source Node 22 CI; private retained producer and its isolated hosted connection probe are complete; installed function-lineage reconciliation is the next dependency before fresh DEVELOPMENT. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
+Sprint: **016 — expected ratings and each user's rating style**, owned Taste numeric source #432 / #433 accepted and installed; #434 query/rollback diagnostics accepted; native Wikidata capture #438 / #439 and statement-ID successor #442 / #443 accepted and installed; reviewed MOVIE ingestion and actual BOOK/MOVIE training support verified; candidate-source expansion and complete private feature diagnostic verified; dormant runner successor accepted after exact-source Node 22 CI; private retained producer and its isolated hosted connection probe are complete; the reviewed hosted lineage contract and exact read-only schema match are verified; fresh finite support and genuine first-answer prerequisites are next before DEVELOPMENT. Taste recovery #428 accepted; preservation diagnostics #430 / #431 accepted; native-only preflight #427 reconciled; catalogue/admission audit #425 / #426 accepted after scalable individual-rating training #422 / #424. Baseline #398, durable capture #400, declared evaluation #402, content challenger #405 and operator connection #409 / #411 remain accepted. Sprint **015** retains its open runtime/quality acceptance; optional skip-prefilter diagnosis #394 remains deferred.
 Sprint **014** retains its open inherited acceptance gates.
 Last accepted sprint: **013**.
 
@@ -11,7 +11,7 @@ This file owns the one current handoff. [ROADMAP](ROADMAP.md) owns execution ord
 owns the Taste → auth → Friend → Shared flow. An open source PR, passing CI,
 hosted deployment and device/quality acceptance are separate states.
 
-## Current handoff — installed function-lineage reconciliation
+## Current handoff — fresh support and first-answer preparation
 
 **Native source accepted and installed:** [#438](https://github.com/Kajooja/Kajo/issues/438)
 / [PR #439](https://github.com/Kajooja/Kajo/pull/439) is merged. The source, tested
@@ -148,33 +148,37 @@ reviews or rehearsals. Operational collection remains disabled; connectivity
 does not establish installed-source parity, current evidence support, prediction
 quality or serving admission.
 
-**Installed-source comparison blocked — November 10:** a read-only comparison
-against the accepted source found matching application table and trigger
-snapshots, but the fresh-install function reference does not represent the
-accepted hosted lineage. One difference is reproduced exactly by omitting the
-optional skip-prefilter that remains uninstalled under the existing admission
-decision. Remaining legacy definition variants and the documented hosted-only
-platform helper require explicit reconciliation. Preserve exact fingerprints;
-do not call these differences harmless solely from their names, copy observed
-hashes into an allowlist, enable the optional optimization or reinstall existing
-forwards to force parity. Detailed counts, identities and observations stay private.
+**Installed-source reconciliation completed — November 10:** the owner-authorized
+full definition review resolved the historical formatting/comment and scoped
+alias variants. The operational reference follows the already accepted omitted
+optional skip-prefilter, binds the complete source snapshot and each reviewed
+source definition, and preserves source owners/direct ACLs, relations and
+application triggers. The existing hosted-only platform helper has an explicit
+exact preserved boundary. A fresh read-only metadata comparison matches this
+complete reviewed contract. Unexpected definitions, permissions and objects still
+stop before invoking application helpers; there is no runtime SQL normalization
+or reference supplied by a target/dispatch. This is reviewed hosted representation
+admission, not bytewise canonical parity or a new whole-platform audit. Detailed
+counts, identities, definitions and observations stay private.
 
-**Single next action:** reconcile the actual installed function lineage with the
-accepted source, including the already-reviewed historical variants and explicit
-platform boundary. Prepare a source-bound comparison with regression coverage
-that continues to reject unexpected definitions, owner/ACL drift and new objects.
-A successful connection or accepted migration receipt is insufficient. The
-private handoff retains the exact unresolved review scope; fresh feature support
-and capture remain blocked until this comparison is accepted.
+**Single next action:** prepare the fresh finite feature-use and complete
+label-blind MOVIE/BOOK support packet together with the genuine first-answer
+route. Obtain any still-missing concrete owner permission before dependent
+operational reads or collection. The private handoff retains exact source/CI
+receipts and the remaining inputs; do not reopen completed source review,
+connection probes or rehearsals.
 
-After that dependency, perform the complete label-blind MOVIE/BOOK support check
-under a fresh explicit finite feature-use horizon and prepare the genuine
-first-answer route. Only then obtain an authenticated database clock and retain
-one new pre-window MOVIE-then-BOOK DEVELOPMENT declaration. Preserve every
-consumed attempt, actual retention chronology, immutable expiry and current
-answers. No replacement/refill, automatic retry after an uncertain commit,
-account reset, old-window reuse, historical forecast backfill, quality admission
-or serving activation.
+After those prerequisites, obtain an authenticated database clock and retain one
+new pre-window MOVIE-then-BOOK DEVELOPMENT declaration. Preserve every consumed
+attempt, actual retention chronology, immutable expiry and current answers.
+No replacement/refill, automatic retry after an uncertain commit, account reset,
+old-window reuse, historical forecast backfill, quality admission or serving
+activation. Both operational collection workflows remain disabled.
+
+[CI reliability follow-up #450](https://github.com/Kajooja/Kajo/issues/450) retains
+the unbounded database-test stall, its incomplete run and the diagnostic scope.
+An unchanged retry does not identify its cause; all required successful checks
+remain mandatory before merging a candidate.
 
 ### Retained native implementation attempts
 
@@ -313,8 +317,9 @@ and actual permitted BOOK/MOVIE training-support inspection are complete. The
 candidate-source expansion, complete final preservation proof and full-census
 feature diagnostic are also verified. The dormant v5/source-v4 runner successor
 is accepted after exact-source Node 22 CI. Its trusted retained-bundle import,
-acknowledgement and activation wrapper is the current handoff above before a
-fresh DEVELOPMENT declaration. An available training fit is neither
+acknowledgement wrapper and installed-source contract are verified. The current
+handoff above prepares fresh support and first-answer prerequisites before a
+new DEVELOPMENT declaration. An available training fit is neither
 target-coverage nor prediction-quality evidence. Keep
 operational identities, counts, source bytes and execution records private.
 
@@ -324,8 +329,8 @@ explicitly cover training or validation. No applicable separate agreement was
 reviewed. Mean fallback is not clearance for other provider-content use in the
 wider pipeline; keep that scope review separate from numerical support.
 
-After the trusted wrapper and concrete private runner scope are verified, retain
-a new pre-window declaration with explicit owned-Taste source version, reviewed
+After the current finite feature-use, complete support and genuine first-answer
+prerequisites are verified, retain a new pre-window declaration with explicit owned-Taste source version, reviewed
 feature-use horizon and genuine first-answer opportunities. Source linkage and
 an available fit are engineering
 readiness, not an observed numerical comparison or quality admission.
