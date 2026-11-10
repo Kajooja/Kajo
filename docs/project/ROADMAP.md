@@ -62,17 +62,22 @@ complete attempt reconciliation and capture worker are accepted. Independent
 producer review, actual transport/native rehearsals and the isolated hosted
 connection probe are complete. Keep both operational collection workflows disabled.
 
-The next dependency is installed function-lineage reconciliation: the current
-fresh-install reference includes the optional skip-prefilter that remains
-uninstalled, and the accepted hosted legacy/platform boundary needs an explicit
-source-bound comparison. Resolve it without changing optimization admission or
-silently accepting definition drift. Then verify complete current MOVIE/BOOK
-support under fresh finite permission, prepare the genuine first-answer route
-and retain one new pre-window DEVELOPMENT declaration from the authenticated
+The installed function-lineage review and source-bound hosted contract are now
+verified, including the existing omitted optional skip-prefilter and an explicit
+preserved platform boundary. Exact fingerprints and unexpected-change rejection
+remain in force; this is neither runtime normalization nor new optimization
+admission. The fresh metadata-only comparison matches the reviewed contract.
+
+Next prepare the concrete fresh finite feature-use and complete current
+label-blind MOVIE/BOOK support packet with the genuine first-answer route.
+Obtain missing owner permission before dependent operational reads/collection.
+Then retain one new pre-window DEVELOPMENT declaration from the authenticated
 database clock. Preserve all consumed attempts, original chronology and expiry;
 never replace/refill a target or retry an uncertain commit automatically.
 STATUS and #448 own this corrected continuation; do not repeat completed source,
-ingestion, reviews or runtime rehearsals.
+ingestion, reviews or runtime rehearsals. CI reliability issue #450 retains the
+unbounded database-test stall without waiving any required merge gate.
+
 Numeric labels, source support and an available fit do not establish usefulness.
 TMDB feature fitting/validation remains
 excluded under the [November 7 source-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
