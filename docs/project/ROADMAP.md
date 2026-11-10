@@ -57,18 +57,22 @@ BOOK/MOVIE training fits remain available through the unchanged numerical core;
 numeric rating values do not filter candidate scope. This private diagnostic does not
 establish prediction quality or a future capture/answer horizon.
 
-The dormant private v5/source-v4 runner successor and complete consumed-attempt
-ledger are accepted after independent source review and exact-source Node 22 CI.
-Next implement and review the trusted retained-bundle import, durable
-acknowledgement and activation wrapper, preserving authenticated artifact
-identity, original chronology and expiry. Keep current and retired operational workflows
-disabled until that wrapper and the concrete operational scope pass. Reconcile
-every prior attempt and allocation, including empty, unavailable, failed, expired
-and withdrawn outcomes; never replace a target or refill a consumed attempt.
-Only then use a fresh authenticated database clock to retain a new MOVIE-then-BOOK
-DEVELOPMENT declaration before its window, with an explicit finite feature-use
-horizon and genuine first-answer route. Do not replay installed forwards,
-accepted source intake, completed coverage lookup or accepted runner source work.
+The private v5/source-v4 runner, retained import, immutable acknowledgement,
+complete attempt reconciliation and capture worker are accepted. Independent
+producer review, actual transport/native rehearsals and the isolated hosted
+connection probe are complete. Keep both operational collection workflows disabled.
+
+The next dependency is installed function-lineage reconciliation: the current
+fresh-install reference includes the optional skip-prefilter that remains
+uninstalled, and the accepted hosted legacy/platform boundary needs an explicit
+source-bound comparison. Resolve it without changing optimization admission or
+silently accepting definition drift. Then verify complete current MOVIE/BOOK
+support under fresh finite permission, prepare the genuine first-answer route
+and retain one new pre-window DEVELOPMENT declaration from the authenticated
+database clock. Preserve all consumed attempts, original chronology and expiry;
+never replace/refill a target or retry an uncertain commit automatically.
+STATUS and #448 own this corrected continuation; do not repeat completed source,
+ingestion, reviews or runtime rehearsals.
 Numeric labels, source support and an available fit do not establish usefulness.
 TMDB feature fitting/validation remains
 excluded under the [November 7 source-use review](../architecture/DATA_ENRICHMENT.md#tmdb-content-use-restriction--reviewed-2026-11-07)
